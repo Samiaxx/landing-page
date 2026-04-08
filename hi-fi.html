@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="hi-fi.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="bg-grid" aria-hidden="true"></div>
@@ -21,15 +21,15 @@
       </div>
     </div>
     <nav class="nav">
-      <a>Home</a>
-      <a>Shop</a>
-      <a>COA</a>
-      <a>FAQ</a>
-      <a>Contact</a>
+      <a href="/en/">Home</a>
+      <a href="/en/shop">Shop</a>
+      <a href="/en/coa">COA</a>
+      <a href="/en/faq">FAQ</a>
+      <a href="/en/contact">Contact</a>
     </nav>
     <div class="header-actions">
-      <button class="lang">EN</button>
-      <button class="lang ghost">ES</button>
+      <a class="lang active" href="/en/">EN</a>
+      <a class="lang ghost" href="/es/">ES</a>
       <button class="cart">
         <span>Cart</span>
         <span class="badge">2</span>
@@ -50,14 +50,28 @@
           <button class="slider-btn next" aria-label="Next slide">›</button>
           <div class="hero-content-block">
             <div class="hero-kicker">Primus Peptides</div>
-            <h1>Advancing Human Potential</h1>
-            <p>Research‑grade supply with clear context, COA verification, and strict quality standards.</p>
+            <h1>Research‑grade peptides, trusted by athletes.</h1>
+            <p>COA-backed, HPLC tested, ships in 24h. Pay with crypto securely via ArionPay.</p>
             <div class="cta-row">
               <button class="btn primary">View products</button>
-              <button class="btn secondary">Research library</button>
+              <button class="btn secondary">See COAs</button>
             </div>
+            <div class="hero-trust">
+              <span>HPLC Tested</span>
+              <span>Ships in 24h</span>
+              <span>Free shipping over EUR 200</span>
+            </div>
+            <div class="hero-payments">Accepted: USDT • ETH • BTC • ArionPay</div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="trust-strip">
+      <div class="container trust-grid">
+        <div class="trust-item"><span class="trust-icon">✓</span> Batch-level COA verification</div>
+        <div class="trust-item"><span class="trust-icon">⚗</span> Research-only HPLC tested purity</div>
+        <div class="trust-item"><span class="trust-icon">↗</span> Same-day dispatch across EU</div>
       </div>
     </section>
 
@@ -70,27 +84,31 @@
         <div class="product-grid">
           <div class="product-card">
             <img class="product-img" src="https://images.unsplash.com/photo-1748281296151-b3209b37e1cb?auto=format&fit=crop&fm=jpg&q=80&w=1200" alt="Lab equipment close-up" />
+            <div class="pc-badges"><span class="pill available">Available</span><span class="pill">30mg</span></div>
             <div class="pc-title">Retatrutide 30mg</div>
             <div class="pc-meta">EUR 60</div>
             <button class="btn tertiary">Add to cart</button>
           </div>
           <div class="product-card">
             <img class="product-img" src="https://images.pexels.com/photos/10187137/pexels-photo-10187137.jpeg?cs=srgb&dl=pexels-ron-lach-10187137.jpg&fm=jpg" alt="Test tubes on blue background" />
+            <div class="pc-badges"><span class="pill available">Available</span><span class="pill">20mg</span></div>
             <div class="pc-title">TB‑500 20mg</div>
             <div class="pc-meta">EUR 40</div>
             <button class="btn tertiary">Add to cart</button>
           </div>
           <div class="product-card">
             <img class="product-img" src="https://images.unsplash.com/photo-1646956140214-c87a7c447be8?auto=format&fit=crop&fm=jpg&q=80&w=1200" alt="Scientist using pipette" />
+            <div class="pc-badges"><span class="pill available">Available</span><span class="pill">10mg</span></div>
             <div class="pc-title">BPC‑157 10mg</div>
             <div class="pc-meta">EUR 14</div>
             <button class="btn tertiary">Add to cart</button>
           </div>
           <div class="product-card">
             <img class="product-img" src="https://images.unsplash.com/photo-1748281296151-b3209b37e1cb?auto=format&fit=crop&fm=jpg&q=80&w=1200" alt="Lab work surface" />
+            <div class="pc-badges"><span class="pill soon">Coming Soon</span><span class="pill">1000mg</span></div>
             <div class="pc-title">NAD+ 1000mg</div>
             <div class="pc-meta">EUR 30</div>
-            <button class="btn tertiary">Add to cart</button>
+            <button class="btn tertiary">Notify me</button>
           </div>
         </div>
       </div>
@@ -136,12 +154,13 @@
         </div>
         <div class="ship-box">
           <div class="ship-left">
-            <div class="ship-title">Free DHL Express eco Shipping on orders above EUR 200</div>
-            <ul class="ship-list">
-              <li>Orders above EUR 200 → Free DHL Express eco Shipping (2‑5 days)</li>
-              <li>Orders up to EUR 200 → EUR 18.90</li>
-              <li>DHL Express 24h → EUR 39.90</li>
-            </ul>
+            <div class="ship-title">Transparent shipping rates with tracked delivery.</div>
+            <div class="ship-table">
+              <div class="ship-row ship-head"><span>Region</span><span>Speed</span><span>Cost</span></div>
+              <div class="ship-row"><span>EU Standard</span><span>2‑5 days</span><span>EUR 18.90</span></div>
+              <div class="ship-row"><span>EU Express</span><span>24h</span><span>EUR 39.90</span></div>
+              <div class="ship-row"><span>Orders &gt; EUR 200</span><span>2‑5 days</span><span>Free</span></div>
+            </div>
           </div>
           <div class="ship-cta">
             <button class="btn primary">Shop now</button>
@@ -273,10 +292,10 @@
     <div class="footer-links">
       <div class="col">
         <div class="col-title">Links</div>
-        <a>Shop</a>
-        <a>COA</a>
-        <a>FAQ</a>
-        <a>Contact</a>
+        <a href="/en/shop">Shop</a>
+        <a href="/en/coa">COA</a>
+        <a href="/en/faq">FAQ</a>
+        <a href="/en/contact">Contact</a>
       </div>
       <div class="col">
         <div class="col-title">Contact</div>
@@ -286,5 +305,9 @@
     </div>
     <div class="footer-payments">USDT • ETH • BTC • ArionPay</div>
   </footer>
+  <div class="cookie-bar">
+    We use essential cookies for secure checkout and analytics.
+    <button class="cookie-btn">Accept</button>
+  </div>
 </body>
 </html>
