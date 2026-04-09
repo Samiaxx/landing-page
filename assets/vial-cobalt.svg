@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title desc">
+  <title id="title">Primus Peptides vial illustration in cobalt</title>
+  <desc id="desc">Minimal medical-style vial on a white background.</desc>
+  <rect width="600" height="600" fill="#ffffff"/>
+  <ellipse cx="300" cy="500" rx="112" ry="24" fill="#edf1f7"/>
+  <rect x="256" y="114" width="88" height="60" rx="14" fill="#0d3b7a"/>
+  <rect x="244" y="158" width="112" height="52" rx="18" fill="#dae5f5"/>
+  <rect x="210" y="188" width="180" height="258" rx="56" fill="#fcfdff" stroke="#d1ddeb" stroke-width="10"/>
+  <rect x="238" y="246" width="124" height="112" rx="20" fill="#f3f6fb"/>
+  <rect x="238" y="228" width="124" height="18" rx="9" fill="#174a92"/>
+  <rect x="252" y="278" width="96" height="10" rx="5" fill="#97abc5"/>
+  <rect x="252" y="304" width="96" height="10" rx="5" fill="#97abc5"/>
+  <rect x="252" y="330" width="74" height="10" rx="5" fill="#b2bfd2"/>
+  <text x="300" y="272" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#17345f">PP</text>
+  <path d="M232 210c14 18 36 28 68 28h48c32 0 54-10 68-28" fill="none" stroke="#ffffff" stroke-opacity=".74" stroke-width="8"/>
+</svg>

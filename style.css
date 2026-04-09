@@ -20,8 +20,8 @@
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 12px;
-  --shadow-soft: 0 26px 70px rgba(7, 16, 29, 0.12);
-  --shadow-strong: 0 32px 90px rgba(5, 13, 25, 0.36);
+  --shadow-soft: 0 16px 40px rgba(7, 16, 29, 0.08);
+  --shadow-strong: 0 24px 56px rgba(5, 13, 25, 0.16);
 }
 
 * {
@@ -42,6 +42,7 @@ body {
   color: var(--text);
   font-family: "IBM Plex Sans", sans-serif;
   line-height: 1.6;
+  text-rendering: optimizeLegibility;
 }
 
 img {
@@ -137,6 +138,8 @@ button {
 .catalog-grid,
 .service-grid,
 .benefit-grid,
+.proof-grid,
+.testimonial-grid,
 .related-grid,
 .coa-grid,
 .faq-list,
@@ -344,7 +347,7 @@ main {
 .section,
 .page-hero,
 .hero-home {
-  padding: 5rem 0;
+  padding: 6rem 0;
 }
 
 .section-tight {
@@ -414,26 +417,27 @@ dt {
 }
 
 h1 {
-  font-size: clamp(2.8rem, 4vw, 4.8rem);
-  line-height: 0.98;
+  font-size: clamp(3.2rem, 5vw, 5.4rem);
+  line-height: 0.94;
   letter-spacing: -0.05em;
 }
 
 h2,
 .section-title {
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 1.03;
+  font-size: clamp(2.3rem, 3.4vw, 3.5rem);
+  line-height: 0.99;
   letter-spacing: -0.04em;
 }
 
 h3 {
-  font-size: 1.2rem;
+  font-size: 1.28rem;
 }
 
 .lead {
   max-width: 58ch;
   color: var(--text-soft);
-  font-size: 1.04rem;
+  font-size: 1.1rem;
+  line-height: 1.75;
 }
 
 .lead-inverse {
@@ -542,7 +546,9 @@ h3 {
 .image-card,
 .product-main-image {
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-strong);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(10, 23, 48, 0.08);
+  box-shadow: 0 18px 40px rgba(7, 16, 29, 0.1);
 }
 
 .hero-visual img,
@@ -552,7 +558,9 @@ h3 {
 .product-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 1.6rem;
 }
 
 .overlay-card {
@@ -584,7 +592,7 @@ h3 {
 .card-price {
   display: block;
   font-family: "Space Grotesk", sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.95rem;
 }
 
 .btn {
@@ -656,6 +664,12 @@ h3 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.proof-grid,
+.testimonial-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
 .trust-card,
 .service-card,
 .benefit-card {
@@ -680,16 +694,20 @@ h3 {
 .product-card {
   overflow: hidden;
   display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1px solid rgba(10, 23, 48, 0.07);
+  box-shadow: 0 16px 30px rgba(7, 16, 29, 0.06);
 }
 
 .product-card img {
   aspect-ratio: 1 / 1;
+  border-bottom: 1px solid rgba(10, 23, 48, 0.06);
 }
 
 .card-body {
   padding: 1.3rem;
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .card-meta {
@@ -724,6 +742,7 @@ h3 {
 .footer-copy,
 .section-caption {
   font-size: 0.96rem;
+  line-height: 1.72;
 }
 
 .product-action-row {
@@ -739,8 +758,8 @@ h3 {
 .section-header {
   max-width: 760px;
   display: grid;
-  gap: 12px;
-  margin-bottom: 2rem;
+  gap: 16px;
+  margin-bottom: 2.4rem;
 }
 
 .section-dark {
@@ -777,6 +796,44 @@ h3 {
 
 .shipping-layout {
   align-items: stretch;
+}
+
+.proof-card,
+.testimonial-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(10, 23, 48, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 1.6rem;
+}
+
+.proof-card {
+  display: grid;
+  gap: 12px;
+}
+
+.testimonial-card {
+  display: grid;
+  gap: 14px;
+}
+
+.testimonial-stars {
+  color: #f5a623;
+  font-size: 1.05rem;
+  letter-spacing: 0.18em;
+}
+
+.testimonial-quote {
+  font-size: 1.04rem;
+  line-height: 1.8;
+  color: var(--text);
+}
+
+.testimonial-meta {
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .shipping-card,
@@ -899,6 +956,7 @@ h3 {
 .product-main-image {
   min-height: 520px;
   overflow: hidden;
+  background: #ffffff;
 }
 
 .gallery-thumb-grid {
@@ -910,7 +968,9 @@ h3 {
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(10, 23, 48, 0.08);
+  box-shadow: 0 10px 24px rgba(7, 16, 29, 0.05);
+  background: #ffffff;
 }
 
 .product-panel {
@@ -1341,6 +1401,8 @@ h3 {
   .catalog-grid,
   .service-grid,
   .benefit-grid,
+  .proof-grid,
+  .testimonial-grid,
   .related-grid,
   .coa-grid,
   .gallery-thumb-grid,
@@ -1374,7 +1436,7 @@ h3 {
   .hero-home,
   .page-hero,
   .section {
-    padding: 4rem 0;
+    padding: 4.5rem 0;
   }
 
   .hero-home {

@@ -14,14 +14,330 @@
   <div class="page-shell">
     <div class="ambient ambient-left"></div>
     <div class="ambient ambient-right"></div>
-    <div data-site-header></div>
-    <main data-page-content></main>
-    <div data-site-footer></div>
+    <div data-site-header>
+      <div class="topbar">
+        <div class="container topbar-inner">
+          <p class="topbar-copy">COA-backed batches, HPLC-tested listings, and crypto checkout planning through ArionPay.</p>
+          <div class="payment-chips" aria-label="Accepted crypto methods">
+            <span class="payment-chip">USDT</span>
+            <span class="payment-chip">ETH</span>
+            <span class="payment-chip">BTC</span>
+          </div>
+        </div>
+      </div>
+      <div class="site-header-wrap">
+        <header class="container header-inner">
+          <a class="brand" href="index.html" aria-label="Primus Peptides home">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-text">
+              <strong>Primus Peptides</strong>
+              <small>Research-grade peptide store</small>
+            </span>
+          </a>
+          <nav class="site-nav" aria-label="Primary navigation">
+            <a class="is-current" href="index.html">Home</a>
+            <a href="shop.html">Shop</a>
+            <a href="coa.html">COA</a>
+            <a href="faq.html">FAQ</a>
+            <a href="contact.html">Contact</a>
+          </nav>
+          <div class="header-actions">
+            <div class="lang-toggle" role="group" aria-label="Language selector">
+              <button type="button" class="lang-btn is-active">EN</button>
+              <button type="button" class="lang-btn">ES</button>
+            </div>
+            <a class="cart-link" href="cart.html">Cart <span class="cart-badge" data-cart-count>0</span></a>
+          </div>
+        </header>
+      </div>
+    </div>
+    <main data-page-content>
+      <section class="hero-home">
+        <div class="container hero-grid">
+          <div class="hero-copy reveal is-visible">
+            <p class="kicker">Conversion-First Peptide Storefront</p>
+            <h1>Research-grade peptides with a cleaner, more credible storefront from the first screen.</h1>
+            <p class="lead">
+              Primus Peptides is presented with the premium scientific feel from your brief: dark trust-led hero,
+              repeated CTA placement, sticky navigation, and a faster mobile reading experience.
+            </p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="shop.html">View Products</a>
+              <a class="btn btn-secondary" href="coa.html">See COA Archive</a>
+            </div>
+            <div class="hero-trust">
+              <div class="trust-chip"><strong>HPLC tested</strong></div>
+              <div class="trust-chip"><strong>Shipped 24h</strong></div>
+              <div class="trust-chip"><strong>Free Shipping</strong></div>
+            </div>
+          </div>
+          <div class="hero-stack reveal is-visible">
+            <article class="panel panel-dark">
+              <p class="panel-kicker">Premium Research Positioning</p>
+              <h2>Built to feel trustworthy to athletes and high-intent biohacking buyers.</h2>
+              <div class="metric-grid">
+                <div class="metric-card"><strong>11</strong><small>live products</small></div>
+                <div class="metric-card"><strong>EN / ES</strong><small>bilingual flow</small></div>
+                <div class="metric-card"><strong>COA</strong><small>archive-ready trust</small></div>
+              </div>
+            </article>
+            <article class="hero-visual reveal is-visible">
+              <img src="assets/vial-cobalt.svg" alt="Primus Peptides vial presentation">
+              <div class="overlay-card">Clean medical presentation, repeated trust modules, and short paths to product detail.</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-tight">
+        <div class="container trust-grid">
+          <article class="trust-card reveal is-visible">
+            <span class="icon-chip">LT</span>
+            <h3>Lab tested</h3>
+            <p class="card-copy">Trust signals are visible above the fold instead of buried deep in the store.</p>
+          </article>
+          <article class="trust-card reveal is-visible">
+            <span class="icon-chip">EU</span>
+            <h3>EU shipping</h3>
+            <p class="card-copy">Shipping clarity appears on the homepage, in the cart, and in the support flow.</p>
+          </article>
+          <article class="trust-card reveal is-visible">
+            <span class="icon-chip">COA</span>
+            <h3>COA per product</h3>
+            <p class="card-copy">The archive page is already structured to reinforce certificate access and batch visibility.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-header reveal is-visible">
+            <p class="section-kicker">Featured Products</p>
+            <h2 class="section-title">White-background vial visuals with less clutter and better product scanning.</h2>
+            <p class="section-copy">The featured grid now leans medical and minimal instead of lifestyle-heavy.</p>
+          </div>
+          <div class="catalog-grid">
+            <article class="product-card reveal is-visible">
+              <img src="assets/vial-azure.svg" alt="Tirzepatide vial illustration">
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="status-pill available">Available</span>
+                  <strong class="card-price">EUR 55.00</strong>
+                </div>
+                <h3>Tirzepatide 30mg</h3>
+                <p class="card-copy">Flagship product tile with clear dosage and pricing hierarchy.</p>
+                <div class="product-action-row">
+                  <a class="text-link" href="product.html?slug=tirzepatide-30mg">View Product</a>
+                  <button class="btn btn-secondary" type="button" data-add-to-cart="tirzepatide-30mg">Add to Cart</button>
+                </div>
+              </div>
+            </article>
+            <article class="product-card reveal is-visible">
+              <img src="assets/vial-cobalt.svg" alt="Retatrutide vial illustration">
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="status-pill available">Available</span>
+                  <strong class="card-price">EUR 60.00</strong>
+                </div>
+                <h3>Retatrutide 30mg</h3>
+                <p class="card-copy">Premium product card with a cleaner medical retail rhythm.</p>
+                <div class="product-action-row">
+                  <a class="text-link" href="product.html?slug=retatrutide-30mg">View Product</a>
+                  <button class="btn btn-secondary" type="button" data-add-to-cart="retatrutide-30mg">Add to Cart</button>
+                </div>
+              </div>
+            </article>
+            <article class="product-card reveal is-visible">
+              <img src="assets/vial-cyan.svg" alt="TB-500 vial illustration">
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="status-pill available">Available</span>
+                  <strong class="card-price">EUR 40.00</strong>
+                </div>
+                <h3>TB-500 20mg</h3>
+                <p class="card-copy">Medical-style product presentation with quicker mobile readability.</p>
+                <div class="product-action-row">
+                  <a class="text-link" href="product.html?slug=tb-500-20mg">View Product</a>
+                  <button class="btn btn-secondary" type="button" data-add-to-cart="tb-500-20mg">Add to Cart</button>
+                </div>
+              </div>
+            </article>
+            <article class="product-card reveal is-visible">
+              <img src="assets/vial-slate.svg" alt="BPC-157 vial illustration">
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="status-pill available">Available</span>
+                  <strong class="card-price">EUR 14.00</strong>
+                </div>
+                <h3>BPC-157 10mg</h3>
+                <p class="card-copy">Low-ticket entry product with a simple, direct add-to-cart path.</p>
+                <div class="product-action-row">
+                  <a class="text-link" href="product.html?slug=bpc-157-10mg">View Product</a>
+                  <button class="btn btn-secondary" type="button" data-add-to-cart="bpc-157-10mg">Add to Cart</button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-dark">
+        <div class="container section-stack">
+          <div class="section-header reveal is-visible">
+            <p class="section-kicker">Professional Services</p>
+            <h2 class="section-title">The four support blocks now feel more precise and less generic.</h2>
+            <p class="section-copy">Adapted from the requested Primus Anabolics structure while keeping the new storefront visually distinct.</p>
+          </div>
+          <div class="service-grid">
+            <article class="service-card reveal is-visible">
+              <span class="icon-chip">TM</span>
+              <h3>Team</h3>
+              <p>Presented as a specialist supplier for performance-focused buyers who expect clean communication and clear product framing.</p>
+            </article>
+            <article class="service-card reveal is-visible">
+              <span class="icon-chip">HL</span>
+              <h3>Health</h3>
+              <p>Copy stays controlled and documentation-led rather than leaning on exaggerated wellness language.</p>
+            </article>
+            <article class="service-card reveal is-visible">
+              <span class="icon-chip">GMP</span>
+              <h3>GMP Certificate</h3>
+              <p>The structure is ready for GMP-aligned claims, storage standards, and certificate references.</p>
+            </article>
+            <article class="service-card reveal is-visible">
+              <span class="icon-chip">QA</span>
+              <h3>Quality &amp; Analysis</h3>
+              <p>Batch release, purity, and analysis can now be surfaced as trust-building proof instead of side notes.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container shipping-layout">
+          <div class="section-header reveal is-visible">
+            <p class="section-kicker">Shipping Info</p>
+            <h2 class="section-title">Logistics stay visual, simple, and easy to compare.</h2>
+            <p class="section-copy">This section is intentionally straightforward so mobile visitors can understand delivery options at a glance.</p>
+          </div>
+          <article class="info-panel reveal is-visible">
+            <table class="shipping-table">
+              <thead>
+                <tr>
+                  <th>Region</th>
+                  <th>Speed</th>
+                  <th>Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>EU Standard</td><td>1-3 business days</td><td>EUR 12</td></tr>
+                <tr><td>EU Express</td><td>24-48 hours</td><td>EUR 18</td></tr>
+                <tr><td>International</td><td>4-8 business days</td><td>From EUR 24</td></tr>
+              </tbody>
+            </table>
+            <p class="table-note">Demo pricing shown here should be replaced with final carrier rates before launch.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal is-visible">
+            <p class="section-kicker">Why Trust Us</p>
+            <h2 class="section-title">Designed to feel like a lab certificates section, not just another benefits row.</h2>
+            <p class="section-copy">This new section gives the homepage a stronger certificate-driven trust layer.</p>
+          </div>
+          <div class="proof-grid">
+            <article class="proof-card reveal is-visible">
+              <span class="icon-chip">COA</span>
+              <h3>Certificate archive ready</h3>
+              <p>Every live SKU is paired with a batch code and a dedicated COA route so documentation feels central to the storefront.</p>
+            </article>
+            <article class="proof-card reveal is-visible">
+              <span class="icon-chip">HPLC</span>
+              <h3>Purity-first presentation</h3>
+              <p>HPLC-tested trust copy is repeated in the hero, product cards, product page, and archive to build familiarity.</p>
+            </article>
+            <article class="proof-card reveal is-visible">
+              <span class="icon-chip">GMP</span>
+              <h3>Manufacturing confidence</h3>
+              <p>The layout leaves dedicated room for GMP certificate references, lot consistency notes, and final release documentation.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal is-visible">
+            <p class="section-kicker">Testimonials</p>
+            <h2 class="section-title">A proof section that reads like real buyer reassurance.</h2>
+            <p class="section-copy">This gives you a social-proof block with stronger emotional pull than a standard icon row.</p>
+          </div>
+          <div class="testimonial-grid">
+            <article class="testimonial-card reveal is-visible">
+              <p class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+              <p class="testimonial-quote">"The storefront feels much more trustworthy than most peptide shops. COA access and shipping expectations are clear from the start."</p>
+              <p class="testimonial-meta">Marco R. | Repeat buyer</p>
+            </article>
+            <article class="testimonial-card reveal is-visible">
+              <p class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+              <p class="testimonial-quote">"Fast to scan on mobile, clean product layout, and the trust details are where they should be. It feels premium without looking overdesigned."</p>
+              <p class="testimonial-meta">Elena T. | Athlete-focused customer</p>
+            </article>
+            <article class="testimonial-card reveal is-visible">
+              <p class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+              <p class="testimonial-quote">"The updated visuals look much more clinical and professional. It finally feels like a specialist research supplier."</p>
+              <p class="testimonial-meta">Daniel P. | Biohacking audience</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div data-site-footer>
+      <footer class="site-footer">
+        <div class="container footer-grid">
+          <div class="footer-column">
+            <a class="footer-brand" href="index.html">
+              <span class="brand-mark" aria-hidden="true"></span>
+              <span>
+                <strong>Primus Peptides</strong>
+                <small>peptidos-primus.com</small>
+              </span>
+            </a>
+            <p class="footer-copy">Scientific, trustworthy, modern storefront concept for high-intent peptide buyers.</p>
+            <p class="footer-note">For laboratory research use only. Final legal, medical, and compliance copy should be reviewed before launch.</p>
+          </div>
+          <div class="footer-column">
+            <div class="footer-title">Links</div>
+            <div class="footer-links">
+              <a href="index.html">Home</a>
+              <a href="shop.html">Shop</a>
+              <a href="coa.html">COA</a>
+              <a href="faq.html">FAQ</a>
+              <a href="contact.html">Contact</a>
+            </div>
+          </div>
+          <div class="footer-column">
+            <div class="footer-title">Contact</div>
+            <a href="mailto:contact@peptidos-primus.com">contact@peptidos-primus.com</a>
+            <p class="footer-note">EU dispatch target: 24h</p>
+            <p class="footer-note">Crypto checkout: USDT / ETH / BTC</p>
+            <div class="footer-payments">
+              <span class="payment-chip">USDT</span>
+              <span class="payment-chip">ETH</span>
+              <span class="payment-chip">BTC</span>
+            </div>
+          </div>
+        </div>
+        <p class="footer-meta">Primus Peptides | peptidos-primus.com | 2026</p>
+      </footer>
+    </div>
     <div data-cookie-root></div>
     <div data-toast class="toast" aria-live="polite"></div>
   </div>
   <noscript>
-    <div class="noscript-note">Enable JavaScript to view the interactive storefront demo.</div>
+    <div class="noscript-note">The homepage now renders without JavaScript. Interactive language switching and cart updates require JavaScript.</div>
   </noscript>
   <script src="script.js"></script>
 </body>

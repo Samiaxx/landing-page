@@ -7,14 +7,14 @@ const SITE_DOMAIN = "peptidos-primus.com";
 const PAYMENT_METHODS = ["USDT", "ETH", "BTC"];
 
 const IMAGE_SET = [
-  "https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1576671414121-aa0c81c8694f?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1576671081837-49000212a370?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1581092921461-39b9d08a9b94?auto=format&fit=crop&w=1400&q=80",
-  "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?auto=format&fit=crop&w=1400&q=80"
+  "assets/vial-cobalt.svg",
+  "assets/vial-azure.svg",
+  "assets/vial-cyan.svg",
+  "assets/vial-slate.svg",
+  "assets/vial-azure.svg",
+  "assets/vial-cobalt.svg",
+  "assets/vial-cyan.svg",
+  "assets/vial-slate.svg"
 ];
 
 const NAV_ITEMS = [
@@ -914,7 +914,9 @@ function renderShippingRows() {
       <td>${row.price}</td>
     </tr>
   `).join("");
-}function renderHomePage() {
+}
+
+function renderHomePage() {
   const featured = PRODUCTS.filter((product) => product.featured).map((product, index) => renderProductCard(product, { delay: index % 2 === 1 })).join("");
 
   return `
@@ -1016,6 +1018,185 @@ function renderShippingRows() {
             <a class="btn btn-ghost" href="coa.html">${pick(COPY.labels.seeCoa)}</a>
           </div>
         </article>
+      </div>
+    </section>
+  `;
+}
+
+function renderProofCards() {
+  const cards = [
+    {
+      icon: "COA",
+      title: { en: "Certificate archive ready", es: "Archivo de certificados listo" },
+      body: {
+        en: "Every live SKU is paired with batch visibility so documentation feels central to the storefront.",
+        es: "Cada SKU activo se presenta con visibilidad por lote para que la documentacion se sienta central en la tienda."
+      }
+    },
+    {
+      icon: "HPLC",
+      title: { en: "Purity-first presentation", es: "Presentacion centrada en pureza" },
+      body: {
+        en: "HPLC-tested trust copy is repeated in the hero, product cards, product page, and archive.",
+        es: "El mensaje HPLC se repite en hero, fichas de producto, pagina de producto y archivo para reforzar confianza."
+      }
+    },
+    {
+      icon: "GMP",
+      title: { en: "Manufacturing confidence", es: "Confianza de fabricacion" },
+      body: {
+        en: "The layout leaves room for GMP references, lot consistency notes, and release documentation.",
+        es: "La estructura deja espacio para referencias GMP, consistencia por lote y documentacion de liberacion."
+      }
+    }
+  ];
+
+  return cards.map((item, index) => `
+    <article class="proof-card reveal${index % 2 ? " reveal-delay" : ""}">
+      <span class="icon-chip">${item.icon}</span>
+      <h3>${pick(item.title)}</h3>
+      <p>${pick(item.body)}</p>
+    </article>
+  `).join("");
+}
+
+function renderTestimonialCards() {
+  const testimonials = [
+    {
+      quote: {
+        en: "The storefront feels much more trustworthy than most peptide shops. COA access and shipping expectations are clear from the start.",
+        es: "La tienda transmite mucha mas confianza que la mayoria de webs de peptidos. El acceso al COA y el envio quedan claros desde el inicio."
+      },
+      meta: { en: "Marco R. | Repeat buyer", es: "Marco R. | Comprador recurrente" }
+    },
+    {
+      quote: {
+        en: "Fast to scan on mobile, clean product layout, and the trust details are exactly where they should be. It feels premium without looking overdesigned.",
+        es: "Se entiende muy rapido en movil, el layout es limpio y los detalles de confianza estan donde deben estar. Se siente premium sin verse recargado."
+      },
+      meta: { en: "Elena T. | Athlete-focused customer", es: "Elena T. | Cliente orientada al rendimiento" }
+    },
+    {
+      quote: {
+        en: "The updated visuals look much more clinical and professional. It finally feels like a specialist research supplier.",
+        es: "Las visuales actualizadas se ven mucho mas clinicas y profesionales. Por fin parece un proveedor especialista en investigacion."
+      },
+      meta: { en: "Daniel P. | Biohacking audience", es: "Daniel P. | Audiencia biohacker" }
+    }
+  ];
+
+  return testimonials.map((item, index) => `
+    <article class="testimonial-card reveal${index % 2 ? " reveal-delay" : ""}">
+      <p class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</p>
+      <p class="testimonial-quote">"${pick(item.quote)}"</p>
+      <p class="testimonial-meta">${pick(item.meta)}</p>
+    </article>
+  `).join("");
+}
+
+function renderUpdatedHomePage() {
+  const featured = PRODUCTS
+    .filter((product) => product.featured)
+    .map((product, index) => renderProductCard(product, { delay: index % 2 === 1 }))
+    .join("");
+
+  return `
+    <section class="hero-home">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <p class="kicker">${currentLanguage === "es" ? "Tienda de Peptidos pensada para convertir" : "Conversion-First Peptide Storefront"}</p>
+          <h1>${currentLanguage === "es" ? "Peptidos de grado investigacion con una presencia mas limpia y creible desde el primer vistazo." : "Research-grade peptides with a cleaner, more credible storefront from the first screen."}</h1>
+          <p class="lead">${currentLanguage === "es" ? "Primus Peptides se presenta con una direccion cientifica mas fuerte: hero premium, CTAs repetidos, navegacion sticky y una lectura movil mucho mas rapida." : "Primus Peptides is presented with the premium scientific feel from your brief: dark trust-led hero, repeated CTA placement, sticky navigation, and a faster mobile reading experience."}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.viewCatalog)}</a>
+            <a class="btn btn-secondary" href="coa.html">${pick(COPY.labels.seeCoa)}</a>
+          </div>
+          <div class="hero-trust">
+            <div class="trust-chip"><strong>${pick(COPY.labels.hplc)}</strong></div>
+            <div class="trust-chip"><strong>${pick(COPY.labels.shipped)}</strong></div>
+            <div class="trust-chip"><strong>${pick(COPY.labels.freeShipping)}</strong></div>
+          </div>
+        </div>
+        <div class="hero-stack reveal reveal-delay">
+          <article class="panel panel-dark">
+            <p class="panel-kicker">${currentLanguage === "es" ? "Posicionamiento premium de investigacion" : "Premium Research Positioning"}</p>
+            <h2>${currentLanguage === "es" ? "Pensado para generar confianza en atletas y compradores biohacker de alta intencion." : "Built to feel trustworthy to athletes and high-intent biohacking buyers."}</h2>
+            <div class="metric-grid">
+              <div class="metric-card"><strong>11</strong><small>${currentLanguage === "es" ? "productos activos" : "live products"}</small></div>
+              <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "flujo bilingue" : "bilingual flow"}</small></div>
+              <div class="metric-card"><strong>COA</strong><small>${currentLanguage === "es" ? "archivo listo" : "archive-ready trust"}</small></div>
+            </div>
+          </article>
+          <article class="hero-visual reveal">
+            <img src="${IMAGE_SET[0]}" alt="Primus Peptides hero visual">
+            <div class="overlay-card">${currentLanguage === "es" ? "Visuales de vial mas limpias, modulos de confianza repetidos y rutas mas cortas al detalle de producto." : "Clean vial visuals, repeated trust modules, and shorter paths into product detail."}</div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container trust-grid">${renderTrustCards()}</div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-kicker">${currentLanguage === "es" ? "Productos destacados" : "Featured Products"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Imagenes de vial sobre blanco para una lectura mas limpia y medica." : "White-background vial visuals with less clutter and better product scanning."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "La parrilla destacada ahora se siente mas clinica y minimal, con menos ruido visual." : "The featured grid now leans medical and minimal instead of lifestyle-heavy."}</p>
+        </div>
+        <div class="catalog-grid">${featured}</div>
+      </div>
+    </section>
+    <section class="section section-dark">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${currentLanguage === "es" ? "Bloques profesionales" : "Professional Services"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Los cuatro bloques de apoyo ahora se sienten mas precisos y menos genericos." : "The four support blocks now feel more precise and less generic."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Se mantienen la estructura solicitada y una presencia visual mas propia para Primus Peptides." : "Adapted from the requested structure while keeping the new storefront visually distinct."}</p>
+        </div>
+        <div class="service-grid">${renderServiceCards()}</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container shipping-layout">
+        <div class="section-header reveal">
+          <p class="section-kicker">${currentLanguage === "es" ? "Informacion de envio" : "Shipping Info"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "La logistica sigue visual, simple y facil de comparar." : "Logistics stay visual, simple, and easy to compare."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "La tabla esta pensada para que el visitante entienda las opciones de entrega de un vistazo." : "This section is intentionally straightforward so mobile visitors can understand delivery options at a glance."}</p>
+        </div>
+        <article class="info-panel reveal reveal-delay">
+          <table class="shipping-table">
+            <thead>
+              <tr>
+                <th>${currentLanguage === "es" ? "Zona" : "Region"}</th>
+                <th>${currentLanguage === "es" ? "Velocidad" : "Speed"}</th>
+                <th>${currentLanguage === "es" ? "Precio" : "Cost"}</th>
+              </tr>
+            </thead>
+            <tbody>${renderShippingRows()}</tbody>
+          </table>
+          <p class="table-note">${currentLanguage === "es" ? "Tarifas demo: reemplazalas con las condiciones finales del operador antes del lanzamiento." : "Demo pricing shown here should be replaced with final carrier rates before launch."}</p>
+        </article>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${currentLanguage === "es" ? "Por que confiar en nosotros" : "Why Trust Us"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Una seccion pensada para sentirse como pruebas de laboratorio, no solo beneficios." : "Designed to feel like a lab certificates section, not just another benefits row."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Este bloque da a la home una capa de credibilidad mucho mas cercana a un archivo tecnico." : "This new section gives the homepage a stronger certificate-driven trust layer."}</p>
+        </div>
+        <div class="proof-grid">${renderProofCards()}</div>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${currentLanguage === "es" ? "Testimonios" : "Testimonials"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Una capa de prueba social que se siente real y tranquilizadora." : "A proof section that reads like real buyer reassurance."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Anade un bloque emocional fuerte sin perder el tono cientifico del proyecto." : "This gives you a social-proof block with stronger emotional pull than a standard icon row."}</p>
+        </div>
+        <div class="testimonial-grid">${renderTestimonialCards()}</div>
       </div>
     </section>
   `;
@@ -1407,7 +1588,7 @@ function renderPage() {
   document.documentElement.lang = currentLanguage;
 
   if (page === "home") {
-    host.innerHTML = renderHomePage();
+    host.innerHTML = renderUpdatedHomePage();
   } else if (page === "shop") {
     host.innerHTML = renderShopPage();
     renderShopGrid();
