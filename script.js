@@ -1,0 +1,1620 @@
+const CART_KEY = "primus-cart-v2";
+const COOKIE_KEY = "primus-cookie-consent";
+const LANG_KEY = "primus-language";
+const FREE_SHIPPING_THRESHOLD = 200;
+const SITE_EMAIL = "contact@peptidos-primus.com";
+const SITE_DOMAIN = "peptidos-primus.com";
+const PAYMENT_METHODS = ["USDT", "ETH", "BTC"];
+
+const IMAGE_SET = [
+  "https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1576671414121-aa0c81c8694f?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1576671081837-49000212a370?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1581092921461-39b9d08a9b94?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?auto=format&fit=crop&w=1400&q=80"
+];
+
+const NAV_ITEMS = [
+  { key: "home", href: "index.html" },
+  { key: "shop", href: "shop.html" },
+  { key: "coa", href: "coa.html" },
+  { key: "faq", href: "faq.html" },
+  { key: "contact", href: "contact.html" }
+];
+
+const PRODUCTS = [
+  {
+    slug: "tirzepatide-30mg",
+    name: { en: "Tirzepatide", es: "Tirzepatide" },
+    dosage: "30mg",
+    price: 55,
+    status: "available",
+    featured: true,
+    image: IMAGE_SET[0],
+    gallery: [IMAGE_SET[0], IMAGE_SET[4], IMAGE_SET[5]],
+    short: {
+      en: "Flagship peptide card for a premium, conversion-led catalogue layout.",
+      es: "Tarjeta principal para un catálogo premium y orientado a la conversión."
+    },
+    batch: "PP-TZP-0426",
+    coaDate: "2026-03-28"
+  },
+  {
+    slug: "retatrutide-30mg",
+    name: { en: "Retatrutide", es: "Retatrutide" },
+    dosage: "30mg",
+    price: 60,
+    status: "available",
+    featured: true,
+    image: IMAGE_SET[3],
+    gallery: [IMAGE_SET[3], IMAGE_SET[0], IMAGE_SET[6]],
+    short: {
+      en: "Built to sit beside Tirzepatide with matching trust and pricing hierarchy.",
+      es: "Diseñado para convivir con Tirzepatide con la misma jerarquía de confianza y precio."
+    },
+    batch: "PP-RET-0426",
+    coaDate: "2026-03-25"
+  },
+  {
+    slug: "tb-500-20mg",
+    name: { en: "TB-500", es: "TB-500" },
+    dosage: "20mg",
+    price: 40,
+    status: "available",
+    featured: true,
+    image: IMAGE_SET[2],
+    gallery: [IMAGE_SET[2], IMAGE_SET[1], IMAGE_SET[4]],
+    short: {
+      en: "Research-grade presentation with strong mobile card spacing and trust cues.",
+      es: "Presentación de grado investigación con buen espacio móvil y señales de confianza."
+    },
+    batch: "PP-TB5-0426",
+    coaDate: "2026-03-24"
+  },
+  {
+    slug: "bpc-157-10mg",
+    name: { en: "BPC-157", es: "BPC-157" },
+    dosage: "10mg",
+    price: 14,
+    status: "available",
+    featured: true,
+    image: IMAGE_SET[1],
+    gallery: [IMAGE_SET[1], IMAGE_SET[5], IMAGE_SET[6]],
+    short: {
+      en: "Compact low-ticket product tile suited for quick add-to-cart behavior.",
+      es: "Ficha compacta de ticket bajo, pensada para una compra rápida."
+    },
+    batch: "PP-BPC-0426",
+    coaDate: "2026-03-21"
+  },
+  {
+    slug: "ghk-cu-50mg",
+    name: { en: "GHK-CU", es: "GHK-CU" },
+    dosage: "50mg",
+    price: 13,
+    status: "available",
+    image: IMAGE_SET[4],
+    gallery: [IMAGE_SET[4], IMAGE_SET[2], IMAGE_SET[7]],
+    short: {
+      en: "Clean catalogue card with price-first scanning and documentation support.",
+      es: "Tarjeta limpia para escaneo rápido de precio y soporte documental."
+    },
+    batch: "PP-GHK-0426",
+    coaDate: "2026-03-19"
+  },
+  {
+    slug: "mots-c-40mg",
+    name: { en: "MOTS-C", es: "MOTS-C" },
+    dosage: "40mg",
+    price: 35,
+    status: "available",
+    image: IMAGE_SET[6],
+    gallery: [IMAGE_SET[6], IMAGE_SET[0], IMAGE_SET[3]],
+    short: {
+      en: "Presented with a polished card balance for image, price, and trust notes.",
+      es: "Presentado con un balance cuidado entre imagen, precio y notas de confianza."
+    },
+    batch: "PP-MOT-0426",
+    coaDate: "2026-03-18"
+  },
+  {
+    slug: "melanotan-mt2-10mg",
+    name: { en: "Melanotan MT2", es: "Melanotan MT2" },
+    dosage: "10mg",
+    price: 14,
+    status: "available",
+    image: IMAGE_SET[7],
+    gallery: [IMAGE_SET[7], IMAGE_SET[1], IMAGE_SET[2]],
+    short: {
+      en: "Ready for catalogue segmentation with a strong availability state.",
+      es: "Preparado para una segmentación de catálogo con un estado claro de disponibilidad."
+    },
+    batch: "PP-MT2-0426",
+    coaDate: "2026-03-17"
+  },
+  {
+    slug: "ss-31-50mg",
+    name: { en: "SS-31", es: "SS-31" },
+    dosage: "50mg",
+    price: 50,
+    status: "available",
+    image: IMAGE_SET[5],
+    gallery: [IMAGE_SET[5], IMAGE_SET[3], IMAGE_SET[0]],
+    short: {
+      en: "Premium card treatment for higher-ticket peptide entries.",
+      es: "Tratamiento visual premium para referencias de precio más alto."
+    },
+    batch: "PP-SS31-0426",
+    coaDate: "2026-03-15"
+  },
+  {
+    slug: "nad-1000mg",
+    name: { en: "NAD+", es: "NAD+" },
+    dosage: "1000mg",
+    price: 30,
+    status: "available",
+    image: IMAGE_SET[0],
+    gallery: [IMAGE_SET[0], IMAGE_SET[5], IMAGE_SET[7]],
+    short: {
+      en: "Strong dosage emphasis designed to read clearly on mobile product cards.",
+      es: "Énfasis claro en la dosificación para una lectura rápida en móvil."
+    },
+    batch: "PP-NAD-0426",
+    coaDate: "2026-03-14"
+  },
+  {
+    slug: "semax-30mg",
+    name: { en: "Semax", es: "Semax" },
+    dosage: "30mg",
+    price: 20,
+    status: "available",
+    image: IMAGE_SET[3],
+    gallery: [IMAGE_SET[3], IMAGE_SET[4], IMAGE_SET[1]],
+    short: {
+      en: "Mid-price product card with documentation-led supporting copy.",
+      es: "Tarjeta de precio medio con copy de apoyo orientado a documentación."
+    },
+    batch: "PP-SEM-0426",
+    coaDate: "2026-03-12"
+  },
+  {
+    slug: "selank-10mg",
+    name: { en: "Selank", es: "Selank" },
+    dosage: "10mg",
+    price: 18,
+    status: "available",
+    image: IMAGE_SET[4],
+    gallery: [IMAGE_SET[4], IMAGE_SET[6], IMAGE_SET[2]],
+    short: {
+      en: "Balanced product tile with a concise conversion-oriented action row.",
+      es: "Ficha equilibrada con una fila de acción corta y orientada a conversión."
+    },
+    batch: "PP-SEL-0426",
+    coaDate: "2026-03-10"
+  },
+  {
+    slug: "dsip-10mg",
+    name: { en: "DSIP", es: "DSIP" },
+    dosage: "10mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[1],
+    gallery: [IMAGE_SET[1], IMAGE_SET[2], IMAGE_SET[3]],
+    short: {
+      en: "Coming May card with launch-state styling and non-purchasable CTA treatment.",
+      es: "Ficha Llega en mayo con estilo de lanzamiento y CTA no comprable."
+    },
+    batch: "PP-DSIP-PRE",
+    coaDate: null
+  },
+  {
+    slug: "epithalon-40mg",
+    name: { en: "Epithalon", es: "Epithalon" },
+    dosage: "40mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[2],
+    gallery: [IMAGE_SET[2], IMAGE_SET[6], IMAGE_SET[7]],
+    short: {
+      en: "Held in a Coming May state until pricing, COA, and launch copy are ready.",
+      es: "En estado Llega en mayo hasta confirmar precio, COA y copy de lanzamiento."
+    },
+    batch: "PP-EPI-PRE",
+    coaDate: null
+  },
+  {
+    slug: "ipamorelin-10mg",
+    name: { en: "Ipamorelin", es: "Ipamorelin" },
+    dosage: "10mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[5],
+    gallery: [IMAGE_SET[5], IMAGE_SET[0], IMAGE_SET[4]],
+    short: {
+      en: "Prelaunch presentation card matching the rest of the catalogue system.",
+      es: "Tarjeta de pre-lanzamiento alineada con el resto del sistema de catálogo."
+    },
+    batch: "PP-IPA-PRE",
+    coaDate: null
+  },
+  {
+    slug: "kpv-10mg",
+    name: { en: "KPV", es: "KPV" },
+    dosage: "10mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[6],
+    gallery: [IMAGE_SET[6], IMAGE_SET[5], IMAGE_SET[1]],
+    short: {
+      en: "Styled as a waiting-list product without pulling attention from live SKUs.",
+      es: "Diseñado como producto en espera sin competir con las referencias activas."
+    },
+    batch: "PP-KPV-PRE",
+    coaDate: null
+  },
+  {
+    slug: "pt141-10mg",
+    name: { en: "PT141", es: "PT141" },
+    dosage: "10mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[7],
+    gallery: [IMAGE_SET[7], IMAGE_SET[4], IMAGE_SET[2]],
+    short: {
+      en: "Launch-ready placeholder card with consistent price and status handling.",
+      es: "Ficha de pre-lanzamiento con manejo coherente de precio y estado."
+    },
+    batch: "PP-PT1-PRE",
+    coaDate: null
+  },
+  {
+    slug: "oxytocin-10mg",
+    name: { en: "Oxytocin", es: "Oxitocina" },
+    dosage: "10mg",
+    price: null,
+    status: "coming",
+    image: IMAGE_SET[3],
+    gallery: [IMAGE_SET[3], IMAGE_SET[2], IMAGE_SET[5]],
+    short: {
+      en: "Final Coming May tile completing the upcoming peptide range.",
+      es: "Última ficha Llega en mayo para completar la gama próxima."
+    },
+    batch: "PP-OXY-PRE",
+    coaDate: null
+  }
+];
+
+const COPY = {
+  shell: {
+    topbar: {
+      en: "COA-backed batches, HPLC-tested listings, and crypto checkout planning through ArionPay.",
+      es: "Lotes con COA, listados verificados por HPLC y planificación de checkout crypto con ArionPay."
+    },
+    brandTag: {
+      en: "Research-grade peptide store",
+      es: "Tienda de péptidos grado investigación"
+    },
+    footerTagline: {
+      en: "Scientific, trustworthy, modern storefront concept for high-intent peptide buyers.",
+      es: "Concepto de tienda científica, confiable y moderna para compradores de péptidos de alta intención."
+    },
+    footerLegal: {
+      en: "For laboratory research use only. Final legal, medical, and compliance copy should be reviewed before launch.",
+      es: "Solo para uso de investigación de laboratorio. El copy legal, médico y de cumplimiento debe revisarse antes del lanzamiento."
+    },
+    linkColumn: { en: "Links", es: "Enlaces" },
+    contactColumn: { en: "Contact", es: "Contacto" },
+    shippingLine: { en: "EU dispatch target: 24h", es: "Objetivo de despacho UE: 24h" },
+    paymentsLine: { en: "Crypto checkout: USDT / ETH / BTC", es: "Checkout crypto: USDT / ETH / BTC" },
+    cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
+    cookieBody: {
+      en: "This prototype uses cookies to remember language preference, cart contents, and consent choices.",
+      es: "Este prototipo usa cookies para recordar idioma, carrito y preferencias de consentimiento."
+    },
+    cookieAccept: { en: "Accept", es: "Aceptar" },
+    cookieEssential: { en: "Only essential", es: "Solo esenciales" },
+    toastAdded: { en: "Added to cart.", es: "Añadido al carrito." },
+    toastContact: { en: "Message captured in the prototype.", es: "Mensaje capturado en el prototipo." },
+    toastLanguage: { en: "Language updated.", es: "Idioma actualizado." },
+    cartLabel: { en: "Cart", es: "Carrito" }
+  },
+  nav: {
+    home: { en: "Home", es: "Inicio" },
+    shop: { en: "Shop", es: "Tienda" },
+    coa: { en: "COA", es: "COA" },
+    faq: { en: "FAQ", es: "FAQ" },
+    contact: { en: "Contact", es: "Contacto" }
+  },
+  labels: {
+    available: { en: "Available", es: "Disponible" },
+    comingMay: { en: "Coming May", es: "Llega en mayo" },
+    comingSoon: { en: "Coming Soon", es: "Próximamente" },
+    priceOnRelease: { en: "Price on release", es: "Precio al lanzamiento" },
+    addToCart: { en: "Add to Cart", es: "Añadir al carrito" },
+    viewProduct: { en: "View Product", es: "Ver producto" },
+    viewCatalog: { en: "View Products", es: "Ver productos" },
+    browseShop: { en: "Browse the full catalogue", es: "Ver el catálogo completo" },
+    seeCoa: { en: "See COA archive", es: "Ver archivo COA" },
+    hplc: { en: "HPLC tested", es: "HPLC verificado" },
+    shipped: { en: "Shipped 24h", es: "Enviado en 24h" },
+    freeShipping: { en: "Free Shipping", es: "Envío gratis" },
+    allProducts: { en: "All Products", es: "Todos" },
+    inStock: { en: "In Stock", es: "En stock" },
+    upcoming: { en: "Coming May", es: "Llega en mayo" },
+    batchReady: { en: "COA ready", es: "COA listo" },
+    batchPending: { en: "Awaiting release", es: "Pendiente de lanzamiento" },
+    checkout: { en: "Checkout with ArionPay", es: "Pagar con ArionPay" },
+    keepBrowsing: { en: "Keep Browsing", es: "Seguir comprando" },
+    guestCheckout: { en: "Guest checkout ready", es: "Checkout como invitado" },
+    searchPlaceholder: { en: "Search peptide, dosage, or status", es: "Buscar péptido, dosis o estado" },
+    qty: { en: "Quantity", es: "Cantidad" },
+    subtotal: { en: "Subtotal", es: "Subtotal" },
+    items: { en: "Items", es: "Artículos" },
+    shipping: { en: "Shipping", es: "Envío" },
+    calculatedLater: { en: "Calculated later", es: "Se calcula después" },
+    sendMessage: { en: "Send Message", es: "Enviar mensaje" }
+  },
+  home: {
+    heroKicker: { en: "Conversion-first peptide storefront", es: "Tienda de péptidos orientada a conversión" },
+    heroTitle: {
+      en: "Research-grade peptides with the premium, scientific trust layer your brand brief calls for.",
+      es: "Péptidos de grado investigación con la capa premium y científica de confianza que pide tu brief."
+    },
+    heroBody: {
+      en: "This static concept follows the BioBoostX-style conversion architecture while adapting it to Primus Peptides: blue gradient palette, high-trust cues, faster mobile scanning, and crypto checkout messaging.",
+      es: "Este concepto estático sigue la arquitectura de conversión tipo BioBoostX, adaptada a Primus Peptides: paleta azul, señales de confianza, lectura móvil más rápida y mensajes de checkout crypto."
+    },
+    heroNote: {
+      en: "Built for mobile-first browsing, sticky navigation, repeat CTAs, and stronger trust placement.",
+      es: "Creado para navegación mobile-first, cabecera sticky, CTAs repetidos y mejor colocación de confianza."
+    },
+    trustTitle: { en: "Trust signals above the fold", es: "Señales de confianza sobre el pliegue" },
+    trustBody: { en: "Structured to look credible to biohacking shoppers and athlete-focused buyers.", es: "Estructurado para resultar creíble a compradores de biohacking y público deportista." },
+    featuredKicker: { en: "Featured Products", es: "Productos destacados" },
+    featuredTitle: { en: "Four hero SKUs with quick actions and clean pricing hierarchy.", es: "Cuatro SKUs principales con acciones rápidas y jerarquía de precio clara." },
+    featuredBody: { en: "Cards are tuned for quick mobile scanning while keeping dosage, price, and trust details readable.", es: "Las tarjetas están ajustadas para una lectura rápida en móvil manteniendo visibles dosis, precio y confianza." },
+    servicesKicker: { en: "Professional Services", es: "Servicios profesionales" },
+    servicesTitle: { en: "Adapted from the Primus Anabolics structure without copying the visual style.", es: "Adaptado de la estructura de Primus Anabolics sin copiar el estilo visual." },
+    servicesBody: { en: "The four content blocks mirror the required Team / Health / GMP / Quality narrative with a cleaner research-store tone.", es: "Los cuatro bloques replican la narrativa Team / Health / GMP / Quality con un tono más limpio de tienda de investigación." },
+    shippingKicker: { en: "Shipping Info", es: "Información de envío" },
+    shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
+    shippingBody: { en: "Demo pricing is included for layout purposes and should be replaced with final carrier rates before launch.", es: "Se incluyen precios demo para la maquetación y deben sustituirse por tarifas finales antes del lanzamiento." },
+    benefitsKicker: { en: "Why Choose Us", es: "Por qué elegirnos" },
+    benefitsTitle: { en: "Short icon-led proof points reinforce trust mid-page and near the footer.", es: "Puntos de prueba con iconos refuerzan la confianza a mitad de página y cerca del footer." },
+    benefitsBody: { en: "This section is deliberately compact so it reads quickly on mobile traffic.", es: "Esta sección es compacta a propósito para una lectura rápida en tráfico móvil." },
+    ctaKicker: { en: "Ready to explore the catalogue?", es: "¿Listo para explorar el catálogo?" },
+    ctaTitle: { en: "Send users from the homepage into the catalogue, COA archive, or checkout flow without friction.", es: "Lleva al usuario desde el inicio al catálogo, archivo COA o checkout sin fricción." },
+    ctaBody: { en: "The brief asked for repeated CTAs throughout the page, so this section gives you a strong mid-page conversion handoff.", es: "El brief pedía CTAs repetidos, así que esta sección crea una transición de conversión a mitad de página." }
+  },  shop: {
+    kicker: { en: "Shop", es: "Tienda" },
+    title: { en: "Searchable catalogue with live stock states and conversion-ready product cards.", es: "Catálogo con búsqueda, estados de stock y tarjetas listas para convertir." },
+    body: { en: "The shop view keeps the hero simple, surfaces search immediately, and separates available products from upcoming May launches.", es: "La vista de tienda mantiene un hero simple, muestra la búsqueda de inmediato y separa productos disponibles de lanzamientos de mayo." },
+    statAvailable: { en: "available now", es: "disponibles ahora" },
+    statUpcoming: { en: "coming in May", es: "llegan en mayo" },
+    statBilingual: { en: "language-ready UI", es: "UI bilingüe lista" },
+    resultsLabel: { en: "results", es: "resultados" },
+    emptyTitle: { en: "No products match this search.", es: "No hay productos para esta búsqueda." },
+    emptyBody: { en: "Try a product name, dosage, or switch back to All Products.", es: "Prueba con un nombre, dosis o vuelve a Todos." }
+  },
+  product: {
+    relatedKicker: { en: "Related Products", es: "Productos relacionados" },
+    relatedTitle: { en: "Keep the product page conversion-led with nearby alternatives.", es: "Mantén la página de producto orientada a conversión con alternativas cercanas." },
+    relatedBody: { en: "A small related-products rail helps reduce dead ends in the shopping journey.", es: "Una pequeña franja de productos relacionados reduce callejones sin salida en la compra." },
+    tabDescription: { en: "Description", es: "Descripción" },
+    tabAdditional: { en: "Additional Info", es: "Información adicional" },
+    descriptionLead: { en: "Same structure as the brief: technical specifications first, then the protocol/info tab below.", es: "Misma estructura del brief: primero especificaciones técnicas y luego la pestaña de información." },
+    protocolLead: { en: "The five-section framework is in place, while precise dosing and reconstitution values should be legally and medically reviewed before publication.", es: "El esquema de cinco secciones está listo, mientras que dosis y reconstitución concretas deben revisarse legal y médicamente antes de publicarse." },
+    material: { en: "Material", es: "Material" },
+    form: { en: "Form", es: "Forma" },
+    manufacturing: { en: "Manufacturing", es: "Fabricación" },
+    storage: { en: "Storage", es: "Conservación" },
+    descriptionMaterialSuffix: { en: "synthetic peptide reference", es: "referencia de péptido sintético" },
+    descriptionFormValue: { en: "lyophilized powder", es: "polvo liofilizado" },
+    descriptionManufacturingValue: { en: "synthetic peptide production", es: "producción sintética de péptidos" },
+    descriptionStorageValue: { en: "cool, dry, protected from light", es: "lugar fresco, seco y protegido de la luz" },
+    howWorks: { en: "How This Works", es: "Cómo funciona" },
+    benefitsSide: { en: "Potential Benefits & Side Effects", es: "Beneficios y efectos secundarios potenciales" },
+    protocolOverview: { en: "Protocol Overview", es: "Resumen del protocolo" },
+    dosingProtocol: { en: "Dosing Protocol", es: "Protocolo de dosificación" },
+    reconstitution: { en: "Dosing & Reconstitution Guide", es: "Guía de dosificación y reconstitución" },
+    protocolHow: {
+      en: "This prototype reserves space for a reviewed mechanism-of-action summary describing receptor targets, pathway context, and how the peptide is typically framed in research literature.",
+      es: "Este prototipo reserva espacio para un resumen revisado del mecanismo de acción, con objetivos receptores, contexto de vías y cómo se describe el péptido en la literatura de investigación."
+    },
+    protocolBenefits: {
+      en: "Use this block for a concise evidence-led summary of research interest, known tolerability notes, and any copy restrictions required for your market.",
+      es: "Usa este bloque para un resumen conciso y basado en evidencia sobre el interés de investigación, notas de tolerabilidad conocidas y restricciones de copy según tu mercado."
+    },
+    protocolOverviewCopy: {
+      en: "Designed as a short research protocol summary area that can explain study framing, observation windows, and practical handling notes without crowding the buy box.",
+      es: "Pensado como un área breve para resumir el protocolo de investigación, explicar el contexto del estudio, ventanas de observación y notas prácticas sin saturar el cuadro de compra."
+    },
+    protocolDoseCopy: {
+      en: "This concept intentionally avoids publishing precise dose ranges, frequency, and cycle length. Insert final reviewed values only after medical, legal, and compliance approval.",
+      es: "Este concepto evita publicar rangos exactos, frecuencia y duración de ciclo. Inserta valores finales solo tras aprobación médica, legal y de cumplimiento."
+    },
+    protocolReconCopy: {
+      en: "The layout is ready for bacteriostatic water volume, concentration math, syringe measurements, and storage instructions once your reviewed SOP is approved.",
+      es: "La maquetación está lista para volumen de agua bacteriostática, cálculos de concentración, medidas de jeringa y conservación una vez aprobado el SOP revisado."
+    },
+    spendMore: { en: "Spend", es: "Añade" },
+    toUnlock: { en: "more to unlock free shipping.", es: "más para desbloquear el envío gratis." },
+    thresholdReached: { en: "Free shipping threshold reached.", es: "Umbral de envío gratis alcanzado." },
+    comingBadge: { en: "Launching in May", es: "Lanzamiento en mayo" },
+    unavailableCopy: { en: "This product is listed with a Coming Soon state and cannot be added to cart yet.", es: "Este producto aparece como Próximamente y todavía no se puede añadir al carrito." }
+  },
+  coa: {
+    kicker: { en: "COA Archive", es: "Archivo COA" },
+    title: { en: "Batch visibility and COA status presented as a trust-building archive.", es: "Visibilidad por lote y estado COA presentados como archivo de confianza." },
+    body: { en: "Each card gives shoppers a fast signal on batch readiness, latest test date, and whether the product is already available or still pending release.", es: "Cada tarjeta da una señal rápida sobre el lote, la fecha de análisis y si el producto está disponible o pendiente de lanzamiento." },
+    noteTitle: { en: "Archive structure", es: "Estructura del archivo" },
+    noteBody: { en: "Upload final PDFs and batch-lab details here once the documentation pack is ready. The page is already styled to surface that trust content prominently.", es: "Sube aquí los PDFs finales y los datos de laboratorio del lote cuando el paquete documental esté listo. La página ya está pensada para destacar esa confianza." },
+    batchLabel: { en: "Batch", es: "Lote" },
+    testedLabel: { en: "Tested", es: "Analizado" },
+    pendingLabel: { en: "Pending release", es: "Pendiente de lanzamiento" }
+  },
+  faq: {
+    kicker: { en: "FAQ", es: "FAQ" },
+    title: { en: "Answers for shipping, COA access, payments, and bilingual storefront behavior.", es: "Respuestas sobre envíos, acceso a COA, pagos y comportamiento bilingüe de la tienda." },
+    body: { en: "The accordion pattern keeps long answers tidy while preserving mobile readability and trust-heavy information design.", es: "El formato acordeón mantiene respuestas largas ordenadas y conserva una lectura móvil limpia y orientada a confianza." },
+    items: [
+      {
+        question: { en: "How is the bilingual experience handled in this prototype?", es: "¿Cómo se gestiona la experiencia bilingüe en este prototipo?" },
+        answer: { en: "The EN / ES toggle updates navigation, page copy, catalogue cards, and product details instantly while keeping the same storefront structure.", es: "El selector EN / ES actualiza navegación, copy, catálogo y detalles de producto al instante manteniendo la misma estructura de tienda." }
+      },
+      {
+        question: { en: "Where are the COAs shown?", es: "¿Dónde se muestran los COA?" },
+        answer: { en: "The dedicated COA page presents batch cards for every product so shoppers can scan release status without leaving the storefront flow.", es: "La página COA presenta tarjetas por lote para cada producto, de forma que el cliente pueda revisar el estado sin salir del flujo de compra." }
+      },
+      {
+        question: { en: "Can shoppers pay with crypto?", es: "¿Se puede pagar con crypto?" },
+        answer: { en: "This prototype surfaces ArionPay-ready messaging and accepted currencies throughout the site. A live checkout integration would connect that flow in the final build.", es: "Este prototipo muestra mensajes listos para ArionPay y las monedas aceptadas en toda la tienda. La integración real conectaría ese flujo en la versión final." }
+      },
+      {
+        question: { en: "Why are some products marked Coming May?", es: "¿Por qué algunos productos aparecen como Llega en mayo?" },
+        answer: { en: "The catalogue uses launch-state styling for DSIP, Epithalon, Ipamorelin, KPV, PT141, and Oxytocin so urgency is visible without creating a broken checkout path.", es: "El catálogo usa un estilo de pre-lanzamiento para DSIP, Epithalon, Ipamorelin, KPV, PT141 y Oxitocina, de modo que la urgencia sea visible sin romper el checkout." }
+      },
+      {
+        question: { en: "What has priority on mobile?", es: "¿Qué tiene prioridad en móvil?" },
+        answer: { en: "Sticky navigation, search, trust cues, clean product cards, and short CTA paths are all positioned to support mobile-first conversion behavior.", es: "La navegación sticky, la búsqueda, las señales de confianza, las tarjetas limpias y los CTAs cortos están colocados para apoyar la conversión mobile-first." }
+      }
+    ]
+  },
+  contact: {
+    kicker: { en: "Contact", es: "Contacto" },
+    title: { en: "Support, shipping, and payment questions presented in a clean trust-first contact layout.", es: "Soporte, envíos y pagos presentados en una página de contacto limpia y centrada en confianza." },
+    body: { en: "The brief called for a dedicated Contact page. This version combines direct support information with a simple form and visible crypto-payment guidance.", es: "El brief pedía una página Contact. Esta versión combina información directa, un formulario simple y guía visible sobre pagos crypto." },
+    emailTitle: { en: "Email", es: "Email" },
+    shippingTitle: { en: "Shipping coverage", es: "Cobertura de envío" },
+    shippingBody: { en: "EU-first fulfilment, tracked dispatch, and international options from the shipping table.", es: "Cumplimiento UE primero, envío con tracking y opciones internacionales según la tabla de envíos." },
+    paymentTitle: { en: "Payment", es: "Pago" },
+    paymentBody: { en: "ArionPay planning for USDT, ETH, BTC, and compatible crypto methods.", es: "Planificación de ArionPay para USDT, ETH, BTC y otros métodos crypto compatibles." },
+    formTitle: { en: "Send a message", es: "Enviar un mensaje" },
+    formBody: { en: "In a live build this form would route to your inbox or CRM while keeping the same visual treatment.", es: "En una versión real este formulario enviaría los datos a tu correo o CRM manteniendo el mismo tratamiento visual." },
+    nameLabel: { en: "Name", es: "Nombre" },
+    emailLabel: { en: "Email", es: "Email" },
+    subjectLabel: { en: "Subject", es: "Asunto" },
+    messageLabel: { en: "Message", es: "Mensaje" },
+    placeholderSubject: { en: "Shipping, COA, or product question", es: "Consulta sobre envío, COA o producto" },
+    placeholderMessage: { en: "Tell us what you need help with.", es: "Cuéntanos en qué necesitas ayuda." }
+  },
+  cart: {
+    kicker: { en: "Cart", es: "Carrito" },
+    title: { en: "Minimal-step cart flow with free shipping progress and guest checkout messaging.", es: "Flujo de carrito con pocos pasos, progreso de envío gratis y mensaje de checkout invitado." },
+    body: { en: "The cart keeps the same trust-heavy design language while surfacing subtotal, payment options, and a direct path to checkout.", es: "El carrito mantiene el mismo lenguaje visual centrado en confianza y muestra subtotal, pagos y una vía directa al checkout." },
+    emptyTitle: { en: "Your cart is empty.", es: "Tu carrito está vacío." },
+    emptyBody: { en: "Add a product from the catalogue or product page to test the conversion flow.", es: "Añade un producto desde el catálogo o desde la ficha para probar el flujo de conversión." },
+    paymentTitle: { en: "Payment options", es: "Opciones de pago" },
+    paymentBody: { en: "ArionPay-ready checkout copy is surfaced here alongside guest checkout messaging.", es: "Aquí se muestra el copy listo para ArionPay junto con el mensaje de checkout como invitado." },
+    thresholdPrefix: { en: "Add", es: "Añade" },
+    thresholdSuffix: { en: "more for free shipping.", es: "más para envío gratis." },
+    thresholdDone: { en: "Free shipping unlocked.", es: "Envío gratis desbloqueado." }
+  }
+};
+
+const HOME_TRUST = [
+  {
+    icon: "LT",
+    title: { en: "Lab tested", es: "Analizado en laboratorio" },
+    body: { en: "HPLC-tested cues are repeated through hero, product, and COA surfaces.", es: "Las señales HPLC se repiten en hero, producto y COA." }
+  },
+  {
+    icon: "EU",
+    title: { en: "EU shipping", es: "Envío UE" },
+    body: { en: "Shipping clarity is built into the homepage and cart flow.", es: "La claridad de envío está integrada en la home y en el carrito." }
+  },
+  {
+    icon: "COA",
+    title: { en: "COA per product", es: "COA por producto" },
+    body: { en: "Every product can surface a COA-ready batch card from the archive.", es: "Cada producto puede mostrar una tarjeta COA desde el archivo." }
+  }
+];
+
+const SERVICE_BLOCKS = [
+  {
+    icon: "TM",
+    title: { en: "Team", es: "Equipo" },
+    body: {
+      en: "Positioned as an EU-based research supplier that understands performance-focused buyers and values clean, direct communication.",
+      es: "Planteado como un proveedor europeo de investigación que entiende al comprador centrado en rendimiento y valora una comunicación clara."
+    }
+  },
+  {
+    icon: "HL",
+    title: { en: "Health", es: "Salud" },
+    body: {
+      en: "Presented with a tighter emphasis on controlled manufacturing, handling standards, and documentation rather than over-claiming outcomes.",
+      es: "Presentado con énfasis en fabricación controlada, estándares de manejo y documentación, sin exagerar resultados."
+    }
+  },
+  {
+    icon: "GMP",
+    title: { en: "GMP Certificate", es: "Certificado GMP" },
+    body: {
+      en: "The copy structure leaves room to highlight GMP-aligned processes, storage discipline, and lot consistency in a trust-first tone.",
+      es: "La estructura deja espacio para destacar procesos alineados con GMP, conservación y consistencia de lotes con un tono de confianza."
+    }
+  },
+  {
+    icon: "QA",
+    title: { en: "Quality & Analysis", es: "Calidad y análisis" },
+    body: {
+      en: "Batch release, purity references, and optional third-party verification are surfaced as evidence-led buying signals.",
+      es: "La liberación por lote, referencias de pureza y verificación externa opcional aparecen como señales de compra basadas en evidencia."
+    }
+  }
+];
+
+const SHIPPING_ROWS = [
+  { region: { en: "EU Standard", es: "UE estándar" }, speed: { en: "1-3 business days", es: "1-3 días laborables" }, price: "EUR 12" },
+  { region: { en: "EU Express", es: "UE express" }, speed: { en: "24-48 hours", es: "24-48 horas" }, price: "EUR 18" },
+  { region: { en: "International", es: "Internacional" }, speed: { en: "4-8 business days", es: "4-8 días laborables" }, price: "From EUR 24" }
+];
+
+const BENEFITS = [
+  { icon: "HPLC", title: { en: "HPLC-tested lots", es: "Lotes HPLC verificados" }, body: { en: "Trust cue repeated across home, product, and COA pages.", es: "Señal de confianza repetida en home, producto y COA." } },
+  { icon: "COA", title: { en: "COA archive", es: "Archivo COA" }, body: { en: "Dedicated page ready to host batch PDFs and release status.", es: "Página dedicada lista para alojar PDFs por lote y estado." } },
+  { icon: "BTC", title: { en: "Crypto-first checkout", es: "Checkout crypto" }, body: { en: "ArionPay-ready messaging built into footer, cart, and hero flows.", es: "Mensajes listos para ArionPay integrados en footer, carrito y hero." } },
+  { icon: "24H", title: { en: "24h dispatch target", es: "Objetivo 24h" }, body: { en: "Shipping cues appear early, not buried at the bottom of the store.", es: "Las señales de envío aparecen pronto, no escondidas al final." } },
+  { icon: "EN", title: { en: "Bilingual EN / ES", es: "Bilingüe EN / ES" }, body: { en: "Language switching is available in the sticky header on every page.", es: "El cambio de idioma está disponible en la cabecera sticky de cada página." } },
+  { icon: "GS", title: { en: "Guest checkout", es: "Checkout invitado" }, body: { en: "The cart summary keeps the path to purchase short and visible.", es: "El resumen del carrito mantiene el camino de compra corto y visible." } }
+];
+
+let currentLanguage = getStoredLanguage();
+let shopQuery = "";
+let shopFilter = "all";
+let activeProductTab = "description";
+let toastTimer = null;
+
+function getStoredLanguage() {
+  const stored = localStorage.getItem(LANG_KEY);
+  return stored === "es" ? "es" : "en";
+}
+
+function pick(value) {
+  if (value && typeof value === "object" && !Array.isArray(value) && ("en" in value || "es" in value)) {
+    return value[currentLanguage] ?? value.en ?? "";
+  }
+  return value ?? "";
+}
+
+function formatPrice(value) {
+  return new Intl.NumberFormat(currentLanguage === "es" ? "es-ES" : "en-IE", {
+    style: "currency",
+    currency: "EUR"
+  }).format(value);
+}
+
+function formatDate(value) {
+  if (!value) {
+    return currentLanguage === "es" ? "Pendiente" : "Pending";
+  }
+
+  return new Intl.DateTimeFormat(currentLanguage === "es" ? "es-ES" : "en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  }).format(new Date(value));
+}
+
+function getCurrentPage() {
+  return document.body.dataset.page || "home";
+}
+
+function getProduct(slug) {
+  return PRODUCTS.find((product) => product.slug === slug) || PRODUCTS[0];
+}
+
+function currentProduct() {
+  const params = new URLSearchParams(window.location.search);
+  return getProduct(params.get("slug") || "tirzepatide-30mg");
+}function normaliseCartEntry(entry) {
+  if (!entry) {
+    return null;
+  }
+
+  if (entry.slug && getProduct(entry.slug)) {
+    return { slug: entry.slug, quantity: Math.max(1, Number(entry.quantity) || 1) };
+  }
+
+  if (entry.name) {
+    const match = PRODUCTS.find((product) => {
+      const fullName = `${product.name.en} ${product.dosage}`;
+      return entry.name === product.name.en || entry.name === fullName;
+    });
+
+    if (match) {
+      return { slug: match.slug, quantity: Math.max(1, Number(entry.quantity) || 1) };
+    }
+  }
+
+  return null;
+}
+
+function readCart() {
+  try {
+    const stored = localStorage.getItem(CART_KEY);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return parsed.map(normaliseCartEntry).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function saveCart(cart) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+function itemCount(cart) {
+  return cart.reduce((total, item) => total + item.quantity, 0);
+}
+
+function subtotal(cart) {
+  return cart.reduce((total, item) => {
+    const product = getProduct(item.slug);
+    return product.price ? total + product.price * item.quantity : total;
+  }, 0);
+}
+
+function addToCart(slug, quantity = 1) {
+  const cart = readCart();
+  const existing = cart.find((item) => item.slug === slug);
+
+  if (existing) {
+    existing.quantity += quantity;
+  } else {
+    cart.push({ slug, quantity });
+  }
+
+  saveCart(cart);
+  updateCartBadges();
+}
+
+function updateCart(slug, change) {
+  const cart = readCart();
+  const item = cart.find((entry) => entry.slug === slug);
+
+  if (!item) {
+    return;
+  }
+
+  item.quantity = Math.max(1, item.quantity + change);
+  saveCart(cart);
+  updateCartBadges();
+}
+
+function removeFromCart(slug) {
+  const cart = readCart().filter((item) => item.slug !== slug);
+  saveCart(cart);
+  updateCartBadges();
+}
+
+function updateCartBadges() {
+  const count = itemCount(readCart());
+  document.querySelectorAll("[data-cart-count]").forEach((node) => {
+    node.textContent = String(count);
+  });
+}
+
+function renderHeader() {
+  const host = document.querySelector("[data-site-header]");
+
+  if (!host) {
+    return;
+  }
+
+  const page = getCurrentPage();
+  const navLinks = NAV_ITEMS.map((item) => `
+    <a class="${page === item.key ? "is-current" : ""}" href="${item.href}">${pick(COPY.nav[item.key])}</a>
+  `).join("");
+  const chips = PAYMENT_METHODS.map((item) => `<span class="payment-chip">${item}</span>`).join("");
+
+  host.innerHTML = `
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <p class="topbar-copy">${pick(COPY.shell.topbar)}</p>
+        <div class="payment-chips" aria-label="Accepted crypto methods">${chips}</div>
+      </div>
+    </div>
+    <div class="site-header-wrap">
+      <header class="container header-inner">
+        <a class="brand" href="index.html" aria-label="Primus Peptides home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-text">
+            <strong>Primus Peptides</strong>
+            <small>${pick(COPY.shell.brandTag)}</small>
+          </span>
+        </a>
+        <nav class="site-nav" aria-label="Primary navigation">${navLinks}</nav>
+        <div class="header-actions">
+          <div class="lang-toggle" role="group" aria-label="Language selector">
+            <button type="button" class="lang-btn ${currentLanguage === "en" ? "is-active" : ""}" data-lang-switch="en">EN</button>
+            <button type="button" class="lang-btn ${currentLanguage === "es" ? "is-active" : ""}" data-lang-switch="es">ES</button>
+          </div>
+          <a class="cart-link" href="cart.html">${pick(COPY.shell.cartLabel)} <span class="cart-badge" data-cart-count>0</span></a>
+        </div>
+      </header>
+    </div>
+  `;
+}
+
+function renderFooter() {
+  const host = document.querySelector("[data-site-footer]");
+
+  if (!host) {
+    return;
+  }
+
+  const links = NAV_ITEMS.map((item) => `<a href="${item.href}">${pick(COPY.nav[item.key])}</a>`).join("");
+  const payments = PAYMENT_METHODS.map((item) => `<span class="payment-chip">${item}</span>`).join("");
+
+  host.innerHTML = `
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-column">
+          <a class="footer-brand" href="index.html">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span>
+              <strong>Primus Peptides</strong>
+              <small>${SITE_DOMAIN}</small>
+            </span>
+          </a>
+          <p class="footer-copy">${pick(COPY.shell.footerTagline)}</p>
+          <p class="footer-note">${pick(COPY.shell.footerLegal)}</p>
+        </div>
+        <div class="footer-column">
+          <div class="footer-title">${pick(COPY.shell.linkColumn)}</div>
+          <div class="footer-links">${links}</div>
+        </div>
+        <div class="footer-column">
+          <div class="footer-title">${pick(COPY.shell.contactColumn)}</div>
+          <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>
+          <p class="footer-note">${pick(COPY.shell.shippingLine)}</p>
+          <p class="footer-note">${pick(COPY.shell.paymentsLine)}</p>
+          <div class="footer-payments">${payments}</div>
+        </div>
+      </div>
+      <p class="footer-meta">Primus Peptides | ${SITE_DOMAIN} | ${new Date().getFullYear()}</p>
+    </footer>
+  `;
+}
+
+function renderCookieBanner() {
+  const host = document.querySelector("[data-cookie-root]");
+
+  if (!host) {
+    return;
+  }
+
+  if (localStorage.getItem(COOKIE_KEY)) {
+    host.innerHTML = "";
+    return;
+  }
+
+  host.innerHTML = `
+    <div class="cookie-banner">
+      <div class="cookie-copy">
+        <strong>${pick(COPY.shell.cookieTitle)}</strong>
+        <span>${pick(COPY.shell.cookieBody)}</span>
+      </div>
+      <div class="cookie-actions">
+        <button class="btn btn-secondary" type="button" data-cookie-action="essential">${pick(COPY.shell.cookieEssential)}</button>
+        <button class="btn btn-primary" type="button" data-cookie-action="accept">${pick(COPY.shell.cookieAccept)}</button>
+      </div>
+    </div>
+  `;
+}
+
+function showToast(message) {
+  const toast = document.querySelector("[data-toast]");
+
+  if (!toast) {
+    return;
+  }
+
+  toast.textContent = message;
+  toast.classList.add("is-visible");
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toast.classList.remove("is-visible");
+  }, 1800);
+}
+
+function productStatusLabel(product) {
+  return product.status === "available" ? pick(COPY.labels.available) : pick(COPY.labels.comingMay);
+}
+
+function productPriceLabel(product) {
+  return typeof product.price === "number" ? formatPrice(product.price) : pick(COPY.labels.priceOnRelease);
+}
+
+function renderProductCard(product, options = {}) {
+  const cardClass = options.reveal === false ? "product-card" : `product-card reveal${options.delay ? " reveal-delay" : ""}`;
+  const actionButton = product.status === "available"
+    ? `<button class="btn btn-secondary" type="button" data-add-to-cart="${product.slug}">${pick(COPY.labels.addToCart)}</button>`
+    : `<span class="badge badge-ready">${pick(COPY.labels.comingMay)}</span>`;
+
+  return `
+    <article class="${cardClass}">
+      <img src="${product.image}" alt="${pick(product.name)} ${product.dosage}">
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
+          <strong class="card-price">${productPriceLabel(product)}</strong>
+        </div>
+        <h3>${pick(product.name)} ${product.dosage}</h3>
+        <p class="card-copy">${pick(product.short)}</p>
+        <div class="product-action-row">
+          <a class="text-link" href="product.html?slug=${product.slug}">${pick(COPY.labels.viewProduct)}</a>
+          ${actionButton}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderTrustCards() {
+  return HOME_TRUST.map((item, index) => `
+    <article class="trust-card reveal${index % 2 ? " reveal-delay" : ""}">
+      <span class="icon-chip">${item.icon}</span>
+      <h3>${pick(item.title)}</h3>
+      <p class="card-copy">${pick(item.body)}</p>
+    </article>
+  `).join("");
+}
+
+function renderServiceCards() {
+  return SERVICE_BLOCKS.map((item, index) => `
+    <article class="service-card reveal${index % 2 ? " reveal-delay" : ""}">
+      <span class="icon-chip">${item.icon}</span>
+      <h3>${pick(item.title)}</h3>
+      <p>${pick(item.body)}</p>
+    </article>
+  `).join("");
+}
+
+function renderBenefitCards() {
+  return BENEFITS.map((item, index) => `
+    <article class="benefit-card reveal${index % 2 ? " reveal-delay" : ""}">
+      <span class="icon-chip">${item.icon}</span>
+      <h3>${pick(item.title)}</h3>
+      <p>${pick(item.body)}</p>
+    </article>
+  `).join("");
+}
+
+function renderShippingRows() {
+  return SHIPPING_ROWS.map((row) => `
+    <tr>
+      <td>${pick(row.region)}</td>
+      <td>${pick(row.speed)}</td>
+      <td>${row.price}</td>
+    </tr>
+  `).join("");
+}function renderHomePage() {
+  const featured = PRODUCTS.filter((product) => product.featured).map((product, index) => renderProductCard(product, { delay: index % 2 === 1 })).join("");
+
+  return `
+    <section class="hero-home">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <p class="kicker">${pick(COPY.home.heroKicker)}</p>
+          <h1>${pick(COPY.home.heroTitle)}</h1>
+          <p class="lead">${pick(COPY.home.heroBody)}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.viewCatalog)}</a>
+          </div>
+          <div class="hero-trust">
+            <div class="trust-chip"><strong>${pick(COPY.labels.hplc)}</strong></div>
+            <div class="trust-chip"><strong>${pick(COPY.labels.shipped)}</strong></div>
+            <div class="trust-chip"><strong>${pick(COPY.labels.freeShipping)}</strong></div>
+          </div>
+        </div>
+        <div class="hero-stack reveal reveal-delay">
+          <article class="panel panel-dark">
+            <p class="panel-kicker">${pick(COPY.home.trustTitle)}</p>
+            <h2>${pick(COPY.home.trustBody)}</h2>
+            <div class="metric-grid">
+              <div class="metric-card"><strong>11</strong><small>${currentLanguage === "es" ? "productos disponibles" : "live products"}</small></div>
+              <div class="metric-card"><strong>6</strong><small>${currentLanguage === "es" ? "beneficios clave" : "trust modules"}</small></div>
+              <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "experiencia bilingüe" : "bilingual flow"}</small></div>
+            </div>
+          </article>
+          <article class="hero-visual reveal">
+            <img src="${IMAGE_SET[0]}" alt="Primus Peptides hero visual">
+            <div class="overlay-card">${pick(COPY.home.heroNote)}</div>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container trust-grid">${renderTrustCards()}</div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.home.featuredKicker)}</p>
+          <h2 class="section-title">${pick(COPY.home.featuredTitle)}</h2>
+          <p class="section-copy">${pick(COPY.home.featuredBody)}</p>
+        </div>
+        <div class="catalog-grid">${featured}</div>
+      </div>
+    </section>
+    <section class="section section-dark">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.home.servicesKicker)}</p>
+          <h2 class="section-title">${pick(COPY.home.servicesTitle)}</h2>
+          <p class="section-copy">${pick(COPY.home.servicesBody)}</p>
+        </div>
+        <div class="service-grid">${renderServiceCards()}</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container shipping-layout">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.home.shippingKicker)}</p>
+          <h2 class="section-title">${pick(COPY.home.shippingTitle)}</h2>
+          <p class="section-copy">${pick(COPY.home.shippingBody)}</p>
+        </div>
+        <article class="info-panel reveal reveal-delay">
+          <table class="shipping-table">
+            <thead>
+              <tr>
+                <th>${currentLanguage === "es" ? "Zona" : "Region"}</th>
+                <th>${currentLanguage === "es" ? "Velocidad" : "Speed"}</th>
+                <th>${currentLanguage === "es" ? "Precio" : "Cost"}</th>
+              </tr>
+            </thead>
+            <tbody>${renderShippingRows()}</tbody>
+          </table>
+          <p class="table-note">${pick(COPY.home.shippingBody)}</p>
+        </article>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.home.benefitsKicker)}</p>
+          <h2 class="section-title">${pick(COPY.home.benefitsTitle)}</h2>
+          <p class="section-copy">${pick(COPY.home.benefitsBody)}</p>
+        </div>
+        <div class="benefit-grid">${renderBenefitCards()}</div>
+      </div>
+    </section>
+    <section class="section section-dark">
+      <div class="container">
+        <article class="cta-panel reveal">
+          <p class="section-kicker">${pick(COPY.home.ctaKicker)}</p>
+          <h2>${pick(COPY.home.ctaTitle)}</h2>
+          <p>${pick(COPY.home.ctaBody)}</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.browseShop)}</a>
+            <a class="btn btn-ghost" href="coa.html">${pick(COPY.labels.seeCoa)}</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function renderShopGrid() {
+  const filtered = PRODUCTS.filter((product) => {
+    const matchesFilter = shopFilter === "all"
+      || (shopFilter === "available" && product.status === "available")
+      || (shopFilter === "coming" && product.status === "coming");
+    const term = shopQuery.trim().toLowerCase();
+    const haystack = `${product.name.en} ${product.dosage} ${product.status}`.toLowerCase();
+    return matchesFilter && (!term || haystack.includes(term));
+  });
+
+  const meta = document.querySelector("[data-shop-meta]");
+  const grid = document.querySelector("[data-shop-grid]");
+
+  if (!grid || !meta) {
+    return;
+  }
+
+  meta.textContent = `${filtered.length} ${pick(COPY.shop.resultsLabel)}`;
+
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <h3>${pick(COPY.shop.emptyTitle)}</h3>
+        <p>${pick(COPY.shop.emptyBody)}</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map((product, index) => renderProductCard(product, { reveal: false, delay: index % 2 === 1 })).join("");
+}
+
+function renderShopPage() {
+  const availableCount = PRODUCTS.filter((product) => product.status === "available").length;
+  const upcomingCount = PRODUCTS.filter((product) => product.status === "coming").length;
+
+  return `
+    <section class="page-hero">
+      <div class="container page-hero-grid">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.shop.kicker)}</p>
+          <h1>${pick(COPY.shop.title)}</h1>
+          <p class="lead">${pick(COPY.shop.body)}</p>
+          <div class="shop-controls">
+            <input class="search-input" type="search" value="${shopQuery}" placeholder="${pick(COPY.labels.searchPlaceholder)}" data-shop-search>
+            <div class="filter-row">
+              <button type="button" class="filter-chip ${shopFilter === "all" ? "is-active" : ""}" data-filter="all">${pick(COPY.labels.allProducts)}</button>
+              <button type="button" class="filter-chip ${shopFilter === "available" ? "is-active" : ""}" data-filter="available">${pick(COPY.labels.inStock)}</button>
+              <button type="button" class="filter-chip ${shopFilter === "coming" ? "is-active" : ""}" data-filter="coming">${pick(COPY.labels.upcoming)}</button>
+            </div>
+          </div>
+        </div>
+        <aside class="page-stat-card reveal reveal-delay">
+          <div class="page-stat-list">
+            <div class="page-stat-item"><strong>${availableCount}</strong><span>${pick(COPY.shop.statAvailable)}</span></div>
+            <div class="page-stat-item"><strong>${upcomingCount}</strong><span>${pick(COPY.shop.statUpcoming)}</span></div>
+            <div class="page-stat-item"><strong>ArionPay</strong><span>${pick(COPY.shop.statBilingual)}</span></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container">
+        <div class="catalog-meta reveal">
+          <p class="section-caption" data-shop-meta></p>
+        </div>
+        <div class="catalog-grid" data-shop-grid></div>
+      </div>
+    </section>
+  `;
+}
+
+function productProtocolSections() {
+  return [
+    { title: pick(COPY.product.howWorks), body: pick(COPY.product.protocolHow) },
+    { title: pick(COPY.product.benefitsSide), body: pick(COPY.product.protocolBenefits) },
+    { title: pick(COPY.product.protocolOverview), body: pick(COPY.product.protocolOverviewCopy) },
+    { title: pick(COPY.product.dosingProtocol), body: pick(COPY.product.protocolDoseCopy) },
+    { title: pick(COPY.product.reconstitution), body: pick(COPY.product.protocolReconCopy) }
+  ].map((item) => `
+    <article class="protocol-section">
+      <h3>${item.title}</h3>
+      <p class="protocol-text">${item.body}</p>
+    </article>
+  `).join("");
+}
+
+function productDescription(product) {
+  return `
+    <div class="section-stack">
+      <p class="section-copy">${pick(COPY.product.descriptionLead)}</p>
+      <dl class="spec-list">
+        <div class="spec-item"><dt>${pick(COPY.product.material)}</dt><dd>${pick(product.name)} ${pick(COPY.product.descriptionMaterialSuffix)}</dd></div>
+        <div class="spec-item"><dt>${pick(COPY.product.form)}</dt><dd>${pick(COPY.product.descriptionFormValue)}</dd></div>
+        <div class="spec-item"><dt>${pick(COPY.product.manufacturing)}</dt><dd>${pick(COPY.product.descriptionManufacturingValue)}</dd></div>
+        <div class="spec-item"><dt>${pick(COPY.product.storage)}</dt><dd>${pick(COPY.product.descriptionStorageValue)}</dd></div>
+      </dl>
+    </div>
+  `;
+}
+
+function productAdditional() {
+  return `
+    <div class="section-stack">
+      <p class="section-copy">${pick(COPY.product.protocolLead)}</p>
+      <div class="protocol-grid">${productProtocolSections()}</div>
+    </div>
+  `;
+}function renderProductPage() {
+  const product = currentProduct();
+  const cart = readCart();
+  const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal(cart), 0);
+  const progress = Math.min((subtotal(cart) / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const gallery = product.gallery.map((image) => `<div class="gallery-thumb"><img src="${image}" alt="${pick(product.name)} ${product.dosage}"></div>`).join("");
+  const panelAction = product.status === "available"
+    ? `
+      <div class="quantity-row" data-quantity-root>
+        <span>${pick(COPY.labels.qty)}</span>
+        <div class="quantity-controls">
+          <button class="qty-btn" type="button" data-qty-action="decrease">-</button>
+          <strong data-quantity-value>1</strong>
+          <button class="qty-btn" type="button" data-qty-action="increase">+</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" type="button" data-add-to-cart="${product.slug}">${pick(COPY.labels.addToCart)}</button>
+    `
+    : `
+      <div class="stock-pill coming">${pick(COPY.product.comingBadge)}</div>
+      <p class="product-subtext">${pick(COPY.product.unavailableCopy)}</p>
+      <button class="btn btn-muted btn-block" type="button" disabled>${pick(COPY.labels.comingMay)}</button>
+    `;
+  const tabPanel = activeProductTab === "description" ? productDescription(product) : productAdditional();
+  const related = PRODUCTS.filter((item) => item.slug !== product.slug).slice(0, 3).map((item, index) => renderProductCard(item, { delay: index % 2 === 1 })).join("");
+  const progressCopy = remaining > 0
+    ? `${pick(COPY.product.spendMore)} ${formatPrice(remaining)} ${pick(COPY.product.toUnlock)}`
+    : pick(COPY.product.thresholdReached);
+
+  return `
+    <section class="page-hero">
+      <div class="container product-main">
+        <p class="breadcrumb">${pick(COPY.nav.home)} / ${pick(COPY.nav.shop)} / ${pick(product.name)} ${product.dosage}</p>
+        <div class="product-layout">
+          <div class="gallery-grid reveal">
+            <div class="product-main-image"><img src="${product.image}" alt="${pick(product.name)} ${product.dosage}"></div>
+            <div class="gallery-thumb-grid">${gallery}</div>
+          </div>
+          <aside class="panel product-panel reveal reveal-delay">
+            <div class="card-meta">
+              <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
+              <span class="badge">${pick(COPY.labels.hplc)}</span>
+            </div>
+            <p class="panel-kicker">${pick(COPY.nav.shop)}</p>
+            <h1>${pick(product.name)} ${product.dosage}</h1>
+            <p class="product-subtext">${pick(product.short)}</p>
+            <div class="price-row">
+              <strong class="price-value">${productPriceLabel(product)}</strong>
+              <span>${product.status === "available" ? "EUR" : pick(COPY.labels.comingSoon)}</span>
+            </div>
+            <div class="product-trust">
+              <div class="trust-icon">${pick(COPY.labels.shipped)}</div>
+              <div class="trust-icon">${pick(COPY.labels.freeShipping)}</div>
+              <div class="trust-icon">${pick(COPY.labels.hplc)}</div>
+            </div>
+            <div class="shipping-progress">
+              <div class="shipping-progress-bar" style="width:${progress}%"></div>
+              <p>${progressCopy}</p>
+            </div>
+            ${panelAction}
+          </aside>
+        </div>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container">
+        <article class="tabs-card reveal">
+          <div class="tab-row">
+            <button type="button" class="tab-button ${activeProductTab === "description" ? "is-active" : ""}" data-tab="description">${pick(COPY.product.tabDescription)}</button>
+            <button type="button" class="tab-button ${activeProductTab === "additional" ? "is-active" : ""}" data-tab="additional">${pick(COPY.product.tabAdditional)}</button>
+          </div>
+          <div data-tab-panel>${tabPanel}</div>
+        </article>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.product.relatedKicker)}</p>
+          <h2 class="section-title">${pick(COPY.product.relatedTitle)}</h2>
+          <p class="section-copy">${pick(COPY.product.relatedBody)}</p>
+        </div>
+        <div class="related-grid">${related}</div>
+      </div>
+    </section>
+  `;
+}
+
+function renderCoaCards() {
+  return PRODUCTS.map((product, index) => {
+    const ready = product.status === "available";
+    return `
+      <article class="coa-card reveal${index % 2 ? " reveal-delay" : ""}">
+        <div class="card-meta">
+          <span class="status-pill ${ready ? "coa" : "coming"}">${ready ? pick(COPY.labels.batchReady) : pick(COPY.coa.pendingLabel)}</span>
+          <span class="stock-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
+        </div>
+        <h3>${pick(product.name)} ${product.dosage}</h3>
+        <p class="card-copy">${pick(COPY.coa.batchLabel)}: ${product.batch}</p>
+        <p class="card-copy">${pick(COPY.coa.testedLabel)}: ${formatDate(product.coaDate)}</p>
+        <a class="text-link" href="product.html?slug=${product.slug}">${pick(COPY.labels.viewProduct)}</a>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderCoaPage() {
+  return `
+    <section class="page-hero">
+      <div class="container page-hero-grid">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.coa.kicker)}</p>
+          <h1>${pick(COPY.coa.title)}</h1>
+          <p class="lead">${pick(COPY.coa.body)}</p>
+        </div>
+        <aside class="page-stat-card reveal reveal-delay">
+          <p class="panel-kicker">${pick(COPY.coa.noteTitle)}</p>
+          <p>${pick(COPY.coa.noteBody)}</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section section-tight">
+      <div class="container coa-grid">${renderCoaCards()}</div>
+    </section>
+  `;
+}
+
+function renderFaqPage() {
+  const items = COPY.faq.items.map((item, index) => `
+    <article class="faq-item reveal${index % 2 ? " reveal-delay" : ""}">
+      <button class="faq-question" type="button" data-faq-button aria-expanded="false">${pick(item.question)}</button>
+      <div class="faq-answer" hidden><p>${pick(item.answer)}</p></div>
+    </article>
+  `).join("");
+
+  return `
+    <section class="page-hero">
+      <div class="container section-stack">
+        <div class="section-header reveal">
+          <p class="section-kicker">${pick(COPY.faq.kicker)}</p>
+          <h1>${pick(COPY.faq.title)}</h1>
+          <p class="lead">${pick(COPY.faq.body)}</p>
+        </div>
+        <div class="faq-list">${items}</div>
+      </div>
+    </section>
+  `;
+}
+
+function renderContactPage() {
+  return `
+    <section class="page-hero">
+      <div class="container contact-grid">
+        <article class="contact-card reveal">
+          <div class="section-header">
+            <p class="section-kicker">${pick(COPY.contact.kicker)}</p>
+            <h1>${pick(COPY.contact.title)}</h1>
+            <p class="lead">${pick(COPY.contact.body)}</p>
+          </div>
+          <div class="contact-points">
+            <div class="contact-point"><strong>${pick(COPY.contact.emailTitle)}</strong><a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a></div>
+            <div class="contact-point"><strong>${pick(COPY.contact.shippingTitle)}</strong><p>${pick(COPY.contact.shippingBody)}</p></div>
+            <div class="contact-point"><strong>${pick(COPY.contact.paymentTitle)}</strong><p>${pick(COPY.contact.paymentBody)}</p><div class="payment-chips">${PAYMENT_METHODS.map((item) => `<span class="payment-chip">${item}</span>`).join("")}</div></div>
+          </div>
+        </article>
+        <article class="contact-card reveal reveal-delay">
+          <div class="section-header">
+            <p class="section-kicker">${pick(COPY.contact.formTitle)}</p>
+            <h2 class="section-title">${pick(COPY.contact.formBody)}</h2>
+          </div>
+          <form class="form-grid" data-contact-form>
+            <label class="full-width"><span>${pick(COPY.contact.nameLabel)}</span><input class="form-input" name="name" required></label>
+            <label class="full-width"><span>${pick(COPY.contact.emailLabel)}</span><input class="form-input" name="email" type="email" required></label>
+            <label class="full-width"><span>${pick(COPY.contact.subjectLabel)}</span><input class="form-input" name="subject" placeholder="${pick(COPY.contact.placeholderSubject)}"></label>
+            <label class="full-width"><span>${pick(COPY.contact.messageLabel)}</span><textarea class="form-textarea" name="message" placeholder="${pick(COPY.contact.placeholderMessage)}"></textarea></label>
+            <div class="full-width form-row">
+              <p class="form-status" data-contact-status></p>
+              <button class="btn btn-primary" type="submit">${pick(COPY.labels.sendMessage)}</button>
+            </div>
+          </form>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
+function renderCartItems(cart) {
+  if (!cart.length) {
+    return `
+      <div class="cart-empty">
+        <h3>${pick(COPY.cart.emptyTitle)}</h3>
+        <p>${pick(COPY.cart.emptyBody)}</p>
+        <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.browseShop)}</a>
+      </div>
+    `;
+  }
+
+  return `<div class="cart-items">${cart.map((item) => {
+    const product = getProduct(item.slug);
+    return `
+      <article class="cart-item">
+        <div>
+          <h3>${pick(product.name)} ${product.dosage}</h3>
+          <p class="card-copy">${product.price ? formatPrice(product.price) : pick(COPY.labels.priceOnRelease)} ${currentLanguage === "es" ? "cada uno" : "each"}</p>
+        </div>
+        <div class="cart-item-actions">
+          <button class="cart-action" type="button" data-cart-action="decrease" data-cart-slug="${product.slug}">-</button>
+          <strong>${item.quantity}</strong>
+          <button class="cart-action" type="button" data-cart-action="increase" data-cart-slug="${product.slug}">+</button>
+        </div>
+        <div class="cart-item-actions">
+          <strong class="summary-price">${product.price ? formatPrice(product.price * item.quantity) : pick(COPY.labels.priceOnRelease)}</strong>
+          <button class="remove-link" type="button" data-cart-action="remove" data-cart-slug="${product.slug}">${currentLanguage === "es" ? "Eliminar" : "Remove"}</button>
+        </div>
+      </article>
+    `;
+  }).join("")}</div>`;
+}
+
+function renderCartPage() {
+  const cart = readCart();
+  const total = subtotal(cart);
+  const remaining = Math.max(FREE_SHIPPING_THRESHOLD - total, 0);
+  const progress = Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const thresholdCopy = remaining > 0
+    ? `${pick(COPY.cart.thresholdPrefix)} ${formatPrice(remaining)} ${pick(COPY.cart.thresholdSuffix)}`
+    : pick(COPY.cart.thresholdDone);
+
+  return `
+    <section class="page-hero">
+      <div class="container cart-layout">
+        <section class="contact-card reveal">
+          <div class="section-header">
+            <p class="section-kicker">${pick(COPY.cart.kicker)}</p>
+            <h1>${pick(COPY.cart.title)}</h1>
+            <p class="lead">${pick(COPY.cart.body)}</p>
+          </div>
+          ${renderCartItems(cart)}
+        </section>
+        <aside class="summary-card reveal reveal-delay">
+          <div class="section-header">
+            <p class="section-kicker">${pick(COPY.shell.cartLabel)}</p>
+            <h2 class="section-title">${pick(COPY.labels.guestCheckout)}</h2>
+          </div>
+          <div class="summary-list">
+            <div class="summary-row"><span class="summary-label">${pick(COPY.labels.items)}</span><strong>${itemCount(cart)}</strong></div>
+            <div class="summary-row"><span class="summary-label">${pick(COPY.labels.subtotal)}</span><strong>${formatPrice(total)}</strong></div>
+            <div class="summary-row"><span class="summary-label">${pick(COPY.labels.shipping)}</span><strong>${pick(COPY.labels.calculatedLater)}</strong></div>
+          </div>
+          <div class="shipping-progress">
+            <div class="shipping-progress-bar" style="width:${progress}%"></div>
+            <p>${thresholdCopy}</p>
+          </div>
+          <div class="section-stack">
+            <div><strong>${pick(COPY.cart.paymentTitle)}</strong><p class="summary-note">${pick(COPY.cart.paymentBody)}</p></div>
+            <div class="payment-chips">${PAYMENT_METHODS.map((item) => `<span class="payment-chip">${item}</span>`).join("")}</div>
+          </div>
+          <div class="summary-actions">
+            <button class="btn btn-primary btn-block" type="button">${pick(COPY.labels.checkout)}</button>
+            <a class="btn btn-secondary btn-block" href="shop.html">${pick(COPY.labels.keepBrowsing)}</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderPage() {
+  const host = document.querySelector("[data-page-content]");
+
+  if (!host) {
+    return;
+  }
+
+  const page = getCurrentPage();
+  document.documentElement.lang = currentLanguage;
+
+  if (page === "home") {
+    host.innerHTML = renderHomePage();
+  } else if (page === "shop") {
+    host.innerHTML = renderShopPage();
+    renderShopGrid();
+  } else if (page === "product") {
+    host.innerHTML = renderProductPage();
+  } else if (page === "coa") {
+    host.innerHTML = renderCoaPage();
+  } else if (page === "faq") {
+    host.innerHTML = renderFaqPage();
+  } else if (page === "contact") {
+    host.innerHTML = renderContactPage();
+  } else if (page === "cart") {
+    host.innerHTML = renderCartPage();
+  }
+
+  bindPageInteractions();
+  initReveal();
+  updateTitle();
+}
+
+function updateTitle() {
+  const page = getCurrentPage();
+  const base = "Primus Peptides";
+
+  if (page === "product") {
+    const product = currentProduct();
+    document.title = `${base} | ${pick(product.name)} ${product.dosage}`;
+    return;
+  }
+
+  const titleMap = {
+    home: pick(COPY.nav.home),
+    shop: pick(COPY.nav.shop),
+    coa: pick(COPY.nav.coa),
+    faq: pick(COPY.nav.faq),
+    contact: pick(COPY.nav.contact),
+    cart: pick(COPY.shell.cartLabel)
+  };
+
+  document.title = `${base} | ${titleMap[page] || pick(COPY.nav.home)}`;
+}
+
+function bindPageInteractions() {
+  const search = document.querySelector("[data-shop-search]");
+
+  if (search) {
+    search.addEventListener("input", (event) => {
+      shopQuery = event.target.value;
+      renderShopGrid();
+    });
+  }
+
+  const contactForm = document.querySelector("[data-contact-form]");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const status = document.querySelector("[data-contact-status]");
+      if (status) {
+        status.textContent = pick(COPY.shell.toastContact);
+      }
+      contactForm.reset();
+      showToast(pick(COPY.shell.toastContact));
+    });
+  }
+}
+
+function handleLanguageSwitch(language) {
+  currentLanguage = language === "es" ? "es" : "en";
+  localStorage.setItem(LANG_KEY, currentLanguage);
+  renderShell();
+  renderPage();
+  renderCookieBanner();
+  updateCartBadges();
+  showToast(pick(COPY.shell.toastLanguage));
+}
+
+function handleAddToCart(button) {
+  const slug = button.getAttribute("data-add-to-cart");
+  const quantityRoot = document.querySelector("[data-quantity-root]");
+  const quantityNode = quantityRoot ? quantityRoot.querySelector("[data-quantity-value]") : null;
+  const quantity = quantityNode ? Number(quantityNode.textContent) || 1 : 1;
+  addToCart(slug, quantity);
+  showToast(pick(COPY.shell.toastAdded));
+  if (getCurrentPage() === "cart") {
+    renderPage();
+  }
+}
+
+function handleQuantityButton(button) {
+  const root = button.closest("[data-quantity-root]");
+  const valueNode = root ? root.querySelector("[data-quantity-value]") : null;
+  if (!valueNode) {
+    return;
+  }
+  const current = Number(valueNode.textContent) || 1;
+  const action = button.getAttribute("data-qty-action");
+  const next = action === "increase" ? current + 1 : Math.max(1, current - 1);
+  valueNode.textContent = String(next);
+}
+
+function handleCartButton(button) {
+  const slug = button.getAttribute("data-cart-slug");
+  const action = button.getAttribute("data-cart-action");
+  if (action === "increase") {
+    updateCart(slug, 1);
+  } else if (action === "decrease") {
+    updateCart(slug, -1);
+  } else if (action === "remove") {
+    removeFromCart(slug);
+  }
+  renderPage();
+}
+
+function handleFaq(button) {
+  const expanded = button.getAttribute("aria-expanded") === "true";
+  const answer = button.nextElementSibling;
+  button.setAttribute("aria-expanded", String(!expanded));
+  if (answer) {
+    answer.hidden = expanded;
+  }
+}
+
+function handleGlobalClick(event) {
+  const langButton = event.target.closest("[data-lang-switch]");
+  const cookieButton = event.target.closest("[data-cookie-action]");
+  const addButton = event.target.closest("[data-add-to-cart]");
+  const qtyButton = event.target.closest("[data-qty-action]");
+  const tabButton = event.target.closest("[data-tab]");
+  const filterButton = event.target.closest("[data-filter]");
+  const faqButton = event.target.closest("[data-faq-button]");
+  const cartButton = event.target.closest("[data-cart-action]");
+
+  if (langButton) {
+    handleLanguageSwitch(langButton.getAttribute("data-lang-switch"));
+    return;
+  }
+
+  if (cookieButton) {
+    localStorage.setItem(COOKIE_KEY, cookieButton.getAttribute("data-cookie-action"));
+    renderCookieBanner();
+    return;
+  }
+
+  if (addButton) {
+    handleAddToCart(addButton);
+    return;
+  }
+
+  if (qtyButton) {
+    handleQuantityButton(qtyButton);
+    return;
+  }
+
+  if (tabButton) {
+    activeProductTab = tabButton.getAttribute("data-tab") === "additional" ? "additional" : "description";
+    renderPage();
+    return;
+  }
+
+  if (filterButton) {
+    shopFilter = filterButton.getAttribute("data-filter") || "all";
+    renderPage();
+    return;
+  }
+
+  if (faqButton) {
+    handleFaq(faqButton);
+    return;
+  }
+
+  if (cartButton) {
+    handleCartButton(cartButton);
+  }
+}
+
+function initReveal() {
+  const nodes = document.querySelectorAll(".reveal");
+  if (!nodes.length) {
+    return;
+  }
+  if (!("IntersectionObserver" in window)) {
+    nodes.forEach((node) => node.classList.add("is-visible"));
+    return;
+  }
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) {
+        return;
+      }
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.18 });
+  nodes.forEach((node) => observer.observe(node));
+}
+
+function renderShell() {
+  renderHeader();
+  renderFooter();
+}
+
+document.addEventListener("click", handleGlobalClick);
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderShell();
+  renderPage();
+  renderCookieBanner();
+  updateCartBadges();
+});
