@@ -59,6 +59,14 @@ function buildGatewayError(message, paymentMethod) {
   const method = paymentMethod || "selected payment method";
   const normalized = typeof message === "string" ? message.trim() : "";
 
+  if (/just a moment/i.test(normalized) || /cf_chl_opt/i.test(normalized) || /enable javascript and cookies to continue/i.test(normalized)) {
+    return {
+      error: "ArionPay is blocking automated invoice creation from the current server.",
+      hint: "Their Cloudflare protection is challenging the API request. Ask ArionPay support to whitelist your Vercel deployment or disable the bot challenge for API invoice requests on this store.",
+      gatewayMessage: "Cloudflare challenge page returned by api.arionpay.com"
+    };
+  }
+
   if (/payment configuration missing/i.test(normalized)) {
     return {
       error: `ArionPay store setup is incomplete for ${method}.`,
