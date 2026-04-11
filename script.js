@@ -1,10 +1,13 @@
 const CART_KEY = "primus-cart-v2";
+const CHECKOUT_DRAFT_KEY = "primus-checkout-draft-v1";
 const COOKIE_KEY = "primus-cookie-consent";
 const LANG_KEY = "primus-language";
+const LAST_ORDER_KEY = "primus-last-order-v1";
 const FREE_SHIPPING_THRESHOLD = 200;
 const SITE_EMAIL = "contact@peptidos-primus.com";
 const SITE_DOMAIN = "peptidos-primus.com";
-const PAYMENT_METHODS = ["USDT", "ETH", "BTC"];
+const PAYMENT_METHODS = ["USDT (TRC20)"];
+const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
 const IMAGE_SET = [
   "assets/vial-cobalt.svg",
@@ -290,16 +293,16 @@ const PRODUCTS = [
 const COPY = {
   shell: {
     topbar: {
-      en: "COA-backed batches, HPLC-tested listings, and crypto checkout planning through ArionPay.",
-      es: "Lotes con COA, listados verificados por HPLC y planificación de checkout crypto con ArionPay."
+      en: "COA-backed batches, HPLC-tested listings, and crypto checkout prepared for ArionPay.",
+      es: "Lotes con COA, listados verificados por HPLC y checkout crypto preparado para ArionPay."
     },
     brandTag: {
       en: "Research-grade peptide store",
       es: "Tienda de péptidos grado investigación"
     },
     footerTagline: {
-      en: "Scientific, trustworthy, modern storefront concept for high-intent peptide buyers.",
-      es: "Concepto de tienda científica, confiable y moderna para compradores de péptidos de alta intención."
+      en: "Scientific, trustworthy, modern storefront for high-intent peptide buyers.",
+      es: "Tienda científica, confiable y moderna para compradores de péptidos de alta intención."
     },
     footerLegal: {
       en: "For laboratory research use only. Final legal, medical, and compliance copy should be reviewed before launch.",
@@ -311,13 +314,13 @@ const COPY = {
     paymentsLine: { en: "Crypto checkout: USDT / ETH / BTC", es: "Checkout crypto: USDT / ETH / BTC" },
     cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
     cookieBody: {
-      en: "This prototype uses cookies to remember language preference, cart contents, and consent choices.",
-      es: "Este prototipo usa cookies para recordar idioma, carrito y preferencias de consentimiento."
+      en: "This storefront uses cookies to remember language preference, cart contents, and consent choices.",
+      es: "Esta tienda usa cookies para recordar idioma, carrito y preferencias de consentimiento."
     },
     cookieAccept: { en: "Accept", es: "Aceptar" },
     cookieEssential: { en: "Only essential", es: "Solo esenciales" },
     toastAdded: { en: "Added to cart.", es: "Añadido al carrito." },
-    toastContact: { en: "Message captured in the prototype.", es: "Mensaje capturado en el prototipo." },
+    toastContact: { en: "Message captured successfully.", es: "Mensaje capturado correctamente." },
     toastLanguage: { en: "Language updated.", es: "Idioma actualizado." },
     cartLabel: { en: "Cart", es: "Carrito" }
   },
@@ -364,8 +367,8 @@ const COPY = {
       es: "Péptidos de grado investigación con la capa premium y científica de confianza que pide tu brief."
     },
     heroBody: {
-      en: "This static concept follows the BioBoostX-style conversion architecture while adapting it to Primus Peptides: blue gradient palette, high-trust cues, faster mobile scanning, and crypto checkout messaging.",
-      es: "Este concepto estático sigue la arquitectura de conversión tipo BioBoostX, adaptada a Primus Peptides: paleta azul, señales de confianza, lectura móvil más rápida y mensajes de checkout crypto."
+      en: "This storefront follows the BioBoostX-style conversion architecture while adapting it to Primus Peptides: blue gradient palette, high-trust cues, faster mobile scanning, and crypto checkout messaging.",
+      es: "Esta tienda sigue la arquitectura de conversión tipo BioBoostX adaptada a Primus Peptides: paleta azul, señales de confianza, lectura móvil más rápida y mensajes de checkout crypto."
     },
     heroNote: {
       en: "Built for mobile-first browsing, sticky navigation, repeat CTAs, and stronger trust placement.",
@@ -381,7 +384,7 @@ const COPY = {
     servicesBody: { en: "The four content blocks mirror the required Team / Health / GMP / Quality narrative with a cleaner research-store tone.", es: "Los cuatro bloques replican la narrativa Team / Health / GMP / Quality con un tono más limpio de tienda de investigación." },
     shippingKicker: { en: "Shipping Info", es: "Información de envío" },
     shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
-    shippingBody: { en: "Demo pricing is included for layout purposes and should be replaced with final carrier rates before launch.", es: "Se incluyen precios demo para la maquetación y deben sustituirse por tarifas finales antes del lanzamiento." },
+    shippingBody: { en: "Estimated carrier pricing is shown here and should be replaced with final live rates before launch.", es: "Aquí se muestran tarifas estimadas del operador y deben sustituirse por tarifas finales antes del lanzamiento." },
     benefitsKicker: { en: "Why Choose Us", es: "Por qué elegirnos" },
     benefitsTitle: { en: "Short icon-led proof points reinforce trust mid-page and near the footer.", es: "Puntos de prueba con iconos refuerzan la confianza a mitad de página y cerca del footer." },
     benefitsBody: { en: "This section is deliberately compact so it reads quickly on mobile traffic.", es: "Esta sección es compacta a propósito para una lectura rápida en tráfico móvil." },
@@ -421,8 +424,8 @@ const COPY = {
     dosingProtocol: { en: "Dosing Protocol", es: "Protocolo de dosificación" },
     reconstitution: { en: "Dosing & Reconstitution Guide", es: "Guía de dosificación y reconstitución" },
     protocolHow: {
-      en: "This prototype reserves space for a reviewed mechanism-of-action summary describing receptor targets, pathway context, and how the peptide is typically framed in research literature.",
-      es: "Este prototipo reserva espacio para un resumen revisado del mecanismo de acción, con objetivos receptores, contexto de vías y cómo se describe el péptido en la literatura de investigación."
+      en: "This section reserves space for a reviewed mechanism-of-action summary describing receptor targets, pathway context, and how the peptide is framed in research literature.",
+      es: "Esta sección reserva espacio para un resumen revisado del mecanismo de acción, con objetivos receptores, contexto de vías y cómo se describe el péptido en la literatura de investigación."
     },
     protocolBenefits: {
       en: "Use this block for a concise evidence-led summary of research interest, known tolerability notes, and any copy restrictions required for your market.",
@@ -433,8 +436,8 @@ const COPY = {
       es: "Pensado como un área breve para resumir el protocolo de investigación, explicar el contexto del estudio, ventanas de observación y notas prácticas sin saturar el cuadro de compra."
     },
     protocolDoseCopy: {
-      en: "This concept intentionally avoids publishing precise dose ranges, frequency, and cycle length. Insert final reviewed values only after medical, legal, and compliance approval.",
-      es: "Este concepto evita publicar rangos exactos, frecuencia y duración de ciclo. Inserta valores finales solo tras aprobación médica, legal y de cumplimiento."
+      en: "This build intentionally avoids publishing precise dose ranges, frequency, and cycle length. Insert final reviewed values only after medical, legal, and compliance approval.",
+      es: "Esta versión evita publicar rangos exactos, frecuencia y duración de ciclo. Inserta valores finales solo tras aprobación médica, legal y de cumplimiento."
     },
     protocolReconCopy: {
       en: "The layout is ready for bacteriostatic water volume, concentration math, syringe measurements, and storage instructions once your reviewed SOP is approved.",
@@ -462,7 +465,7 @@ const COPY = {
     body: { en: "The accordion pattern keeps long answers tidy while preserving mobile readability and trust-heavy information design.", es: "El formato acordeón mantiene respuestas largas ordenadas y conserva una lectura móvil limpia y orientada a confianza." },
     items: [
       {
-        question: { en: "How is the bilingual experience handled in this prototype?", es: "¿Cómo se gestiona la experiencia bilingüe en este prototipo?" },
+        question: { en: "How is the bilingual experience handled in this storefront?", es: "¿Cómo se gestiona la experiencia bilingüe en esta tienda?" },
         answer: { en: "The EN / ES toggle updates navigation, page copy, catalogue cards, and product details instantly while keeping the same storefront structure.", es: "El selector EN / ES actualiza navegación, copy, catálogo y detalles de producto al instante manteniendo la misma estructura de tienda." }
       },
       {
@@ -471,7 +474,7 @@ const COPY = {
       },
       {
         question: { en: "Can shoppers pay with crypto?", es: "¿Se puede pagar con crypto?" },
-        answer: { en: "This prototype surfaces ArionPay-ready messaging and accepted currencies throughout the site. A live checkout integration would connect that flow in the final build.", es: "Este prototipo muestra mensajes listos para ArionPay y las monedas aceptadas en toda la tienda. La integración real conectaría ese flujo en la versión final." }
+        answer: { en: "This storefront surfaces ArionPay-ready messaging and accepted currencies throughout the site. A live checkout integration would connect that flow in the final build.", es: "Esta tienda muestra mensajes listos para ArionPay y las monedas aceptadas en toda la web. La integración real conectaría ese flujo en la versión final." }
       },
       {
         question: { en: "Why are some products marked Coming May?", es: "¿Por qué algunos productos aparecen como Llega en mayo?" },
@@ -589,8 +592,61 @@ let shopFilter = "all";
 let activeProductTab = "description";
 let toastTimer = null;
 
+function readWindowNameStore() {
+  try {
+    if (!window.name || !window.name.startsWith(WINDOW_NAME_STORE_PREFIX)) {
+      return {};
+    }
+
+    return JSON.parse(window.name.slice(WINDOW_NAME_STORE_PREFIX.length)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function writeWindowNameStore(store) {
+  try {
+    window.name = `${WINDOW_NAME_STORE_PREFIX}${JSON.stringify(store)}`;
+  } catch {
+    // Ignore fallback write failures.
+  }
+}
+
+function readPersistedValue(key) {
+  try {
+    const stored = localStorage.getItem(key);
+
+    if (stored !== null) {
+      const windowStore = readWindowNameStore();
+      if (windowStore[key] !== stored) {
+        windowStore[key] = stored;
+        writeWindowNameStore(windowStore);
+      }
+      return stored;
+    }
+  } catch {
+    // Continue to window.name fallback.
+  }
+
+  const fallbackStore = readWindowNameStore();
+  return Object.prototype.hasOwnProperty.call(fallbackStore, key) ? fallbackStore[key] : null;
+}
+
+function writePersistedValue(key, value) {
+  const stringValue = String(value);
+  const windowStore = readWindowNameStore();
+  windowStore[key] = stringValue;
+  writeWindowNameStore(windowStore);
+
+  try {
+    localStorage.setItem(key, stringValue);
+  } catch {
+    // The local preview can still keep state through window.name.
+  }
+}
+
 function getStoredLanguage() {
-  const stored = localStorage.getItem(LANG_KEY);
+  const stored = readPersistedValue(LANG_KEY);
   return stored === "es" ? "es" : "en";
 }
 
@@ -656,7 +712,7 @@ function currentProduct() {
 
 function readCart() {
   try {
-    const stored = localStorage.getItem(CART_KEY);
+    const stored = readPersistedValue(CART_KEY);
     const parsed = stored ? JSON.parse(stored) : [];
     return parsed.map(normaliseCartEntry).filter(Boolean);
   } catch {
@@ -665,7 +721,7 @@ function readCart() {
 }
 
 function saveCart(cart) {
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  writePersistedValue(CART_KEY, JSON.stringify(cart));
 }
 
 function itemCount(cart) {
@@ -809,7 +865,7 @@ function renderCookieBanner() {
     return;
   }
 
-  if (localStorage.getItem(COOKIE_KEY)) {
+  if (readPersistedValue(COOKIE_KEY)) {
     host.innerHTML = "";
     return;
   }
@@ -1175,7 +1231,7 @@ function renderUpdatedHomePage() {
             </thead>
             <tbody>${renderShippingRows()}</tbody>
           </table>
-          <p class="table-note">${currentLanguage === "es" ? "Tarifas demo: reemplazalas con las condiciones finales del operador antes del lanzamiento." : "Demo pricing shown here should be replaced with final carrier rates before launch."}</p>
+            <p class="table-note">${currentLanguage === "es" ? "Tarifas estimadas: sustitúyelas por las condiciones finales del operador antes del lanzamiento." : "Estimated carrier pricing shown here should be replaced with final live rates before launch."}</p>
         </article>
       </div>
     </section>
@@ -1184,7 +1240,7 @@ function renderUpdatedHomePage() {
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Por que confiar en nosotros" : "Why Trust Us"}</p>
           <h2 class="section-title">${currentLanguage === "es" ? "Una seccion pensada para sentirse como pruebas de laboratorio, no solo beneficios." : "Designed to feel like a lab certificates section, not just another benefits row."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Este bloque da a la home una capa de credibilidad mucho mas cercana a un archivo tecnico." : "This new section gives the homepage a stronger certificate-driven trust layer."}</p>
+          <p class="section-copy">${currentLanguage === "es" ? "Este bloque añade a la home una capa de credibilidad mucho más cercana a un archivo técnico." : "This section gives the homepage a stronger certificate-driven trust layer."}</p>
         </div>
         <div class="proof-grid">${renderProofCards()}</div>
       </div>
@@ -1194,7 +1250,7 @@ function renderUpdatedHomePage() {
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Testimonios" : "Testimonials"}</p>
           <h2 class="section-title">${currentLanguage === "es" ? "Una capa de prueba social que se siente real y tranquilizadora." : "A proof section that reads like real buyer reassurance."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Anade un bloque emocional fuerte sin perder el tono cientifico del proyecto." : "This gives you a social-proof block with stronger emotional pull than a standard icon row."}</p>
+          <p class="section-copy">${currentLanguage === "es" ? "Añade una capa de prueba social sólida sin perder el tono científico del proyecto." : "A social-proof block that adds reassurance without losing the scientific tone."}</p>
         </div>
         <div class="testimonial-grid">${renderTestimonialCards()}</div>
       </div>
@@ -1658,7 +1714,7 @@ function bindPageInteractions() {
 
 function handleLanguageSwitch(language) {
   currentLanguage = language === "es" ? "es" : "en";
-  localStorage.setItem(LANG_KEY, currentLanguage);
+  writePersistedValue(LANG_KEY, currentLanguage);
   renderShell();
   renderPage();
   renderCookieBanner();
@@ -1728,7 +1784,7 @@ function handleGlobalClick(event) {
   }
 
   if (cookieButton) {
-    localStorage.setItem(COOKIE_KEY, cookieButton.getAttribute("data-cookie-action"));
+    writePersistedValue(COOKIE_KEY, cookieButton.getAttribute("data-cookie-action"));
     renderCookieBanner();
     return;
   }
