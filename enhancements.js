@@ -1525,7 +1525,11 @@
             const result = await response.json().catch(() => ({}));
 
             if (!response.ok || !result.invoiceUrl) {
-              const detail = result.error
+              const detail = result.error && result.hint
+                ? `${result.error} ${result.hint}`
+                : result.hint
+                || result.error
+                || result.detail?.gatewayMessage
                 || result.detail?.error
                 || result.detail?.message
                 || tx("Unable to start ArionPay checkout.", "No se pudo iniciar el checkout de ArionPay.");

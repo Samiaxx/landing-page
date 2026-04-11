@@ -28,6 +28,59 @@ const ASSET_MAP = {
   BTC: "BTC"
 };
 
+function safeJsonParse(value) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeGatewayMessage(result, rawText) {
+  if (result && typeof result === "object") {
+    const directMessage = result.error || result.message || result.detail;
+    if (typeof directMessage === "string" && directMessage.trim()) {
+      return directMessage.trim();
+    }
+  }
+
+  if (typeof rawText === "string" && rawText.trim()) {
+    return rawText.trim();
+  }
+
+  return "ArionPay invoice creation failed.";
+}
+
+function buildGatewayError(message, paymentMethod) {
+  const method = paymentMethod || "selected payment method";
+  const normalized = typeof message === "string" ? message.trim() : "";
+
+  if (/payment configuration missing/i.test(normalized)) {
+    return {
+      error: `ArionPay store setup is incomplete for ${method}.`,
+      hint: "Open your ArionPay store, attach or activate the receiving wallet for this asset, save the payment method configuration, and try checkout again.",
+      gatewayMessage: normalized
+    };
+  }
+
+  if (/not enabled\/available/i.test(normalized)) {
+    return {
+      error: `${method} is not enabled in your ArionPay store.`,
+      hint: "Enable this asset under Store Settings > Accepted Currencies in ArionPay, then retry the checkout.",
+      gatewayMessage: normalized
+    };
+  }
+
+  return {
+    error: normalized || "ArionPay invoice creation failed.",
+    gatewayMessage: normalized || "ArionPay invoice creation failed."
+  };
+}
+
 function parseBody(req) {
   if (!req.body) {
     return {};
@@ -152,13 +205,21 @@ module.exports = async function handler(req, res) {
       body: payloadJson
     });
 
-    const result = await response.json().catch(() => ({}));
+    const rawText = await response.text();
+    const result = safeJsonParse(rawText) || {};
 
     if (!response.ok || result?.status !== "success" || !result?.data?.invoice_url) {
-      const detailMessage = result?.error || result?.message || result?.detail || "ArionPay invoice creation failed.";
+      const gatewayMessage = normalizeGatewayMessage(result, rawText);
+      const gatewayError = buildGatewayError(gatewayMessage, chain);
       return res.status(502).json({
-        error: detailMessage,
-        detail: result
+        error: gatewayError.error,
+        hint: gatewayError.hint,
+        detail: {
+          statusCode: response.status,
+          paymentMethod: chain,
+          gatewayMessage: gatewayError.gatewayMessage,
+          gatewayResponse: result && Object.keys(result).length ? result : rawText || null
+        }
       });
     }
 
