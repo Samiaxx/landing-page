@@ -6,7 +6,8 @@ const LAST_ORDER_KEY = "primus-last-order-v1";
 const FREE_SHIPPING_THRESHOLD = 200;
 const SITE_EMAIL = "contact@peptidos-primus.com";
 const SITE_DOMAIN = "peptidos-primus.com";
-const PAYMENT_METHODS = ["USDT (TRC20)"];
+const BRAND_LOGO_SRC = "assets/store-logo.png";
+const PAYMENT_METHODS = ["USDT (TRC20)", "Bank Transfer"];
 const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
 const IMAGE_SET = [
@@ -293,8 +294,8 @@ const PRODUCTS = [
 const COPY = {
   shell: {
     topbar: {
-      en: "COA-backed batches, HPLC-tested listings, and crypto checkout prepared for ArionPay.",
-      es: "Lotes con COA, listados verificados por HPLC y checkout crypto preparado para ArionPay."
+      en: "COA-backed batches, HPLC-tested listings, and hosted crypto checkout links with bank transfer fallback.",
+      es: "Lotes con COA, listados verificados por HPLC y enlaces de checkout crypto alojados con transferencia bancaria como alternativa."
     },
     brandTag: {
       en: "Research-grade peptide store",
@@ -311,7 +312,7 @@ const COPY = {
     linkColumn: { en: "Links", es: "Enlaces" },
     contactColumn: { en: "Contact", es: "Contacto" },
     shippingLine: { en: "EU dispatch target: 24h", es: "Objetivo de despacho UE: 24h" },
-    paymentsLine: { en: "Crypto checkout: USDT / ETH / BTC", es: "Checkout crypto: USDT / ETH / BTC" },
+    paymentsLine: { en: "Payments: USDT (TRC20) / Bank Transfer", es: "Pagos: USDT (TRC20) / Transferencia bancaria" },
     cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
     cookieBody: {
       en: "This storefront uses cookies to remember language preference, cart contents, and consent choices.",
@@ -349,7 +350,7 @@ const COPY = {
     upcoming: { en: "Coming May", es: "Llega en mayo" },
     batchReady: { en: "COA ready", es: "COA listo" },
     batchPending: { en: "Awaiting release", es: "Pendiente de lanzamiento" },
-    checkout: { en: "Checkout with ArionPay", es: "Pagar con ArionPay" },
+    checkout: { en: "Checkout", es: "Finalizar compra" },
     keepBrowsing: { en: "Keep Browsing", es: "Seguir comprando" },
     guestCheckout: { en: "Guest checkout ready", es: "Checkout como invitado" },
     searchPlaceholder: { en: "Search peptide, dosage, or status", es: "Buscar péptido, dosis o estado" },
@@ -474,7 +475,7 @@ const COPY = {
       },
       {
         question: { en: "Can shoppers pay with crypto?", es: "¿Se puede pagar con crypto?" },
-        answer: { en: "This storefront surfaces ArionPay-ready messaging and accepted currencies throughout the site. A live checkout integration would connect that flow in the final build.", es: "Esta tienda muestra mensajes listos para ArionPay y las monedas aceptadas en toda la web. La integración real conectaría ese flujo en la versión final." }
+        answer: { en: "Shoppers can pay with hosted ArionPay payment links for supported single-product USDT orders, or choose bank transfer as the manual fallback.", es: "Los compradores pueden pagar con enlaces de pago alojados de ArionPay para pedidos USDT compatibles de un solo producto, o elegir transferencia bancaria como alternativa manual." }
       },
       {
         question: { en: "Why are some products marked Coming May?", es: "¿Por qué algunos productos aparecen como Llega en mayo?" },
@@ -494,7 +495,7 @@ const COPY = {
     shippingTitle: { en: "Shipping coverage", es: "Cobertura de envío" },
     shippingBody: { en: "EU-first fulfilment, tracked dispatch, and international options from the shipping table.", es: "Cumplimiento UE primero, envío con tracking y opciones internacionales según la tabla de envíos." },
     paymentTitle: { en: "Payment", es: "Pago" },
-    paymentBody: { en: "ArionPay planning for USDT, ETH, BTC, and compatible crypto methods.", es: "Planificación de ArionPay para USDT, ETH, BTC y otros métodos crypto compatibles." },
+    paymentBody: { en: "USDT (TRC20) now uses hosted ArionPay payment links, while bank transfer stays available as the manual fallback.", es: "USDT (TRC20) ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual." },
     formTitle: { en: "Send a message", es: "Enviar un mensaje" },
     formBody: { en: "In a live build this form would route to your inbox or CRM while keeping the same visual treatment.", es: "En una versión real este formulario enviaría los datos a tu correo o CRM manteniendo el mismo tratamiento visual." },
     nameLabel: { en: "Name", es: "Nombre" },
@@ -511,7 +512,7 @@ const COPY = {
     emptyTitle: { en: "Your cart is empty.", es: "Tu carrito está vacío." },
     emptyBody: { en: "Add a product from the catalogue or product page to test the conversion flow.", es: "Añade un producto desde el catálogo o desde la ficha para probar el flujo de conversión." },
     paymentTitle: { en: "Payment options", es: "Opciones de pago" },
-    paymentBody: { en: "ArionPay-ready checkout copy is surfaced here alongside guest checkout messaging.", es: "Aquí se muestra el copy listo para ArionPay junto con el mensaje de checkout como invitado." },
+    paymentBody: { en: "Choose between hosted crypto checkout and manual bank transfer during checkout.", es: "Elige entre checkout crypto alojado y transferencia bancaria manual durante el checkout." },
     thresholdPrefix: { en: "Add", es: "Añade" },
     thresholdSuffix: { en: "more for free shipping.", es: "más para envío gratis." },
     thresholdDone: { en: "Free shipping unlocked.", es: "Envío gratis desbloqueado." }
@@ -580,7 +581,7 @@ const SHIPPING_ROWS = [
 const BENEFITS = [
   { icon: "HPLC", title: { en: "HPLC-tested lots", es: "Lotes HPLC verificados" }, body: { en: "Trust cue repeated across home, product, and COA pages.", es: "Señal de confianza repetida en home, producto y COA." } },
   { icon: "COA", title: { en: "COA archive", es: "Archivo COA" }, body: { en: "Dedicated page ready to host batch PDFs and release status.", es: "Página dedicada lista para alojar PDFs por lote y estado." } },
-  { icon: "BTC", title: { en: "Crypto-first checkout", es: "Checkout crypto" }, body: { en: "ArionPay-ready messaging built into footer, cart, and hero flows.", es: "Mensajes listos para ArionPay integrados en footer, carrito y hero." } },
+  { icon: "BTC", title: { en: "Crypto-first checkout", es: "Checkout crypto" }, body: { en: "Hosted payment-link messaging is built into the footer, cart, and hero flows.", es: "La mensajería de enlaces de pago alojados está integrada en el footer, el carrito y el hero." } },
   { icon: "24H", title: { en: "24h dispatch target", es: "Objetivo 24h" }, body: { en: "Shipping cues appear early, not buried at the bottom of the store.", es: "Las señales de envío aparecen pronto, no escondidas al final." } },
   { icon: "EN", title: { en: "Bilingual EN / ES", es: "Bilingüe EN / ES" }, body: { en: "Language switching is available in the sticky header on every page.", es: "El cambio de idioma está disponible en la cabecera sticky de cada página." } },
   { icon: "GS", title: { en: "Guest checkout", es: "Checkout invitado" }, body: { en: "The cart summary keeps the path to purchase short and visible.", es: "El resumen del carrito mantiene el camino de compra corto y visible." } }
@@ -612,6 +613,32 @@ function writeWindowNameStore(store) {
   }
 }
 
+function readCookieValue(key) {
+  try {
+    const encodedKey = `${encodeURIComponent(key)}=`;
+    const segments = document.cookie ? document.cookie.split("; ") : [];
+
+    for (const segment of segments) {
+      if (segment.startsWith(encodedKey)) {
+        return decodeURIComponent(segment.slice(encodedKey.length));
+      }
+    }
+  } catch {
+    // Ignore cookie read failures.
+  }
+
+  return null;
+}
+
+function writeCookieValue(key, value, maxAgeDays = 30) {
+  try {
+    const maxAge = Math.max(1, Math.round(maxAgeDays * 24 * 60 * 60));
+    document.cookie = `${encodeURIComponent(key)}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+  } catch {
+    // Ignore cookie write failures.
+  }
+}
+
 function readPersistedValue(key) {
   try {
     const stored = localStorage.getItem(key);
@@ -622,14 +649,47 @@ function readPersistedValue(key) {
         windowStore[key] = stored;
         writeWindowNameStore(windowStore);
       }
+      if (readCookieValue(key) !== stored) {
+        writeCookieValue(key, stored);
+      }
       return stored;
     }
   } catch {
-    // Continue to window.name fallback.
+    // Continue to cookie/window.name fallback.
+  }
+
+  const cookieValue = readCookieValue(key);
+
+  if (cookieValue !== null) {
+    const windowStore = readWindowNameStore();
+    if (windowStore[key] !== cookieValue) {
+      windowStore[key] = cookieValue;
+      writeWindowNameStore(windowStore);
+    }
+
+    try {
+      localStorage.setItem(key, cookieValue);
+    } catch {
+      // Continue to window.name fallback.
+    }
+
+    return cookieValue;
   }
 
   const fallbackStore = readWindowNameStore();
-  return Object.prototype.hasOwnProperty.call(fallbackStore, key) ? fallbackStore[key] : null;
+  const fallbackValue = Object.prototype.hasOwnProperty.call(fallbackStore, key) ? fallbackStore[key] : null;
+
+  if (fallbackValue !== null) {
+    writeCookieValue(key, fallbackValue);
+
+    try {
+      localStorage.setItem(key, fallbackValue);
+    } catch {
+      // Ignore localStorage sync failures.
+    }
+  }
+
+  return fallbackValue;
 }
 
 function writePersistedValue(key, value) {
@@ -637,11 +697,12 @@ function writePersistedValue(key, value) {
   const windowStore = readWindowNameStore();
   windowStore[key] = stringValue;
   writeWindowNameStore(windowStore);
+  writeCookieValue(key, stringValue);
 
   try {
     localStorage.setItem(key, stringValue);
   } catch {
-    // The local preview can still keep state through window.name.
+    // The local preview can still keep state through window.name and cookies.
   }
 }
 
@@ -792,17 +853,13 @@ function renderHeader() {
     <div class="topbar">
       <div class="container topbar-inner">
         <p class="topbar-copy">${pick(COPY.shell.topbar)}</p>
-        <div class="payment-chips" aria-label="Accepted crypto methods">${chips}</div>
+        <div class="payment-chips" aria-label="Accepted payment methods">${chips}</div>
       </div>
     </div>
     <div class="site-header-wrap">
       <header class="container header-inner">
         <a class="brand" href="index.html" aria-label="Primus Peptides home">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span class="brand-text">
-            <strong>Primus Peptides</strong>
-            <small>${pick(COPY.shell.brandTag)}</small>
-          </span>
+          <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
         </a>
         <nav class="site-nav" aria-label="Primary navigation">${navLinks}</nav>
         <div class="header-actions">
@@ -831,12 +888,8 @@ function renderFooter() {
     <footer class="site-footer">
       <div class="container footer-grid">
         <div class="footer-column">
-          <a class="footer-brand" href="index.html">
-            <span class="brand-mark" aria-hidden="true"></span>
-            <span>
-              <strong>Primus Peptides</strong>
-              <small>${SITE_DOMAIN}</small>
-            </span>
+          <a class="footer-brand" href="index.html" aria-label="Primus Peptides home">
+            <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
           </a>
           <p class="footer-copy">${pick(COPY.shell.footerTagline)}</p>
           <p class="footer-note">${pick(COPY.shell.footerLegal)}</p>
@@ -1314,7 +1367,7 @@ function renderShopPage() {
           <div class="page-stat-list">
             <div class="page-stat-item"><strong>${availableCount}</strong><span>${pick(COPY.shop.statAvailable)}</span></div>
             <div class="page-stat-item"><strong>${upcomingCount}</strong><span>${pick(COPY.shop.statUpcoming)}</span></div>
-            <div class="page-stat-item"><strong>ArionPay</strong><span>${pick(COPY.shop.statBilingual)}</span></div>
+            <div class="page-stat-item"><strong>USDT / BANK</strong><span>${currentLanguage === "es" ? "pagos alojados" : "hosted payments"}</span></div>
           </div>
         </aside>
       </div>

@@ -9,7 +9,25 @@
   const LAST_ORDER_STORE = typeof LAST_ORDER_KEY === "string"
     ? LAST_ORDER_KEY
     : "primus-last-order-v1";
-  const ARIONPAY_INVOICE_ENDPOINT = "/api/create-arionpay-invoice";
+  // Replace each empty value with the hosted checkout URL created in ArionPay.
+  // Each product can use either:
+  // 1. a single string URL if one hosted link covers that product, or
+  // 2. per-shipping URLs when the hosted payment link amount is fixed by delivery option.
+  const HOSTED_CRYPTO_PAYMENT_LINKS = {
+    USDT_TRC20: {
+      "tirzepatide-30mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "retatrutide-30mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "tb-500-20mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "bpc-157-10mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "ghk-cu-50mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "mots-c-40mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "melanotan-mt2-10mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "ss-31-50mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "nad-1000mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "semax-30mg": { "eu-standard": "", "eu-express": "", international: "" },
+      "selank-10mg": { "eu-standard": "", "eu-express": "", international: "" }
+    }
+  };
 
   const POLICY_LINKS = [
     { href: "privacy.html", key: "privacy", label: { en: "Privacy Policy", es: "Política de privacidad" } },
@@ -57,11 +75,20 @@
   const PAYMENT_OPTIONS = [
     {
       id: "USDT_TRC20",
-      label: "USDT (TRC20)",
-      chip: "USDT",
+      label: { en: "ArionPay", es: "ArionPay" },
+      chip: "ARIONPAY",
       note: {
-        en: "Enabled now in ArionPay through your TRC20 wallet bundle.",
-        es: "Disponible ahora en ArionPay a través de tu wallet bundle TRC20."
+        en: "Continue to the hosted ArionPay crypto checkout once the order details are confirmed.",
+        es: "Usa enlaces de pago alojados de ArionPay configurados por producto y opción de envío."
+      }
+    },
+    {
+      id: "BANK_TRANSFER",
+      label: { en: "Direct bank transfer", es: "Transferencia bancaria directa" },
+      chip: "BANK",
+      note: {
+        en: "Place the order now and complete payment after support confirms the receiving account.",
+        es: "Reserva el pedido ahora y completa el pago manualmente por transferencia bancaria tras la revisión."
       }
     },
     {
@@ -87,6 +114,53 @@
   ];
 
   const ACTIVE_PAYMENT_OPTIONS = PAYMENT_OPTIONS.filter((item) => item.enabled !== false);
+  PAYMENT_OPTIONS[0].note.es = "Continua al checkout crypto alojado de ArionPay una vez confirmados los datos del pedido.";
+  PAYMENT_OPTIONS[1].note.es = "Realiza el pedido ahora y completa el pago despues de que soporte confirme la cuenta receptora.";
+  const CRYPTO_CURRENCY_OPTIONS = [
+    {
+      id: "USDT_TRC20",
+      label: { en: "Tether (USDT - TRC20)", es: "Tether (USDT - TRC20)" },
+      shortLabel: "USDT",
+      live: true
+    },
+    {
+      id: "BTC",
+      label: { en: "Bitcoin (BTC)", es: "Bitcoin (BTC)" },
+      shortLabel: "BTC",
+      live: false
+    },
+    {
+      id: "ETH",
+      label: { en: "Ethereum (ETH)", es: "Ethereum (ETH)" },
+      shortLabel: "ETH",
+      live: false
+    }
+  ];
+  const CHECKOUT_COUNTRIES = [
+    { code: "NG", label: { en: "Nigeria", es: "Nigeria" }, regions: ["Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno", "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT Abuja", "Gombe", "Imo", "Jigawa", "Kaduna", "Kano", "Katsina", "Kebbi", "Kogi", "Kwara", "Lagos", "Nasarawa", "Niger", "Ogun", "Ondo", "Osun", "Oyo", "Plateau", "Rivers", "Sokoto", "Taraba", "Yobe", "Zamfara"] },
+    { code: "DE", label: { en: "Germany", es: "Alemania" }, regions: ["Baden-Wuerttemberg", "Bavaria", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hesse", "Lower Saxony", "Mecklenburg-Vorpommern", "North Rhine-Westphalia", "Rhineland-Palatinate", "Saarland", "Saxony", "Saxony-Anhalt", "Schleswig-Holstein", "Thuringia"] },
+    { code: "ES", label: { en: "Spain", es: "Espana" }, regions: ["Andalusia", "Aragon", "Asturias", "Balearic Islands", "Basque Country", "Canary Islands", "Cantabria", "Castile and Leon", "Castilla-La Mancha", "Catalonia", "Extremadura", "Galicia", "La Rioja", "Madrid", "Murcia", "Navarre", "Valencian Community"] },
+    { code: "FR", label: { en: "France", es: "Francia" }, regions: ["Auvergne-Rhone-Alpes", "Bourgogne-Franche-Comte", "Brittany", "Centre-Val de Loire", "Corsica", "Grand Est", "Hauts-de-France", "Ile-de-France", "Normandy", "Nouvelle-Aquitaine", "Occitanie", "Pays de la Loire", "Provence-Alpes-Cote d Azur"] },
+    { code: "IT", label: { en: "Italy", es: "Italia" }, regions: ["Abruzzo", "Aosta Valley", "Apulia", "Basilicata", "Calabria", "Campania", "Emilia-Romagna", "Friuli Venezia Giulia", "Lazio", "Liguria", "Lombardy", "Marche", "Molise", "Piedmont", "Sardinia", "Sicily", "Trentino-South Tyrol", "Tuscany", "Umbria", "Veneto"] },
+    { code: "NL", label: { en: "Netherlands", es: "Paises Bajos" }, regions: ["Drenthe", "Flevoland", "Friesland", "Gelderland", "Groningen", "Limburg", "North Brabant", "North Holland", "Overijssel", "South Holland", "Utrecht", "Zeeland"] },
+    { code: "LT", label: { en: "Lithuania", es: "Lituania" }, regions: ["Alytus", "Kaunas", "Klaipeda", "Marijampole", "Panevezys", "Siauliai", "Taurage", "Telsiai", "Utena", "Vilnius"] },
+    { code: "PT", label: { en: "Portugal", es: "Portugal" }, regions: ["Aveiro", "Beja", "Braga", "Braganca", "Castelo Branco", "Coimbra", "Evora", "Faro", "Guarda", "Leiria", "Lisbon", "Madeira", "Portalegre", "Porto", "Santarem", "Setubal", "Viana do Castelo", "Vila Real", "Viseu", "Azores"] },
+    { code: "GB", label: { en: "United Kingdom", es: "Reino Unido" }, regions: ["England", "Scotland", "Wales", "Northern Ireland"] },
+    { code: "IE", label: { en: "Ireland", es: "Irlanda" }, regions: ["Connacht", "Leinster", "Munster", "Ulster"] },
+    { code: "BE", label: { en: "Belgium", es: "Belgica" }, regions: ["Brussels-Capital Region", "Flanders", "Wallonia"] },
+    { code: "AT", label: { en: "Austria", es: "Austria" }, regions: ["Burgenland", "Carinthia", "Lower Austria", "Upper Austria", "Salzburg", "Styria", "Tyrol", "Vorarlberg", "Vienna"] },
+    { code: "CH", label: { en: "Switzerland", es: "Suiza" }, regions: ["Aargau", "Appenzell Ausserrhoden", "Appenzell Innerrhoden", "Basel-Landschaft", "Basel-Stadt", "Bern", "Fribourg", "Geneva", "Glarus", "Graubuenden", "Jura", "Lucerne", "Neuchatel", "Nidwalden", "Obwalden", "Schaffhausen", "Schwyz", "Solothurn", "St Gallen", "Thurgau", "Ticino", "Uri", "Valais", "Vaud", "Zug", "Zurich"] },
+    { code: "US", label: { en: "United States", es: "Estados Unidos" }, regions: ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"] },
+    { code: "CA", label: { en: "Canada", es: "Canada" }, regions: ["Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Northwest Territories", "Nunavut", "Yukon"] }
+  ];
+  const BANK_TRANSFER_DETAILS = {
+    beneficiary: "",
+    bankName: "",
+    iban: "",
+    swift: "",
+    accountNumber: "",
+    sortCode: ""
+  };
 
   const PRODUCT_PROFILES = {
     "tirzepatide-30mg": {
@@ -313,8 +387,8 @@
               es: "Todos los precios se muestran en EUR salvo indicación en contrario. Las variaciones del tipo de cambio y las comisiones de red pueden afectar al valor final de los pagos en crypto."
             },
             {
-              en: "ArionPay or another approved provider can be connected to automate payment capture during the final integration stage.",
-              es: "ArionPay u otro proveedor aprobado puede conectarse para automatizar el cobro en la fase final de integración."
+              en: "Hosted ArionPay payment links and manual bank transfer can both be used during the current launch phase, with a deeper gateway integration added later if needed.",
+              es: "Los enlaces de pago alojados de ArionPay y la transferencia bancaria manual pueden usarse durante la fase actual de lanzamiento, con una integración más profunda añadida más adelante si fuera necesario."
             }
           ]
         },
@@ -482,8 +556,39 @@
 
   function selectedPayment() {
     const saved = readCheckoutDraft();
-    return ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === saved.paymentMethod)
+    const savedMethod = saved.paymentMethod === "BANK_TRANSFER" ? "BANK_TRANSFER" : "USDT_TRC20";
+    return ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === savedMethod)
       || ACTIVE_PAYMENT_OPTIONS[0];
+  }
+
+  function selectedCryptoCurrency() {
+    const saved = readCheckoutDraft();
+    return CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === saved.paymentCurrency)
+      || CRYPTO_CURRENCY_OPTIONS[0];
+  }
+
+  function countryConfig(countryValue) {
+    const normalized = String(countryValue || "").trim().toUpperCase();
+    return CHECKOUT_COUNTRIES.find((item) => item.code === normalized)
+      || CHECKOUT_COUNTRIES.find((item) => String(item.label.en).toLowerCase() === String(countryValue || "").trim().toLowerCase())
+      || CHECKOUT_COUNTRIES[0];
+  }
+
+  function regionOptions(countryValue) {
+    return countryConfig(countryValue).regions || [];
+  }
+
+  function normalizeRegion(countryValue, regionValue) {
+    const regions = regionOptions(countryValue);
+    return regions.includes(regionValue) ? regionValue : (regions[0] || "");
+  }
+
+  function paymentDisplayLabel(payment, cryptoCurrency) {
+    if (isBankTransferPayment(payment)) {
+      return localize(payment.label);
+    }
+
+    return `ArionPay - ${localize((cryptoCurrency || selectedCryptoCurrency()).label)}`;
   }
 
   function deliveryPrice(option, total) {
@@ -515,8 +620,8 @@
       es: "Tienda de péptidos para investigación"
     };
     COPY.shell.topbar = {
-      en: "COA-backed batches, HPLC-tested listings, and crypto checkout prepared for ArionPay.",
-      es: "Lotes respaldados por COA, fichas analizadas por HPLC y checkout crypto preparado para ArionPay."
+      en: "COA-backed batches, HPLC-tested listings, and hosted crypto payment links with bank transfer fallback.",
+      es: "Lotes respaldados por COA, fichas analizadas por HPLC y enlaces de pago crypto alojados con transferencia bancaria como alternativa."
     };
     COPY.shell.toastContact = {
       en: "Email draft ready.",
@@ -666,20 +771,50 @@
 
   function checkoutDraftFromForm(form) {
     const data = new FormData(form);
+    const country = countryConfig(data.get("country")).code;
     return {
       firstName: String(data.get("firstName") || "").trim(),
       lastName: String(data.get("lastName") || "").trim(),
       email: String(data.get("email") || "").trim(),
       phone: String(data.get("phone") || "").trim(),
       company: String(data.get("company") || "").trim(),
-      country: String(data.get("country") || "").trim(),
+      country,
+      state: normalizeRegion(country, String(data.get("state") || "").trim()),
       city: String(data.get("city") || "").trim(),
       postalCode: String(data.get("postalCode") || "").trim(),
       address: String(data.get("address") || "").trim(),
+      addressLine2: String(data.get("addressLine2") || "").trim(),
       notes: String(data.get("notes") || "").trim(),
       shippingMethod: String(data.get("shippingMethod") || "eu-standard"),
-      paymentMethod: String(data.get("paymentMethod") || ACTIVE_PAYMENT_OPTIONS[0].id)
+      paymentMethod: String(data.get("paymentMethod") || "USDT_TRC20"),
+      paymentCurrency: String(data.get("paymentCurrency") || "USDT_TRC20"),
+      marketingOptIn: data.get("marketingOptIn") === "on",
+      createAccount: data.get("createAccount") === "on",
+      alternateShipping: data.get("alternateShipping") === "on",
+      ageConfirmed: data.get("ageConfirmed") === "on"
     };
+  }
+
+  function renderCountryOptions(currentValue) {
+    const currentCode = countryConfig(currentValue).code;
+    return CHECKOUT_COUNTRIES.map((item) => `
+      <option value="${item.code}" ${item.code === currentCode ? "selected" : ""}>${localize(item.label)}</option>
+    `).join("");
+  }
+
+  function renderStateOptions(countryValue, currentState) {
+    return regionOptions(countryValue).map((region) => `
+      <option value="${region}" ${region === normalizeRegion(countryValue, currentState) ? "selected" : ""}>${region}</option>
+    `).join("");
+  }
+
+  function renderCheckoutToggle(name, label, checked) {
+    return `
+      <label class="checkout-toggle">
+        <input type="checkbox" name="${name}" ${checked ? "checked" : ""}>
+        <span>${label}</span>
+      </label>
+    `;
   }
 
   function renderDeliveryOption(option, currentId, total) {
@@ -703,13 +838,243 @@
       <label class="checkout-option ${currentId === option.id ? "is-selected" : ""}">
         <div class="checkout-option-head">
           <div>
-            <div class="checkout-option-title">${option.label}</div>
+            <div class="checkout-option-title">${localize(option.label)}</div>
             <div class="checkout-option-copy">${localize(option.note)}</div>
           </div>
           <input type="radio" name="paymentMethod" value="${option.id}" ${currentId === option.id ? "checked" : ""}>
         </div>
       </label>
     `;
+  }
+
+  function renderSidebarDeliveryChoice(option, currentId, total) {
+    const price = deliveryPrice(option, total);
+    return `
+      <label class="checkout-choice ${currentId === option.id ? "is-selected" : ""}" data-choice-card data-choice-name="shippingMethod" data-choice-value="${option.id}">
+        <input type="radio" name="shippingMethod" value="${option.id}" form="checkout-form" ${currentId === option.id ? "checked" : ""}>
+        <div class="checkout-choice-copy">
+          <strong>${localize(option.label)}</strong>
+          <span>${localize(option.note)}</span>
+          <small>${localize(option.eta)} · ${price === 0 ? tx("Free", "Gratis") : formatPrice(price)}</small>
+        </div>
+      </label>
+    `;
+  }
+
+  function renderSidebarPaymentChoice(option, currentId) {
+    const currentCurrency = selectedCryptoCurrency().id;
+    const icons = option.id === "BANK_TRANSFER"
+      ? `<div class="checkout-payment-icons"><span>IBAN</span><span>SEPA</span></div>`
+      : `<div class="checkout-payment-icons">
+          ${CRYPTO_CURRENCY_OPTIONS.map((item) => `
+            <button class="checkout-payment-chip ${currentCurrency === item.id ? "is-active" : ""}" type="button" data-payment-currency-switch="${item.id}" aria-pressed="${currentCurrency === item.id ? "true" : "false"}">${item.shortLabel}</button>
+          `).join("")}
+        </div>`;
+
+    return `
+      <label class="checkout-choice checkout-choice-payment ${currentId === option.id ? "is-selected" : ""}" data-choice-card data-choice-name="paymentMethod" data-choice-value="${option.id}">
+        <input type="radio" name="paymentMethod" value="${option.id}" form="checkout-form" ${currentId === option.id ? "checked" : ""}>
+        <div class="checkout-choice-copy">
+          <strong>${localize(option.label)}</strong>
+          <span>${localize(option.note)}</span>
+          ${icons}
+        </div>
+      </label>
+    `;
+  }
+
+  function isBankTransferPayment(payment) {
+    return payment && payment.id === "BANK_TRANSFER";
+  }
+
+  function bankTransferConfigured() {
+    return Boolean(
+      BANK_TRANSFER_DETAILS.beneficiary.trim()
+      && BANK_TRANSFER_DETAILS.bankName.trim()
+      && (BANK_TRANSFER_DETAILS.iban.trim() || BANK_TRANSFER_DETAILS.accountNumber.trim())
+    );
+  }
+
+  function checkoutSubmitLabel(payment) {
+    return isBankTransferPayment(payment)
+      ? tx("Place binding order", "Realizar pedido vinculante")
+      : "Pay with ARIONPAY";
+  }
+
+  function checkoutPendingStatus(payment) {
+    return isBankTransferPayment(payment)
+      ? tx("Saving your order and opening bank transfer instructions...", "Guardando tu pedido y abriendo las instrucciones de transferencia bancaria...")
+      : tx("Preparing ArionPay checkout...", "Preparando el checkout de ArionPay...");
+  }
+
+  function checkoutHelperCopy(payment) {
+    return isBankTransferPayment(payment)
+      ? tx(
+        "Your order will be reserved first, then bank transfer instructions will be shown on the confirmation screen.",
+        "Primero se reservara tu pedido y despues se mostraran las instrucciones de transferencia bancaria en la pantalla de confirmacion."
+      )
+      : tx(
+        "You will continue to ArionPay to complete the crypto payment for supported single-product checkouts.",
+        "Continuaras a ArionPay para completar el pago crypto en checkouts compatibles de un solo producto."
+      );
+  }
+
+  function singleItemCartEntry(cart) {
+    if (!Array.isArray(cart) || cart.length !== 1) {
+      return null;
+    }
+
+    const [entry] = cart;
+    if (!entry || !entry.slug || Number(entry.quantity) !== 1) {
+      return null;
+    }
+
+    return entry;
+  }
+
+  function resolveHostedPaymentLink(paymentId, slug, shippingId) {
+    const paymentGroup = HOSTED_CRYPTO_PAYMENT_LINKS[paymentId] || {};
+    const productEntry = paymentGroup[slug];
+
+    if (typeof productEntry === "string") {
+      return productEntry;
+    }
+
+    if (!productEntry || typeof productEntry !== "object") {
+      return "";
+    }
+
+    return productEntry[shippingId] || productEntry.default || "";
+  }
+
+  function hostedCryptoCheckoutState(payment, cart, shipping, paymentCurrencyId) {
+    if (isBankTransferPayment(payment)) {
+      return { ready: true, url: "", reason: "" };
+    }
+
+    const item = singleItemCartEntry(cart);
+
+    if (!item) {
+      return {
+        ready: false,
+        url: "",
+        reason: tx(
+          "Hosted crypto checkout currently supports one product with quantity 1 per order. Use bank transfer or place separate crypto orders.",
+          "El checkout crypto alojado solo admite un producto con cantidad 1 por pedido. Usa transferencia bancaria o realiza pedidos crypto por separado."
+        )
+      };
+    }
+
+    const shippingId = shipping?.id || "eu-standard";
+    const url = resolveHostedPaymentLink(paymentCurrencyId || "USDT_TRC20", item.slug, shippingId);
+
+    if (!url) {
+      return {
+        ready: false,
+        url: "",
+        reason: tx(
+          "This currency, product, and delivery option do not have a hosted payment link configured yet. Use bank transfer for now.",
+          "Esta moneda, producto y opcion de envio todavia no tienen configurado un enlace de pago alojado. Usa transferencia bancaria por ahora."
+        )
+      };
+    }
+
+    return { ready: true, url, reason: "" };
+  }
+
+  function buildBankTransferMailto(order) {
+    const customerName = order?.customer
+      ? [order.customer.firstName, order.customer.lastName].filter(Boolean).join(" ").trim()
+      : "";
+    const subject = `Bank transfer request ${order.reference}`;
+    const lines = [
+      `Order reference: ${order.reference}`,
+      customerName ? `Customer: ${customerName}` : "",
+      order?.customer?.email ? `Email: ${order.customer.email}` : "",
+      order?.customer?.phone ? `Phone: ${order.customer.phone}` : "",
+      `Amount due: ${formatPrice(order.total)}`,
+      "",
+      "Please send the current bank transfer instructions for this order."
+    ].filter(Boolean);
+
+    return `mailto:${SITE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+  }
+
+  function renderBankTransferInstructions(order) {
+    return `
+      <div class="policy-callout">
+        <strong>${tx("Bank transfer details are shared only after manual review.", "Los datos de transferencia bancaria se comparten solo tras una revision manual.")}</strong>
+        <p>${tx(
+          `This store is still validating the final receiving account, so bank details are intentionally not shown on the public checkout page. Use the order reference ${order.reference} and request the current transfer instructions from ${SITE_EMAIL}.`,
+          `Esta tienda sigue validando la cuenta receptora final, por lo que los datos bancarios no se muestran en la pagina publica de checkout. Usa la referencia ${order.reference} y solicita las instrucciones vigentes a ${SITE_EMAIL}.`
+        )}</p>
+        <p>${tx(
+          "Do not send payment until the support team confirms the active account for this order.",
+          "No envies el pago hasta que el equipo de soporte confirme la cuenta activa para este pedido."
+        )}</p>
+        <div class="cta-row-inline">
+          <a class="btn btn-primary" href="${buildBankTransferMailto(order)}">${tx("Request bank details by email", "Solicitar datos bancarios por email")}</a>
+          <a class="btn btn-secondary" href="contact.html">${tx("Open support page", "Abrir pagina de soporte")}</a>
+        </div>
+      </div>
+    `;
+  }
+
+  function syncCheckoutUi() {
+    const submitButton = document.querySelector("[data-checkout-submit]");
+    const statusNode = document.querySelector("[data-checkout-status]");
+    const params = new URLSearchParams(window.location.search);
+    const order = readLastOrder();
+    const cart = readCart();
+    const shipping = selectedDelivery(subtotal(cart));
+
+    if (!submitButton && !statusNode) {
+      if (!(params.get("status") === "success" && order && isBankTransferPayment(order.payment))) {
+        return;
+      }
+    }
+
+    const payment = selectedPayment();
+    const cryptoCurrency = selectedCryptoCurrency();
+    const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, cryptoCurrency.id);
+
+    if (submitButton) {
+      submitButton.textContent = checkoutSubmitLabel(payment);
+      submitButton.disabled = !isBankTransferPayment(payment) && !cryptoState.ready;
+    }
+
+    if (statusNode) {
+      statusNode.textContent = isBankTransferPayment(payment)
+        ? checkoutHelperCopy(payment)
+        : cryptoState.ready
+          ? tx(
+            `You will be redirected to ArionPay for ${localize(cryptoCurrency.label)}.`,
+            `Seras redirigido a ArionPay para ${localize(cryptoCurrency.label)}.`
+          )
+          : cryptoState.reason;
+    }
+
+    if (params.get("status") === "success" && order && isBankTransferPayment(order.payment)) {
+      const kicker = document.querySelector(".success-card .section-kicker");
+      const title = document.querySelector(".success-title");
+      const copy = document.querySelector(".success-copy");
+
+      if (kicker) {
+        kicker.textContent = tx("Bank transfer selected", "Transferencia bancaria seleccionada");
+      }
+
+      if (title) {
+        title.textContent = bankTransferConfigured()
+          ? tx("Complete your bank transfer to confirm this order.", "Completa tu transferencia bancaria para confirmar este pedido.")
+          : tx("Your order is reserved pending bank transfer instructions.", "Tu pedido esta reservado mientras se comparten las instrucciones de transferencia bancaria.");
+      }
+
+      if (copy) {
+        copy.textContent = bankTransferConfigured()
+          ? tx("Use the payment details below and include the order reference so the transfer can be matched to this order.", "Usa los datos de pago de abajo e incluye la referencia del pedido para que la transferencia se asocie correctamente.")
+          : tx("The order has been saved with manual-payment status. Share the order reference with support so the transfer details can be sent and the payment can be confirmed.", "El pedido se ha guardado con estado de pago manual. Comparte la referencia del pedido con soporte para recibir los datos de transferencia y confirmar el pago.");
+      }
+    }
   }
 
   renderFooter = function () {
@@ -726,12 +1091,8 @@
       <footer class="site-footer">
         <div class="container footer-grid footer-grid-enhanced">
           <div class="footer-column">
-            <a class="footer-brand" href="index.html">
-              <span class="brand-mark" aria-hidden="true"></span>
-              <span>
-                <strong>Primus Peptides</strong>
-                <small>${SITE_DOMAIN}</small>
-              </span>
+            <a class="footer-brand" href="index.html" aria-label="Primus Peptides home">
+              <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
             </a>
             <p class="footer-copy">${tx(
               "Research-grade peptide storefront with HPLC-tested product presentation, clear checkout routing, and stronger buyer trust signals.",
@@ -754,7 +1115,7 @@
             <div class="footer-title">${tx("Support", "Soporte")}</div>
             <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>
             <p class="footer-note">${tx("EU dispatch target: 24h", "Objetivo de salida UE: 24h")}</p>
-            <p class="footer-note">${tx("Crypto checkout: USDT (TRC20)", "Checkout crypto: USDT (TRC20)")}</p>
+            <p class="footer-note">${tx("Payments: USDT (TRC20) / Bank transfer", "Pagos: USDT (TRC20) / Transferencia bancaria")}</p>
             <div class="footer-payments">${payments}</div>
           </div>
         </div>
@@ -861,7 +1222,7 @@
           </article>
           <article class="info-panel reveal reveal-delay">
             <p class="panel-kicker">${tx("Checkout-ready", "Listo para checkout")}</p>
-            <h3>${tx("ArionPay can now slot into a cleaner front-end order flow.", "ArionPay ya puede conectarse a un flujo de pedido frontal mucho más limpio.")}</h3>
+            <h3>${tx("Hosted ArionPay payment links now fit the storefront without a custom invoice dependency.", "Los enlaces de pago alojados de ArionPay ahora encajan en la tienda sin depender de una factura personalizada.")}</h3>
             <p class="section-copy">${tx(
               "The cart, checkout, and support pages are now structured to reduce friction while still keeping the storefront compliant and trust-led.",
               "Carrito, checkout y soporte ya están estructurados para reducir fricción manteniendo una tienda clara y orientada a confianza."
@@ -1112,6 +1473,7 @@
     const cart = readCart();
     const total = subtotal(cart);
     const delivery = selectedDelivery(total);
+    const payment = selectedPayment();
     const shippingCost = cart.length ? deliveryPrice(delivery, total) : 0;
     const grandTotal = total + shippingCost;
     const progress = Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100);
@@ -1124,7 +1486,7 @@
             <div class="section-header">
               <p class="section-kicker">${tx("Cart", "Carrito")}</p>
               <h1>${tx("Review your order before checkout.", "Revisa tu pedido antes del checkout.")}</h1>
-              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery and crypto-payment setup.", "El carrito ahora lleva a un checkout invitado más limpio con configuración de envío y pago crypto.")}</p>
+              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery selection, hosted crypto payment links, and bank transfer fallback.", "El carrito ahora lleva directamente a un checkout invitado más limpio con selección de envío, enlaces de pago crypto alojados y transferencia bancaria como alternativa.")}</p>
             </div>
             ${renderCartItems(cart)}
           </section>
@@ -1145,7 +1507,19 @@
             </div>
             <div class="support-chip-row">
               <div class="support-chip">${tx("Delivery option")}: ${hasItems ? localize(delivery.label) : tx("Select products first", "Selecciona productos primero")}</div>
-              <div class="support-chip">${tx("Payments")}: ${ACTIVE_PAYMENT_OPTIONS.map((item) => item.label).join(" / ")}</div>
+              <div class="support-chip">${tx("Payments")}: ${ACTIVE_PAYMENT_OPTIONS.map((item) => localize(item.label)).join(" / ")}</div>
+            </div>
+            <div class="stack-sm" data-cart-preferences>
+              <span class="checkout-eyebrow">${tx("Choose delivery before checkout", "Elige envio antes del checkout")}</span>
+              <div class="checkout-method-grid">
+                ${DELIVERY_OPTIONS.map((item) => renderDeliveryOption(item, delivery.id, total)).join("")}
+              </div>
+            </div>
+            <div class="stack-sm" data-cart-preferences>
+              <span class="checkout-eyebrow">${tx("Choose payment before checkout", "Elige pago antes del checkout")}</span>
+              <div class="checkout-method-grid">
+                ${ACTIVE_PAYMENT_OPTIONS.map((item) => renderPaymentOption(item, payment.id)).join("")}
+              </div>
             </div>
             <div class="summary-actions">
               ${hasItems
@@ -1154,6 +1528,10 @@
               }
               <a class="btn btn-secondary btn-block" href="shop.html">${tx("Keep browsing", "Seguir comprando")}</a>
             </div>
+            <p class="helper-copy">${hasItems
+              ? tx("Your delivery and payment choices will carry into checkout.", "Tus elecciones de envio y pago se mantendran en el checkout.")
+              : tx("Add at least one product to activate checkout.", "Agrega al menos un producto para activar el checkout.")
+            }</p>
           </aside>
         </div>
       </section>
@@ -1173,7 +1551,7 @@
             <div class="contact-points">
               <div class="contact-point"><strong>${tx("Email", "Correo")}</strong><a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a></div>
               <div class="contact-point"><strong>${tx("Shipping window", "Ventana de envío")}</strong><p>${tx("EU dispatch target: 24h once payment and order review are complete.", "Objetivo de salida UE: 24h una vez completada la revisión de pago y pedido.")}</p></div>
-              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("USDT (TRC20) is enabled now. Add ETH and BTC in ArionPay first, then we can expose them here too.", "USDT (TRC20) está activo ahora. Añade ETH y BTC en ArionPay primero y luego los mostramos aquí también.")}</p><div class="payment-chips">${ACTIVE_PAYMENT_OPTIONS.map((item) => `<span class="payment-chip">${item.chip || item.label}</span>`).join("")}</div></div>
+              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("USDT (TRC20) now routes through hosted ArionPay payment links for supported single-product checkouts, with bank transfer available as fallback.", "USDT (TRC20) ahora se dirige mediante enlaces de pago alojados de ArionPay para checkouts compatibles de un solo producto, con transferencia bancaria disponible como alternativa.")}</p><div class="payment-chips">${ACTIVE_PAYMENT_OPTIONS.map((item) => `<span class="payment-chip">${item.chip || item.label}</span>`).join("")}</div></div>
             </div>
           </article>
           <article class="contact-card reveal reveal-delay">
@@ -1197,33 +1575,38 @@
     `;
   };
 
-  function renderCheckoutPage() {
+  function legacyRenderCheckoutPage() {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
     const order = readLastOrder();
     const cart = readCart();
     const total = subtotal(cart);
     const draft = readCheckoutDraft();
+    const country = countryConfig(draft.country || "NG");
+    const region = normalizeRegion(country.code, draft.state || "");
     const delivery = DELIVERY_OPTIONS.find((item) => item.id === (draft.shippingMethod || "eu-standard")) || DELIVERY_OPTIONS[0];
     const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === (draft.paymentMethod || ACTIVE_PAYMENT_OPTIONS[0].id)) || ACTIVE_PAYMENT_OPTIONS[0];
+    const cryptoCurrency = selectedCryptoCurrency();
     const shippingCost = deliveryPrice(delivery, total);
     const grandTotal = total + shippingCost;
+    const bankTransferOrder = success && order && isBankTransferPayment(order.payment);
 
     if (success && order) {
       return `
         <section class="page-hero">
           <div class="container section-stack">
             <article class="success-card reveal">
-              <p class="section-kicker">${tx("Order received", "Pedido recibido")}</p>
-              <h1 class="success-title">${tx("Your checkout flow is set up and the order summary is ready.", "Tu flujo de checkout está listo y el resumen del pedido ya está preparado.")}</h1>
-              <p class="success-copy">${tx("The next implementation step is to connect this confirmation state to ArionPay session creation and backend fulfilment logic.", "El siguiente paso de implementación es conectar este estado de confirmación con la creación de sesiones ArionPay y la lógica de fulfilment.")}</p>
+              <p class="section-kicker">${bankTransferOrder ? tx("Bank transfer selected", "Transferencia bancaria seleccionada") : tx("Order received", "Pedido recibido")}</p>
+              <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
+              <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links, while bank transfer remains available as the manual-payment fallback.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual.")}</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
-                <article class="detail-card"><span class="detail-label">${tx("Payment", "Pago")}</span><strong>${order.payment.label}</strong><p>${localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual bank transfer pending confirmation.", "Transferencia bancaria manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
                 <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
               </div>
               <div class="summary-divider"></div>
               <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
+              ${bankTransferOrder ? renderBankTransferInstructions(order) : ""}
               <div class="cta-row-inline">
                 <a class="btn btn-primary" href="shop.html">${tx("Back to shop", "Volver a la tienda")}</a>
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
@@ -1250,12 +1633,14 @@
 
     return `
       <section class="page-hero">
-        <div class="container checkout-grid">
+        <div class="container checkout-shell">
+          <div class="checkout-banner reveal">${tx("Free tracked EU shipping on all orders over 200 EUR.", "Envio UE con seguimiento gratis en todos los pedidos superiores a 200 EUR.")}</div>
+          <div class="checkout-grid checkout-grid-pro">
           <section class="checkout-main reveal">
             <div class="section-header">
               <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
-              <h1>${tx("Guest checkout with delivery and crypto payment selection.", "Checkout invitado con selección de envío y pago crypto.")}</h1>
-              <p class="lead">${tx("Choose delivery, pay with the enabled ArionPay asset, and continue directly into the hosted payment page.", "Elige el envío, paga con el asset activo de ArionPay y continúa directamente a la página de pago alojada.")}</p>
+              <h1>${tx("Guest checkout with delivery and payment selection.", "Checkout invitado con seleccion de envio y pago.")}</h1>
+              <p class="lead">${tx("Choose delivery, then continue with a hosted ArionPay payment link or reserve the order for manual bank transfer.", "Elige el envio y luego continua con un enlace de pago alojado de ArionPay o reserva el pedido para transferencia bancaria manual.")}</p>
             </div>
             <form class="form-grid" id="checkout-form" data-checkout-form>
               <label><span>${tx("First name", "Nombre")}</span><input class="form-input" name="firstName" required value="${draft.firstName || ""}"></label>
@@ -1292,12 +1677,211 @@
             </div>
             <div class="support-chip-row">
               <div class="support-chip">${tx("Selected delivery", "Envío elegido")}: ${localize(delivery.label)}</div>
-              <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${payment.label}</div>
+              <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${localize(payment.label)}</div>
             </div>
-            <button class="btn btn-primary btn-block" type="submit" form="checkout-form" data-checkout-submit>${tx("Pay with ArionPay", "Pagar con ArionPay")}</button>
+            <button class="btn btn-primary btn-block" type="submit" form="checkout-form" data-checkout-submit>${checkoutSubmitLabel(payment)}</button>
             <a class="btn btn-secondary btn-block" href="cart.html">${tx("Back to cart", "Volver al carrito")}</a>
-            <p class="helper-copy" data-checkout-status>${tx("A secure hosted invoice will be created and opened in ArionPay for the selected crypto payment method.", "Se creará una factura segura alojada y se abrirá en ArionPay con el método crypto seleccionado.")}</p>
+            <p class="helper-copy" data-checkout-status>${tx("Select a payment method to continue.", "Selecciona un metodo de pago para continuar.")}</p>
           </aside>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderCheckoutPage() {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("status") === "success";
+    const order = readLastOrder();
+    const cart = readCart();
+    const total = subtotal(cart);
+    const draft = readCheckoutDraft();
+    const country = countryConfig(draft.country || "NG");
+    const region = normalizeRegion(country.code, draft.state || "");
+    const delivery = DELIVERY_OPTIONS.find((item) => item.id === (draft.shippingMethod || "eu-standard")) || DELIVERY_OPTIONS[0];
+    const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === (draft.paymentMethod || ACTIVE_PAYMENT_OPTIONS[0].id)) || ACTIVE_PAYMENT_OPTIONS[0];
+    const cryptoCurrency = selectedCryptoCurrency();
+    const shippingCost = deliveryPrice(delivery, total);
+    const grandTotal = total + shippingCost;
+    const bankTransferOrder = success && order && isBankTransferPayment(order.payment);
+    const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
+    const cryptoCurrencyOptions = CRYPTO_CURRENCY_OPTIONS.map((item) => {
+      const optionLabel = item.live
+        ? localize(item.label)
+        : `${localize(item.label)} - ${tx("coming soon", "proximamente")}`;
+      return `<option value="${item.id}" ${item.id === cryptoCurrency.id ? "selected" : ""}>${optionLabel}</option>`;
+    }).join("");
+
+    if (success && order) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            <article class="success-card reveal">
+              <p class="section-kicker">${bankTransferOrder ? tx("Bank transfer selected", "Transferencia bancaria seleccionada") : tx("Order received", "Pedido recibido")}</p>
+              <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
+              <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links, while bank transfer remains available as the manual-payment fallback.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual.")}</p>
+              <div class="order-meta-grid">
+                <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
+                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual bank transfer pending confirmation.", "Transferencia bancaria manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
+              ${bankTransferOrder ? renderBankTransferInstructions(order) : ""}
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="shop.html">${tx("Back to shop", "Volver a la tienda")}</a>
+                <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
+              </div>
+            </article>
+          </div>
+        </section>
+      `;
+    }
+
+    if (!cart.length) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            <div class="empty-state reveal">
+              <h1>${tx("Your cart is empty.", "Tu carrito esta vacio.")}</h1>
+              <p>${tx("Add products before opening the guest checkout flow.", "Anade productos antes de abrir el checkout invitado.")}</p>
+              <a class="btn btn-primary" href="shop.html">${tx("Browse products", "Ver productos")}</a>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="page-hero">
+        <div class="container checkout-shell">
+          <div class="checkout-banner reveal">${tx("Free tracked EU shipping on all orders over 200 EUR.", "Envio UE con seguimiento gratis en todos los pedidos superiores a 200 EUR.")}</div>
+          <div class="checkout-grid checkout-grid-pro">
+            <section class="checkout-main reveal">
+              <article class="checkout-card checkout-card-form">
+                <div class="section-header">
+                  <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
+                  <h1>${tx("Billing details and payment selection.", "Datos de facturacion y seleccion de pago.")}</h1>
+                  <p class="lead">${tx("This checkout now follows a more standard store layout, making it easier to compare crypto checkout against a future card gateway or another provider.", "Este checkout ahora sigue una estructura mas estandar, facilitando comparar el pago crypto con una futura pasarela de tarjeta u otro proveedor.")}</p>
+                </div>
+                <form class="form-grid checkout-form-pro" id="checkout-form" data-checkout-form>
+                  <div class="full-width checkout-field-grid">
+                    <label>
+                      <span>${tx("First name *", "Nombre *")}</span>
+                      <input class="form-input" name="firstName" required value="${draft.firstName || ""}">
+                    </label>
+                    <label>
+                      <span>${tx("Last name *", "Apellidos *")}</span>
+                      <input class="form-input" name="lastName" required value="${draft.lastName || ""}">
+                    </label>
+                  </div>
+                  <div class="full-width checkout-field-grid">
+                    <label>
+                      <span>${tx("Email *", "Correo *")}</span>
+                      <input class="form-input" name="email" type="email" required value="${draft.email || ""}">
+                    </label>
+                    <label>
+                      <span>${tx("Phone *", "Telefono *")}</span>
+                      <input class="form-input" name="phone" required value="${draft.phone || ""}">
+                    </label>
+                  </div>
+                  <label class="full-width">
+                    <span>${tx("Company name (optional)", "Nombre de empresa (opcional)")}</span>
+                    <input class="form-input" name="company" value="${draft.company || ""}">
+                  </label>
+                  <label class="full-width">
+                    <span>${tx("Country / Region *", "Pais / Region *")}</span>
+                    <select class="form-select" name="country" required>
+                      ${renderCountryOptions(country.code)}
+                    </select>
+                  </label>
+                  <div class="full-width checkout-field-grid">
+                    <label>
+                      <span>${tx("Street address *", "Direccion *")}</span>
+                      <input class="form-input" name="address" required value="${draft.address || ""}">
+                    </label>
+                    <label>
+                      <span>${tx("Apartment, suite, unit, etc. (optional)", "Apartamento, suite, unidad, etc. (opcional)")}</span>
+                      <input class="form-input" name="addressLine2" value="${draft.addressLine2 || ""}">
+                    </label>
+                  </div>
+                  <label class="full-width">
+                    <span>${tx("Town / City *", "Ciudad *")}</span>
+                    <input class="form-input" name="city" required value="${draft.city || ""}">
+                  </label>
+                  <div class="full-width checkout-field-grid">
+                    <label>
+                      <span>${tx("State *", "Estado *")}</span>
+                      <select class="form-select" name="state" required>
+                        ${renderStateOptions(country.code, region)}
+                      </select>
+                    </label>
+                    <label>
+                      <span>${tx("Postal code *", "Codigo postal *")}</span>
+                      <input class="form-input" name="postalCode" required value="${draft.postalCode || ""}">
+                    </label>
+                  </div>
+                  <label class="full-width">
+                    <span>${tx("Order notes (optional)", "Notas del pedido (opcional)")}</span>
+                    <textarea class="form-textarea" name="notes" placeholder="${tx("Delivery notes, support context, or purchase instructions.", "Notas de entrega, contexto de soporte o instrucciones de compra.")}">${draft.notes || ""}</textarea>
+                  </label>
+                  <div class="full-width checkout-toggle-group">
+                    ${renderCheckoutToggle("marketingOptIn", tx("I would like to receive updates and news via email. (optional)", "Quiero recibir novedades y noticias por email. (opcional)"), draft.marketingOptIn)}
+                    ${renderCheckoutToggle("createAccount", tx("Create an account?", "Crear una cuenta?"), draft.createAccount)}
+                    ${renderCheckoutToggle("alternateShipping", tx("Ship to a different address?", "Enviar a una direccion diferente?"), draft.alternateShipping)}
+                  </div>
+                </form>
+              </article>
+            </section>
+            <aside class="summary-card checkout-side reveal reveal-delay">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Summary", "Resumen")}</p>
+                <h2 class="section-title">${tx("Order overview", "Resumen del pedido")}</h2>
+              </div>
+              <div class="order-line-items">${renderOrderLineItems(cart)}</div>
+              <div class="summary-divider"></div>
+              <div class="checkout-side-section">
+                <p class="checkout-eyebrow">${tx("Delivery method", "Metodo de envio")}</p>
+                <div class="checkout-choice-list">
+                  ${DELIVERY_OPTIONS.map((item) => renderSidebarDeliveryChoice(item, delivery.id, total)).join("")}
+                </div>
+              </div>
+              <div class="summary-list">
+                <div class="summary-row"><span class="summary-label">${tx("Subtotal", "Subtotal")}</span><strong>${formatPrice(total)}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Estimated total", "Total estimado")}</span><strong>${formatPrice(grandTotal)}</strong></div>
+              </div>
+              <div class="checkout-side-section">
+                <p class="checkout-eyebrow">${tx("Payment method", "Metodo de pago")}</p>
+                <div class="checkout-choice-list">
+                  ${ACTIVE_PAYMENT_OPTIONS.map((item) => renderSidebarPaymentChoice(item, payment.id)).join("")}
+                </div>
+                ${isBankTransferPayment(payment)
+                  ? `<p class="checkout-side-note">${tx("Bank details stay off the public checkout until the client confirms the final receiving account.", "Los datos bancarios se mantienen fuera del checkout publico hasta que el cliente confirme la cuenta receptora final.")}</p>`
+                  : `
+                    <label class="checkout-inline-select">
+                      <span>${tx("Please select a currency *", "Selecciona una moneda *")}</span>
+                      <select class="form-select" name="paymentCurrency" form="checkout-form">
+                        ${cryptoCurrencyOptions}
+                      </select>
+                    </label>
+                    <p class="checkout-side-note">${tx("Only currencies with a live hosted link can continue immediately. Other currencies remain visible for future gateway planning.", "Solo las monedas con enlace alojado activo pueden continuar de inmediato. Las demas siguen visibles para planificar la futura pasarela.")}</p>
+                  `
+                }
+              </div>
+              <div class="support-chip-row">
+                <div class="support-chip">${tx("Selected delivery", "Envio elegido")}: ${localize(delivery.label)}</div>
+                <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
+              </div>
+              <label class="checkout-agreement">
+                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${draft.ageConfirmed ? "checked" : ""} required>
+                <span>${tx("I confirm that I am purchasing for laboratory research use only, that I am of legal age, and that I have read the terms and privacy policy.", "Confirmo que compro solo para investigacion de laboratorio, que soy mayor de edad y que he leido los terminos y la politica de privacidad.")}</span>
+              </label>
+              <button class="btn btn-primary btn-block" type="submit" form="checkout-form" data-checkout-submit>${checkoutSubmitLabel(payment)}</button>
+              <a class="btn btn-secondary btn-block" href="cart.html">${tx("Back to cart", "Volver al carrito")}</a>
+              <p class="helper-copy" data-checkout-status>${checkoutHelperCopy(payment)}</p>
+            </aside>
+          </div>
         </div>
       </section>
     `;
@@ -1410,6 +1994,7 @@
     bindPageInteractions();
     initReveal();
     updateTitle();
+    syncCheckoutUi();
   };
 
   updateTitle = function () {
@@ -1470,15 +2055,65 @@
     }
 
     const checkoutForm = document.querySelector("[data-checkout-form]");
+    const cartPreferences = document.querySelectorAll('[data-cart-preferences] input[name="shippingMethod"], [data-cart-preferences] input[name="paymentMethod"]');
+
+    cartPreferences.forEach((input) => {
+      input.addEventListener("change", () => {
+        const draft = readCheckoutDraft();
+
+        if (input.name === "shippingMethod") {
+          draft.shippingMethod = input.value;
+        }
+
+        if (input.name === "paymentMethod") {
+          draft.paymentMethod = input.value;
+        }
+
+        saveCheckoutDraft(draft);
+        renderPage();
+      });
+    });
 
     if (checkoutForm) {
+      document.querySelectorAll("[data-choice-card]").forEach((card) => {
+        card.addEventListener("click", (event) => {
+          if (event.target.closest("input, select, textarea, a")) {
+            return;
+          }
+
+          const choiceName = card.getAttribute("data-choice-name");
+          const choiceValue = card.getAttribute("data-choice-value");
+          const targetInput = document.querySelector(`[name="${choiceName}"][value="${choiceValue}"]`);
+
+          if (!targetInput) {
+            return;
+          }
+
+          targetInput.checked = true;
+          targetInput.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      });
+
+      document.querySelectorAll("[data-payment-currency-switch]").forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const draft = readCheckoutDraft();
+          draft.paymentMethod = "USDT_TRC20";
+          draft.paymentCurrency = button.getAttribute("data-payment-currency-switch") || "USDT_TRC20";
+          saveCheckoutDraft(draft);
+          renderPage();
+        });
+      });
+
       checkoutForm.addEventListener("input", () => {
         saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
       });
 
       checkoutForm.addEventListener("change", (event) => {
         saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
-        if (event.target.name === "shippingMethod" || event.target.name === "paymentMethod") {
+        if (["country", "shippingMethod", "paymentMethod", "paymentCurrency"].includes(event.target.name)) {
           renderPage();
         }
       });
@@ -1493,93 +2128,105 @@
         const shipping = DELIVERY_OPTIONS.find((item) => item.id === draft.shippingMethod) || DELIVERY_OPTIONS[0];
         const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === draft.paymentMethod) || ACTIVE_PAYMENT_OPTIONS[0];
         const shippingCost = deliveryPrice(shipping, total);
+        const paymentCurrency = CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === draft.paymentCurrency) || CRYPTO_CURRENCY_OPTIONS[0];
         const reference = orderReference();
 
         if (submitButton) {
           submitButton.disabled = true;
-          submitButton.textContent = tx("Redirecting to ArionPay...", "Redirigiendo a ArionPay...");
+          submitButton.textContent = isBankTransferPayment(payment)
+            ? tx("Preparing bank transfer instructions...", "Preparando instrucciones de transferencia bancaria...")
+            : tx("Opening ArionPay...", "Abriendo ArionPay...");
         }
 
         if (statusNode) {
-          statusNode.textContent = tx("Creating secure crypto invoice...", "Creando factura crypto segura...");
+          statusNode.textContent = checkoutPendingStatus(payment);
         }
 
         saveCheckoutDraft(draft);
 
-        fetch(ARIONPAY_INVOICE_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
+        if (isBankTransferPayment(payment)) {
+          const order = {
             reference,
-            shippingMethod: draft.shippingMethod,
-            paymentMethod: draft.paymentMethod,
+            createdAt: new Date().toISOString(),
+            customer: draft,
+            shipping,
+            payment,
+            subtotal: Number(total.toFixed(2)),
+            shippingCost: Number(shippingCost.toFixed(2)),
+            total: Number((total + shippingCost).toFixed(2)),
+            status: "bank_transfer_pending",
+            paymentCurrency,
             items: cart.map((item) => ({
               slug: item.slug,
-              quantity: item.quantity
+              quantity: item.quantity,
+              lineTotal: (getProduct(item.slug).price || 0) * item.quantity
             }))
-          })
-        })
-          .then(async (response) => {
-            const result = await response.json().catch(() => ({}));
+          };
 
-            if (!response.ok || !result.invoiceUrl) {
-              const detail = result.error && result.hint
-                ? `${result.error} ${result.hint}`
-                : result.hint
-                || result.error
-                || result.detail?.gatewayMessage
-                || result.detail?.error
-                || result.detail?.message
-                || tx("Unable to start ArionPay checkout.", "No se pudo iniciar el checkout de ArionPay.");
-              throw new Error(detail);
-            }
+          saveLastOrder(order);
 
-            const order = {
-              reference: result.reference || reference,
-              createdAt: new Date().toISOString(),
-              customer: draft,
-              shipping,
-              payment,
-              subtotal: result.subtotal,
-              shippingCost: result.shipping,
-              total: result.total,
-              status: "invoice_created",
-              invoiceId: result.invoiceId,
-              invoiceUrl: result.invoiceUrl,
-              items: cart.map((item) => ({
-                slug: item.slug,
-                quantity: item.quantity,
-                lineTotal: (getProduct(item.slug).price || 0) * item.quantity
-              }))
-            };
+          if (typeof saveCart === "function") {
+            saveCart([]);
+          }
 
-            saveLastOrder(order);
+          if (typeof updateCartBadges === "function") {
+            updateCartBadges();
+          }
 
-            if (statusNode) {
-              statusNode.textContent = tx("Invoice created. Opening ArionPay checkout...", "Factura creada. Abriendo checkout de ArionPay...");
-            }
+          window.location.href = "checkout.html?status=success";
+          return;
+        }
 
-            window.location.href = result.invoiceUrl;
-          })
-          .catch((error) => {
-            const fallback = window.location.protocol === "file:"
-              ? tx("Serve the site through Vercel or a local web server to use the live ArionPay checkout.", "Sirve la web desde Vercel o un servidor local para usar el checkout real de ArionPay.")
-              : tx("Unable to start ArionPay checkout right now.", "No se pudo iniciar el checkout de ArionPay ahora mismo.");
-            const message = error instanceof Error && error.message ? error.message : fallback;
+        const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, paymentCurrency.id);
 
-            if (statusNode) {
-              statusNode.textContent = message;
-            }
+        if (!cryptoState.ready || !cryptoState.url) {
+          const message = cryptoState.reason || tx(
+            "Hosted crypto checkout is not available for this cart.",
+            "El checkout crypto alojado no esta disponible para este carrito."
+          );
 
-            if (submitButton) {
-              submitButton.disabled = false;
-              submitButton.textContent = tx("Pay with ArionPay", "Pagar con ArionPay");
-            }
+          if (statusNode) {
+            statusNode.textContent = message;
+          }
 
-            showToast(message);
-          });
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = checkoutSubmitLabel(payment);
+          }
+
+          showToast(message);
+          return;
+        }
+
+        const order = {
+          reference,
+          createdAt: new Date().toISOString(),
+          customer: draft,
+          shipping,
+          payment,
+          subtotal: Number(total.toFixed(2)),
+          shippingCost: Number(shippingCost.toFixed(2)),
+          total: Number((total + shippingCost).toFixed(2)),
+          status: "payment_link_redirected",
+          paymentCurrency,
+          paymentLinkUrl: cryptoState.url,
+          items: cart.map((item) => ({
+            slug: item.slug,
+            quantity: item.quantity,
+            lineTotal: (getProduct(item.slug).price || 0) * item.quantity
+          }))
+        };
+
+        saveLastOrder(order);
+
+        if (statusNode) {
+          statusNode.textContent = tx(
+            "Opening the hosted ArionPay payment link...",
+            "Abriendo el enlace de pago alojado de ArionPay..."
+          );
+        }
+
+        window.location.href = cryptoState.url;
       });
     }
   };

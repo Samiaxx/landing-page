@@ -3,44 +3,8 @@ const http = require("http");
 const path = require("path");
 const { URL } = require("url");
 
-const createInvoiceHandler = require("./api/create-arionpay-invoice");
-const webhookHandler = require("./api/arionpay-webhook");
-
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
-
-function loadEnvFile(filename) {
-  const filepath = path.join(ROOT, filename);
-
-  if (!fs.existsSync(filepath)) {
-    return;
-  }
-
-  const lines = fs.readFileSync(filepath, "utf8").split(/\r?\n/);
-
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-
-    if (!trimmed || trimmed.startsWith("#")) {
-      return;
-    }
-
-    const index = trimmed.indexOf("=");
-    if (index === -1) {
-      return;
-    }
-
-    const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim();
-
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
-  });
-}
-
-loadEnvFile(".env.local");
-loadEnvFile(".env");
 
 const CONTENT_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -62,73 +26,6 @@ function sendJson(res, statusCode, payload) {
     "Content-Length": Buffer.byteLength(body)
   });
   res.end(body);
-}
-
-function createResponseAdapter(res) {
-  return {
-    statusCode: 200,
-    headersSent: false,
-    setHeader(name, value) {
-      res.setHeader(name, value);
-    },
-    status(code) {
-      this.statusCode = code;
-      return this;
-    },
-    json(payload) {
-      if (this.headersSent) {
-        return this;
-      }
-
-      const body = JSON.stringify(payload);
-      res.writeHead(this.statusCode, {
-        "Content-Type": "application/json; charset=utf-8",
-        "Content-Length": Buffer.byteLength(body)
-      });
-      res.end(body);
-      this.headersSent = true;
-      return this;
-    }
-  };
-}
-
-function readRequestBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-
-    req.on("data", (chunk) => {
-      chunks.push(chunk);
-    });
-
-    req.on("end", () => {
-      resolve(Buffer.concat(chunks).toString("utf8"));
-    });
-
-    req.on("error", reject);
-  });
-}
-
-async function handleApiRoute(handler, req, res) {
-  const rawBody = await readRequestBody(req);
-  let parsedBody = {};
-
-  if (rawBody) {
-    try {
-      parsedBody = JSON.parse(rawBody);
-    } catch {
-      parsedBody = {};
-    }
-  }
-
-  const request = {
-    method: req.method,
-    headers: req.headers,
-    body: parsedBody,
-    rawBody
-  };
-
-  const response = createResponseAdapter(res);
-  await handler(request, response);
 }
 
 function resolveStaticPath(urlPath) {
@@ -170,16 +67,6 @@ const server = http.createServer(async (req, res) => {
   const { pathname } = currentUrl;
 
   try {
-    if (pathname === "/api/create-arionpay-invoice") {
-      await handleApiRoute(createInvoiceHandler, req, res);
-      return;
-    }
-
-    if (pathname === "/api/arionpay-webhook") {
-      await handleApiRoute(webhookHandler, req, res);
-      return;
-    }
-
     if (req.method !== "GET" && req.method !== "HEAD") {
       sendJson(res, 405, { error: "Method not allowed" });
       return;
