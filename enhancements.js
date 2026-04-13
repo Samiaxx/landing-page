@@ -9,7 +9,10 @@
   const LAST_ORDER_STORE = typeof LAST_ORDER_KEY === "string"
     ? LAST_ORDER_KEY
     : "primus-last-order-v1";
-  // Replace each empty value with the hosted checkout URL created in ArionPay.
+  const NOWPAYMENTS_SESSION_MS = ((2 * 60) + 15) * 60 * 1000;
+  let nowPaymentsStatusTimer = null;
+  let nowPaymentsCountdownTimer = null;
+  // Legacy hosted-link structure kept only as fallback reference.
   // Each product can use either:
   // 1. a single string URL if one hosted link covers that product, or
   // 2. per-shipping URLs when the hosted payment link amount is fixed by delivery option.
@@ -75,10 +78,10 @@
   const PAYMENT_OPTIONS = [
     {
       id: "USDT_TRC20",
-      label: { en: "ArionPay", es: "ArionPay" },
-      chip: "ARIONPAY",
+      label: { en: "Cryptocurrency", es: "Criptomoneda" },
+      chip: "CRYPTO",
       note: {
-        en: "Continue to the hosted ArionPay crypto checkout once the order details are confirmed.",
+        en: "Complete your order with a secure crypto payment in USDT, BTC, or ETH once your checkout details are confirmed.",
         es: "Usa enlaces de pago alojados de ArionPay configurados por producto y opción de envío."
       }
     },
@@ -114,7 +117,7 @@
   ];
 
   const ACTIVE_PAYMENT_OPTIONS = PAYMENT_OPTIONS.filter((item) => item.enabled !== false);
-  PAYMENT_OPTIONS[0].note.es = "Continua al checkout crypto alojado de ArionPay una vez confirmados los datos del pedido.";
+  PAYMENT_OPTIONS[0].note.es = "Completa tu pedido con un pago seguro en criptomonedas usando USDT, BTC o ETH una vez confirmados los datos del checkout.";
   PAYMENT_OPTIONS[1].note.es = "Realiza el pedido ahora y completa el pago despues de que soporte confirme la cuenta receptora.";
   const CRYPTO_CURRENCY_OPTIONS = [
     {
@@ -127,13 +130,13 @@
       id: "BTC",
       label: { en: "Bitcoin (BTC)", es: "Bitcoin (BTC)" },
       shortLabel: "BTC",
-      live: false
+      live: true
     },
     {
       id: "ETH",
       label: { en: "Ethereum (ETH)", es: "Ethereum (ETH)" },
       shortLabel: "ETH",
-      live: false
+      live: true
     }
   ];
   const CHECKOUT_COUNTRIES = [
@@ -387,8 +390,8 @@
               es: "Todos los precios se muestran en EUR salvo indicación en contrario. Las variaciones del tipo de cambio y las comisiones de red pueden afectar al valor final de los pagos en crypto."
             },
             {
-              en: "Hosted ArionPay payment links and manual bank transfer can both be used during the current launch phase, with a deeper gateway integration added later if needed.",
-              es: "Los enlaces de pago alojados de ArionPay y la transferencia bancaria manual pueden usarse durante la fase actual de lanzamiento, con una integración más profunda añadida más adelante si fuera necesario."
+              en: "Cryptocurrency checkout and manual bank transfer can both be used during the current launch phase, with a deeper card gateway integration added later if needed.",
+              es: "El checkout con criptomonedas y la transferencia bancaria manual pueden usarse durante la fase actual de lanzamiento, con una integracion de tarjeta mas profunda añadida mas adelante si fuera necesario."
             }
           ]
         },
@@ -588,7 +591,7 @@
       return localize(payment.label);
     }
 
-    return `ArionPay - ${localize((cryptoCurrency || selectedCryptoCurrency()).label)}`;
+    return `${tx("Cryptocurrency", "Criptomoneda")} - ${localize((cryptoCurrency || selectedCryptoCurrency()).label)}`;
   }
 
   function deliveryPrice(option, total) {
@@ -620,8 +623,8 @@
       es: "Tienda de péptidos para investigación"
     };
     COPY.shell.topbar = {
-      en: "COA-backed batches, HPLC-tested listings, and hosted crypto payment links with bank transfer fallback.",
-      es: "Lotes respaldados por COA, fichas analizadas por HPLC y enlaces de pago crypto alojados con transferencia bancaria como alternativa."
+      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with bank transfer fallback.",
+      es: "Lotes respaldados por COA, fichas analizadas por HPLC y checkout seguro con criptomonedas y transferencia bancaria como alternativa."
     };
     COPY.shell.toastContact = {
       en: "Email draft ready.",
@@ -862,7 +865,7 @@
   }
 
   function renderSidebarPaymentChoice(option, currentId) {
-    const currentCurrency = selectedCryptoCurrency().id;
+    const currentCurrency = currentId === option.id ? selectedCryptoCurrency().id : "";
     const icons = option.id === "BANK_TRANSFER"
       ? `<div class="checkout-payment-icons"><span>IBAN</span><span>SEPA</span></div>`
       : `<div class="checkout-payment-icons">
@@ -897,14 +900,14 @@
 
   function checkoutSubmitLabel(payment) {
     return isBankTransferPayment(payment)
-      ? tx("Place binding order", "Realizar pedido vinculante")
-      : "Pay with ARIONPAY";
+      ? tx("Order now", "Pedir ahora")
+      : tx("Pay now", "Pagar ahora");
   }
 
   function checkoutPendingStatus(payment) {
     return isBankTransferPayment(payment)
       ? tx("Saving your order and opening bank transfer instructions...", "Guardando tu pedido y abriendo las instrucciones de transferencia bancaria...")
-      : tx("Preparing ArionPay checkout...", "Preparando el checkout de ArionPay...");
+      : tx("Preparing your cryptocurrency checkout...", "Preparando tu checkout con criptomonedas...");
   }
 
   function checkoutHelperCopy(payment) {
@@ -914,8 +917,8 @@
         "Primero se reservara tu pedido y despues se mostraran las instrucciones de transferencia bancaria en la pantalla de confirmacion."
       )
       : tx(
-        "You will continue to ArionPay to complete the crypto payment for supported single-product checkouts.",
-        "Continuaras a ArionPay para completar el pago crypto en checkouts compatibles de un solo producto."
+        "You will continue to a secure cryptocurrency payment screen with the amount, wallet address, QR code, and live payment status.",
+        "Continuaras a una pantalla segura de pago con criptomonedas con el importe, la direccion de wallet, el codigo QR y el estado del pago en vivo."
       );
   }
 
@@ -951,35 +954,31 @@
     if (isBankTransferPayment(payment)) {
       return { ready: true, url: "", reason: "" };
     }
-
-    const item = singleItemCartEntry(cart);
-
-    if (!item) {
+    if (!Array.isArray(cart) || !cart.length) {
       return {
         ready: false,
         url: "",
         reason: tx(
-          "Hosted crypto checkout currently supports one product with quantity 1 per order. Use bank transfer or place separate crypto orders.",
-          "El checkout crypto alojado solo admite un producto con cantidad 1 por pedido. Usa transferencia bancaria o realiza pedidos crypto por separado."
+          "Add at least one product before starting cryptocurrency checkout.",
+          "Agrega al menos un producto antes de iniciar el checkout con criptomonedas."
         )
       };
     }
 
-    const shippingId = shipping?.id || "eu-standard";
-    const url = resolveHostedPaymentLink(paymentCurrencyId || "USDT_TRC20", item.slug, shippingId);
+    const selectedCurrency = CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === paymentCurrencyId) || CRYPTO_CURRENCY_OPTIONS[0];
 
-    if (!url) {
+    if (!selectedCurrency.live) {
       return {
         ready: false,
         url: "",
         reason: tx(
-          "This currency, product, and delivery option do not have a hosted payment link configured yet. Use bank transfer for now.",
-          "Esta moneda, producto y opcion de envio todavia no tienen configurado un enlace de pago alojado. Usa transferencia bancaria por ahora."
+          "This cryptocurrency option is not active yet. Choose USDT, BTC, or ETH when available.",
+          "Esta opcion de criptomoneda aun no esta activa. Elige USDT, BTC o ETH cuando este disponible."
         )
       };
     }
 
-    return { ready: true, url, reason: "" };
+    return { ready: true, url: "", reason: "" };
   }
 
   function buildBankTransferMailto(order) {
@@ -1020,6 +1019,171 @@
     `;
   }
 
+  function nowPaymentsStatusCopy(status) {
+    const normalized = String(status || "waiting").toLowerCase();
+
+    if (normalized === "finished") {
+      return tx("Payment finished", "Pago finalizado");
+    }
+
+    if (normalized === "confirmed") {
+      return tx("Payment confirmed", "Pago confirmado");
+    }
+
+    if (normalized === "confirming") {
+      return tx("Confirming on-chain", "Confirmando en cadena");
+    }
+
+    if (normalized === "failed") {
+      return tx("Payment failed", "Pago fallido");
+    }
+
+    if (normalized === "expired") {
+      return tx("Payment expired", "Pago expirado");
+    }
+
+    return tx("Awaiting payment", "Esperando pago");
+  }
+
+  function nowPaymentsCountdown(expirationEstimateDate) {
+    if (!expirationEstimateDate) {
+      return "--:--:--";
+    }
+
+    const target = new Date(expirationEstimateDate).getTime();
+
+    if (!Number.isFinite(target)) {
+      return "--:--:--";
+    }
+
+    const remaining = Math.max(0, target - Date.now());
+    const hours = Math.floor(remaining / 3600000);
+    const minutes = Math.floor((remaining % 3600000) / 60000);
+    const seconds = Math.floor((remaining % 60000) / 1000);
+
+    return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+  }
+
+  function nowPaymentsSessionExpiresAt(order) {
+    const preset = order?.paymentSessionExpiresAt || "";
+    if (Number.isFinite(new Date(preset).getTime())) {
+      return preset;
+    }
+
+    const createdAt = new Date(order?.createdAt || "").getTime();
+    if (!Number.isFinite(createdAt)) {
+      return "";
+    }
+
+    return new Date(createdAt + NOWPAYMENTS_SESSION_MS).toISOString();
+  }
+
+  function nowPaymentsSessionActive(order) {
+    const target = new Date(nowPaymentsSessionExpiresAt(order)).getTime();
+    return Number.isFinite(target) && target > Date.now();
+  }
+
+  function nowPaymentsQrSource(order) {
+    const payment = order?.nowPayments || {};
+    const qrPayload = payment.payAddress || "";
+    return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
+  }
+
+  function nowPaymentsWalletHref(order) {
+    const payment = order?.nowPayments || {};
+    const address = payment.payAddress || "";
+    const amount = payment.payAmount || "";
+
+    if (!address) {
+      return "";
+    }
+
+    if (payment.payCurrency === "BTC") {
+      return `bitcoin:${address}${amount ? `?amount=${encodeURIComponent(amount)}` : ""}`;
+    }
+
+    if (payment.payCurrency === "ETH") {
+      return `ethereum:${address}${amount ? `?value=${encodeURIComponent(amount)}` : ""}`;
+    }
+
+    return "";
+  }
+
+  function renderNowPaymentsWalletAction(order) {
+    const payment = order?.nowPayments || {};
+    const walletHref = nowPaymentsWalletHref(order);
+
+    if (walletHref) {
+      return `<a class="btn btn-primary payment-wallet-btn" href="${walletHref}">${tx("Open in wallet", "Abrir en wallet")}</a>`;
+    }
+
+    return `<button class="btn btn-primary payment-wallet-btn" type="button" data-copy-value="${payment.payAddress || ""}" data-copy-label="${tx("Wallet address copied.", "Direccion copiada.")}">${tx("Copy wallet address", "Copiar direccion")}</button>`;
+  }
+
+  function renderNowPaymentsPaymentScreen(order) {
+    const payment = order?.nowPayments || {};
+    const sessionExpiresAt = nowPaymentsSessionExpiresAt(order);
+
+    return `
+      <section class="page-hero">
+        <div class="container checkout-shell">
+          <div class="checkout-banner reveal">${tx("Shopping Cart > Checkout details > Order Complete", "Carrito > Detalles del checkout > Pedido completado")}</div>
+          <div class="checkout-grid checkout-grid-pro">
+            <section class="checkout-main reveal">
+              <article class="checkout-card crypto-payment-card" data-nowpayments-payment data-payment-id="${payment.paymentId || ""}" data-payment-expires="${payment.expirationEstimateDate || ""}" data-session-expires="${sessionExpiresAt}">
+                <div class="crypto-payment-header">
+                  <h1>${tx("To complete your order", "Para completar tu pedido")}</h1>
+                </div>
+                <div class="crypto-payment-row">
+                  <span>${tx("Send", "Enviar")}</span>
+                  <div class="crypto-payment-value-group">
+                    <strong class="crypto-payment-value" data-payment-amount>${payment.payAmount ? `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}` : tx("Pending amount", "Importe pendiente")}</strong>
+                    <button class="copy-chip" type="button" data-copy-value="${payment.payAmount ? `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}` : ""}" data-copy-label="${tx("Payment amount copied.", "Importe copiado.")}">${tx("Copy", "Copiar")}</button>
+                  </div>
+                </div>
+                <div class="crypto-payment-row">
+                  <span>${tx("To", "A")}</span>
+                  <div class="crypto-payment-value-group">
+                    <strong class="crypto-payment-address" data-payment-address>${payment.payAddress || tx("Waiting for deposit address", "Esperando direccion de deposito")}</strong>
+                    <button class="copy-chip" type="button" data-copy-value="${payment.payAddress || ""}" data-copy-label="${tx("Wallet address copied.", "Direccion copiada.")}">${tx("Copy", "Copiar")}</button>
+                  </div>
+                </div>
+                <div class="crypto-payment-layout">
+                  <div class="crypto-payment-qr-wrap">
+                    <img class="crypto-payment-qr" data-payment-qr src="${nowPaymentsQrSource(order)}" alt="${tx("NOWPayments QR code", "Codigo QR de NOWPayments")}">
+                  </div>
+                  <div class="crypto-payment-status-block">
+                    <strong data-payment-status>${nowPaymentsStatusCopy(payment.paymentStatus)}</strong>
+                    <p data-payment-helper>${tx("Your payment details stay active for up to 2 hours 15 minutes, and the crypto quote refreshes automatically in the background.", "Tus datos de pago permanecen activos hasta 2 horas y 15 minutos, y la cotizacion crypto se actualiza automaticamente en segundo plano.")}</p>
+                    <div class="crypto-payment-timer" data-payment-countdown>${nowPaymentsCountdown(sessionExpiresAt)}</div>
+                    <div class="crypto-payment-actions" data-payment-wallet-action>${renderNowPaymentsWalletAction(order)}</div>
+                  </div>
+                </div>
+              </article>
+            </section>
+            <aside class="summary-card checkout-side reveal reveal-delay">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Thank you", "Gracias")}</p>
+                <h2 class="section-title">${tx("Your crypto payment is ready.", "Tu pago crypto esta listo.")}</h2>
+              </div>
+              <div class="summary-list">
+                <div class="summary-row"><span class="summary-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Total due", "Total a pagar")}</span><strong>${formatPrice(order.total)}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Selected currency", "Moneda elegida")}</span><strong>${paymentDisplayLabel(order.payment, { label: { en: payment.payCurrencyCode || payment.payCurrency || "Crypto", es: payment.payCurrencyCode || payment.payCurrency || "Crypto" } })}</strong></div>
+              </div>
+              <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
+              <div class="policy-callout">
+                <strong>${tx("Send the exact amount shown on this page.", "Envia el importe exacto mostrado en esta pagina.")}</strong>
+                <p>${tx("The payment status refreshes automatically. Your crypto quote can keep updating during the reserved 2 hour 15 minute checkout window, and the order will complete as soon as the payment is confirmed.", "El estado del pago se actualiza automaticamente. La cotizacion crypto puede seguir actualizandose durante la ventana reservada de 2 horas y 15 minutos, y el pedido se completara en cuanto el pago quede confirmado.")}</p>
+              </div>
+              <a class="btn btn-secondary btn-block" href="cart.html">${tx("Back to cart", "Volver al carrito")}</a>
+            </aside>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   function syncCheckoutUi() {
     const submitButton = document.querySelector("[data-checkout-submit]");
     const statusNode = document.querySelector("[data-checkout-status]");
@@ -1048,8 +1212,8 @@
         ? checkoutHelperCopy(payment)
         : cryptoState.ready
           ? tx(
-            `You will be redirected to ArionPay for ${localize(cryptoCurrency.label)}.`,
-            `Seras redirigido a ArionPay para ${localize(cryptoCurrency.label)}.`
+            `You will be redirected to the cryptocurrency payment screen for ${localize(cryptoCurrency.label)}.`,
+            `Seras redirigido a la pantalla de pago con criptomonedas para ${localize(cryptoCurrency.label)}.`
           )
           : cryptoState.reason;
     }
@@ -1115,7 +1279,7 @@
             <div class="footer-title">${tx("Support", "Soporte")}</div>
             <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>
             <p class="footer-note">${tx("EU dispatch target: 24h", "Objetivo de salida UE: 24h")}</p>
-            <p class="footer-note">${tx("Payments: USDT (TRC20) / Bank transfer", "Pagos: USDT (TRC20) / Transferencia bancaria")}</p>
+            <p class="footer-note">${tx("Payments: BTC / USDT / ETH / Bank transfer", "Pagos: BTC / USDT / ETH / Transferencia bancaria")}</p>
             <div class="footer-payments">${payments}</div>
           </div>
         </div>
@@ -1222,7 +1386,7 @@
           </article>
           <article class="info-panel reveal reveal-delay">
             <p class="panel-kicker">${tx("Checkout-ready", "Listo para checkout")}</p>
-            <h3>${tx("Hosted ArionPay payment links now fit the storefront without a custom invoice dependency.", "Los enlaces de pago alojados de ArionPay ahora encajan en la tienda sin depender de una factura personalizada.")}</h3>
+            <h3>${tx("Cryptocurrency checkout now fits the storefront without relying on the old custom gateway flow.", "El checkout con criptomonedas ahora encaja en la tienda sin depender del flujo antiguo de pasarela personalizada.")}</h3>
             <p class="section-copy">${tx(
               "The cart, checkout, and support pages are now structured to reduce friction while still keeping the storefront compliant and trust-led.",
               "Carrito, checkout y soporte ya están estructurados para reducir fricción manteniendo una tienda clara y orientada a confianza."
@@ -1486,7 +1650,7 @@
             <div class="section-header">
               <p class="section-kicker">${tx("Cart", "Carrito")}</p>
               <h1>${tx("Review your order before checkout.", "Revisa tu pedido antes del checkout.")}</h1>
-              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery selection, hosted crypto payment links, and bank transfer fallback.", "El carrito ahora lleva directamente a un checkout invitado más limpio con selección de envío, enlaces de pago crypto alojados y transferencia bancaria como alternativa.")}</p>
+              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery selection, secure cryptocurrency checkout, and bank transfer fallback.", "El carrito ahora lleva directamente a un checkout invitado más limpio con selección de envío, checkout seguro con criptomonedas y transferencia bancaria como alternativa.")}</p>
             </div>
             ${renderCartItems(cart)}
           </section>
@@ -1551,7 +1715,7 @@
             <div class="contact-points">
               <div class="contact-point"><strong>${tx("Email", "Correo")}</strong><a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a></div>
               <div class="contact-point"><strong>${tx("Shipping window", "Ventana de envío")}</strong><p>${tx("EU dispatch target: 24h once payment and order review are complete.", "Objetivo de salida UE: 24h una vez completada la revisión de pago y pedido.")}</p></div>
-              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("USDT (TRC20) now routes through hosted ArionPay payment links for supported single-product checkouts, with bank transfer available as fallback.", "USDT (TRC20) ahora se dirige mediante enlaces de pago alojados de ArionPay para checkouts compatibles de un solo producto, con transferencia bancaria disponible como alternativa.")}</p><div class="payment-chips">${ACTIVE_PAYMENT_OPTIONS.map((item) => `<span class="payment-chip">${item.chip || item.label}</span>`).join("")}</div></div>
+              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("BTC, USDT, and ETH are available through secure cryptocurrency checkout, with bank transfer available as fallback.", "BTC, USDT y ETH estan disponibles mediante checkout seguro con criptomonedas, con transferencia bancaria como alternativa.")}</p><div class="payment-chips">${["BTC", "USDT", "ETH", tx("Bank Transfer", "Transferencia bancaria")].map((item) => `<span class="payment-chip">${item}</span>`).join("")}</div></div>
             </div>
           </article>
           <article class="contact-card reveal reveal-delay">
@@ -1692,6 +1856,7 @@
   function renderCheckoutPage() {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
+    const paymentPending = params.get("status") === "payment";
     const order = readLastOrder();
     const cart = readCart();
     const total = subtotal(cart);
@@ -1712,6 +1877,10 @@
       return `<option value="${item.id}" ${item.id === cryptoCurrency.id ? "selected" : ""}>${optionLabel}</option>`;
     }).join("");
 
+    if (paymentPending && order && order.nowPayments && !bankTransferOrder) {
+      return renderNowPaymentsPaymentScreen(order);
+    }
+
     if (success && order) {
       return `
         <section class="page-hero">
@@ -1719,7 +1888,10 @@
             <article class="success-card reveal">
               <p class="section-kicker">${bankTransferOrder ? tx("Bank transfer selected", "Transferencia bancaria seleccionada") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
-              <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links, while bank transfer remains available as the manual-payment fallback.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual.")}</p>
+              <p class="success-copy">${bankTransferOrder
+                ? tx("Bank transfer remains available as a manual-payment fallback when needed.", "La transferencia bancaria sigue disponible como alternativa de pago manual cuando sea necesario.")
+                : tx("Your cryptocurrency payment is completed and the order is now confirmed.", "Tu pago con criptomonedas se ha completado y el pedido ya esta confirmado.")
+              }</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
                 <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual bank transfer pending confirmation.", "Transferencia bancaria manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
@@ -1762,7 +1934,7 @@
                 <div class="section-header">
                   <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
                   <h1>${tx("Billing details and payment selection.", "Datos de facturacion y seleccion de pago.")}</h1>
-                  <p class="lead">${tx("This checkout now follows a more standard store layout, making it easier to compare crypto checkout against a future card gateway or another provider.", "Este checkout ahora sigue una estructura mas estandar, facilitando comparar el pago crypto con una futura pasarela de tarjeta u otro proveedor.")}</p>
+                  <p class="lead">${tx("This checkout now uses a direct cryptocurrency flow for USDT, BTC, and ETH, while keeping the cleaner standard storefront layout.", "Este checkout ahora usa un flujo directo con criptomonedas para USDT, BTC y ETH, manteniendo una estructura de tienda mas limpia y estandar.")}</p>
                 </div>
                 <form class="form-grid checkout-form-pro" id="checkout-form" data-checkout-form>
                   <div class="full-width checkout-field-grid">
@@ -1865,7 +2037,7 @@
                         ${cryptoCurrencyOptions}
                       </select>
                     </label>
-                    <p class="checkout-side-note">${tx("Only currencies with a live hosted link can continue immediately. Other currencies remain visible for future gateway planning.", "Solo las monedas con enlace alojado activo pueden continuar de inmediato. Las demas siguen visibles para planificar la futura pasarela.")}</p>
+                    <p class="checkout-side-note">${tx("Choose BTC, USDT, or ETH to continue to the secure cryptocurrency payment screen.", "Elige BTC, USDT o ETH para continuar a la pantalla segura de pago con criptomonedas.")}</p>
                   `
                 }
               </div>
@@ -2135,7 +2307,7 @@
           submitButton.disabled = true;
           submitButton.textContent = isBankTransferPayment(payment)
             ? tx("Preparing bank transfer instructions...", "Preparando instrucciones de transferencia bancaria...")
-            : tx("Opening ArionPay...", "Abriendo ArionPay...");
+            : tx("Creating your crypto payment...", "Creando tu pago con criptomonedas...");
         }
 
         if (statusNode) {
@@ -2179,10 +2351,10 @@
 
         const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, paymentCurrency.id);
 
-        if (!cryptoState.ready || !cryptoState.url) {
+        if (!cryptoState.ready) {
           const message = cryptoState.reason || tx(
-            "Hosted crypto checkout is not available for this cart.",
-            "El checkout crypto alojado no esta disponible para este carrito."
+            "Cryptocurrency checkout is not available for this cart.",
+            "El checkout con criptomonedas no esta disponible para este carrito."
           );
 
           if (statusNode) {
@@ -2198,36 +2370,284 @@
           return;
         }
 
-        const order = {
-          reference,
-          createdAt: new Date().toISOString(),
-          customer: draft,
-          shipping,
-          payment,
-          subtotal: Number(total.toFixed(2)),
-          shippingCost: Number(shippingCost.toFixed(2)),
-          total: Number((total + shippingCost).toFixed(2)),
-          status: "payment_link_redirected",
-          paymentCurrency,
-          paymentLinkUrl: cryptoState.url,
-          items: cart.map((item) => ({
-            slug: item.slug,
-            quantity: item.quantity,
-            lineTotal: (getProduct(item.slug).price || 0) * item.quantity
-          }))
-        };
+        fetch("/api/create-nowpayments-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            reference,
+            total: Number((total + shippingCost).toFixed(2)),
+            selectedCurrency: paymentCurrency.id,
+            items: cart.map((item) => {
+              const product = getProduct(item.slug);
+              return {
+                slug: item.slug,
+                name: `${localize(product.name)} ${product.dosage}`,
+                quantity: item.quantity
+              };
+            })
+          })
+        })
+          .then(async (response) => {
+            const result = await response.json().catch(() => ({}));
 
-        saveLastOrder(order);
+            if (!response.ok || !result.paymentId || !result.payAddress) {
+              throw new Error(result.detail || result.error || tx("Unable to create the cryptocurrency payment.", "No se pudo crear el pago con criptomonedas."));
+            }
 
-        if (statusNode) {
-          statusNode.textContent = tx(
-            "Opening the hosted ArionPay payment link...",
-            "Abriendo el enlace de pago alojado de ArionPay..."
-          );
+            const order = {
+              reference,
+              createdAt: new Date().toISOString(),
+              customer: draft,
+              shipping,
+              payment,
+              subtotal: Number(total.toFixed(2)),
+              shippingCost: Number(shippingCost.toFixed(2)),
+              total: Number((total + shippingCost).toFixed(2)),
+              status: "payment_pending",
+              paymentCurrency,
+              paymentSessionExpiresAt: new Date(Date.now() + NOWPAYMENTS_SESSION_MS).toISOString(),
+              nowPayments: result,
+              items: cart.map((item) => ({
+                slug: item.slug,
+                quantity: item.quantity,
+                lineTotal: (getProduct(item.slug).price || 0) * item.quantity
+              }))
+            };
+
+            saveLastOrder(order);
+
+            if (statusNode) {
+              statusNode.textContent = tx(
+                "Crypto payment created. Opening the payment screen...",
+                "Pago con criptomonedas creado. Abriendo la pantalla de pago..."
+              );
+            }
+
+            window.location.href = "checkout.html?status=payment";
+          })
+          .catch((error) => {
+            const message = error instanceof Error && error.message
+              ? error.message
+              : tx("Unable to create the cryptocurrency payment.", "No se pudo crear el pago con criptomonedas.");
+
+            if (statusNode) {
+              statusNode.textContent = message;
+            }
+
+            if (submitButton) {
+              submitButton.disabled = false;
+              submitButton.textContent = checkoutSubmitLabel(payment);
+            }
+
+            showToast(message);
+          });
+      });
+    }
+
+    document.querySelectorAll("[data-copy-value]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const value = button.getAttribute("data-copy-value") || "";
+        const label = button.getAttribute("data-copy-label") || tx("Copied.", "Copiado.");
+
+        if (!value) {
+          return;
         }
 
-        window.location.href = cryptoState.url;
+        try {
+          await navigator.clipboard.writeText(value);
+          showToast(label);
+        } catch (error) {
+          showToast(tx("Unable to copy automatically.", "No se pudo copiar automaticamente."));
+        }
       });
+    });
+
+    const nowPaymentsRoot = document.querySelector("[data-nowpayments-payment]");
+    if (nowPaymentsStatusTimer) {
+      window.clearInterval(nowPaymentsStatusTimer);
+      nowPaymentsStatusTimer = null;
+    }
+    if (nowPaymentsCountdownTimer) {
+      window.clearInterval(nowPaymentsCountdownTimer);
+      nowPaymentsCountdownTimer = null;
+    }
+
+    if (nowPaymentsRoot) {
+      const paymentId = nowPaymentsRoot.getAttribute("data-payment-id") || "";
+      let expiresAt = nowPaymentsRoot.getAttribute("data-payment-expires") || "";
+      const sessionExpiresAt = nowPaymentsRoot.getAttribute("data-session-expires") || "";
+      const countdownNode = document.querySelector("[data-payment-countdown]");
+      const statusNode = document.querySelector("[data-payment-status]");
+      const helperNode = document.querySelector("[data-payment-helper]");
+      const amountNode = document.querySelector("[data-payment-amount]");
+      const addressNode = document.querySelector("[data-payment-address]");
+      const qrNode = document.querySelector("[data-payment-qr]");
+      const walletActionNode = document.querySelector("[data-payment-wallet-action]");
+      let refreshingEstimate = false;
+
+      const syncNowPaymentsNodes = (order) => {
+        const payment = order?.nowPayments || {};
+        expiresAt = payment.expirationEstimateDate || expiresAt;
+        nowPaymentsRoot.setAttribute("data-payment-expires", expiresAt);
+
+        if (statusNode) {
+          statusNode.textContent = nowPaymentsStatusCopy(payment.paymentStatus);
+        }
+
+        if (helperNode) {
+          helperNode.textContent = nowPaymentsSessionActive(order)
+            ? tx("Your payment details stay active for up to 2 hours 15 minutes, and the crypto quote refreshes automatically in the background.", "Tus datos de pago permanecen activos hasta 2 horas y 15 minutos, y la cotizacion crypto se actualiza automaticamente en segundo plano.")
+            : tx("This reserved crypto checkout window has expired. Return to checkout to create a fresh payment.", "Esta ventana reservada para pago crypto ha expirado. Vuelve al checkout para crear un nuevo pago.");
+        }
+
+        if (amountNode && payment.payAmount) {
+          amountNode.textContent = `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}`;
+          if (amountNode.nextElementSibling) {
+            amountNode.nextElementSibling.setAttribute("data-copy-value", `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}`);
+          }
+        }
+
+        if (addressNode && payment.payAddress) {
+          addressNode.textContent = payment.payAddress;
+          if (addressNode.nextElementSibling) {
+            addressNode.nextElementSibling.setAttribute("data-copy-value", payment.payAddress);
+          }
+        }
+
+        if (qrNode) {
+          qrNode.setAttribute("src", nowPaymentsQrSource(order));
+        }
+
+        if (walletActionNode) {
+          walletActionNode.innerHTML = renderNowPaymentsWalletAction(order);
+          const walletCopyButton = walletActionNode.querySelector("[data-copy-value]");
+          if (walletCopyButton) {
+            walletCopyButton.addEventListener("click", async () => {
+              const value = walletCopyButton.getAttribute("data-copy-value") || "";
+              const label = walletCopyButton.getAttribute("data-copy-label") || tx("Copied.", "Copiado.");
+
+              if (!value) {
+                return;
+              }
+
+              try {
+                await navigator.clipboard.writeText(value);
+                showToast(label);
+              } catch (error) {
+                showToast(tx("Unable to copy automatically.", "No se pudo copiar automaticamente."));
+              }
+            });
+          }
+        }
+      };
+
+      const refreshEstimate = () => {
+        if (refreshingEstimate || !paymentId) {
+          return;
+        }
+
+        const order = readLastOrder();
+        if (!order || !order.nowPayments || order.nowPayments.paymentId !== paymentId || !nowPaymentsSessionActive(order)) {
+          return;
+        }
+
+        refreshingEstimate = true;
+        if (statusNode) {
+          statusNode.textContent = tx("Refreshing payment quote...", "Actualizando cotizacion del pago...");
+        }
+
+        fetch("/api/refresh-nowpayments-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ paymentId })
+        })
+          .then((response) => response.json().then((payload) => ({ ok: response.ok, payload })))
+          .then(({ ok, payload }) => {
+            if (!ok) {
+              throw new Error(payload.detail || payload.error || "Unable to refresh payment.");
+            }
+
+            const latestOrder = readLastOrder();
+            if (!latestOrder || !latestOrder.nowPayments || latestOrder.nowPayments.paymentId !== paymentId) {
+              return;
+            }
+
+            latestOrder.nowPayments = { ...latestOrder.nowPayments, ...payload };
+            saveLastOrder(latestOrder);
+            syncNowPaymentsNodes(latestOrder);
+          })
+          .catch(() => {
+            const latestOrder = readLastOrder();
+            if (latestOrder && latestOrder.nowPayments) {
+              syncNowPaymentsNodes(latestOrder);
+            }
+          })
+          .finally(() => {
+            refreshingEstimate = false;
+          });
+      };
+
+      const refreshCountdown = () => {
+        if (countdownNode) {
+          countdownNode.textContent = nowPaymentsCountdown(sessionExpiresAt);
+        }
+
+        const rateExpiresAt = new Date(expiresAt).getTime();
+        if (Number.isFinite(rateExpiresAt) && rateExpiresAt <= Date.now()) {
+          refreshEstimate();
+        }
+      };
+
+      const refreshPaymentStatus = () => {
+        if (!paymentId) {
+          return;
+        }
+
+        fetch(`/api/get-nowpayments-payment?payment_id=${encodeURIComponent(paymentId)}`)
+          .then((response) => response.json().then((payload) => ({ ok: response.ok, payload })))
+          .then(({ ok, payload }) => {
+            if (!ok) {
+              throw new Error(payload.detail || payload.error || "Unable to refresh payment.");
+            }
+
+            const order = readLastOrder();
+            if (!order || !order.nowPayments || order.nowPayments.paymentId !== paymentId) {
+              return;
+            }
+
+            order.nowPayments = { ...order.nowPayments, ...payload };
+            saveLastOrder(order);
+            syncNowPaymentsNodes(order);
+
+            if (payload.paymentStatus === "finished") {
+              order.status = "finished";
+              saveLastOrder(order);
+              if (typeof saveCart === "function") {
+                saveCart([]);
+              }
+              if (typeof updateCartBadges === "function") {
+                updateCartBadges();
+              }
+              window.location.href = "checkout.html?status=success";
+            }
+          })
+          .catch(() => {
+            // Keep the current screen stable if a refresh fails.
+          });
+      };
+
+      const initialOrder = readLastOrder();
+      if (initialOrder && initialOrder.nowPayments && initialOrder.nowPayments.paymentId === paymentId) {
+        syncNowPaymentsNodes(initialOrder);
+      }
+      refreshCountdown();
+      refreshPaymentStatus();
+      nowPaymentsCountdownTimer = window.setInterval(refreshCountdown, 1000);
+      nowPaymentsStatusTimer = window.setInterval(refreshPaymentStatus, 15000);
     }
   };
 

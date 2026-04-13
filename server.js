@@ -2,6 +2,9 @@ const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const { URL } = require("url");
+const createNowPaymentsPayment = require("./api/create-nowpayments-payment");
+const getNowPaymentsPayment = require("./api/get-nowpayments-payment");
+const refreshNowPaymentsPayment = require("./api/refresh-nowpayments-payment");
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
@@ -18,6 +21,37 @@ const CONTENT_TYPES = {
   ".txt": "text/plain; charset=utf-8",
   ".webp": "image/webp"
 };
+
+function loadEnvFile(filepath) {
+  if (!fs.existsSync(filepath)) {
+    return;
+  }
+
+  const lines = fs.readFileSync(filepath, "utf8").split(/\r?\n/);
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+
+    if (!trimmed || trimmed.startsWith("#")) {
+      return;
+    }
+
+    const separatorIndex = trimmed.indexOf("=");
+    if (separatorIndex <= 0) {
+      return;
+    }
+
+    const key = trimmed.slice(0, separatorIndex).trim();
+    const value = trimmed.slice(separatorIndex + 1).trim();
+
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  });
+}
+
+loadEnvFile(path.join(ROOT, ".env"));
+loadEnvFile(path.join(ROOT, ".env.local"));
 
 function sendJson(res, statusCode, payload) {
   const body = JSON.stringify(payload);
@@ -67,6 +101,21 @@ const server = http.createServer(async (req, res) => {
   const { pathname } = currentUrl;
 
   try {
+    if (pathname === "/api/create-nowpayments-payment") {
+      await createNowPaymentsPayment(req, res);
+      return;
+    }
+
+    if (pathname === "/api/get-nowpayments-payment") {
+      await getNowPaymentsPayment(req, res);
+      return;
+    }
+
+    if (pathname === "/api/refresh-nowpayments-payment") {
+      await refreshNowPaymentsPayment(req, res);
+      return;
+    }
+
     if (req.method !== "GET" && req.method !== "HEAD") {
       sendJson(res, 405, { error: "Method not allowed" });
       return;

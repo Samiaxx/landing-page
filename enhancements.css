@@ -644,6 +644,121 @@
   background: rgba(9, 22, 48, 0.04);
 }
 
+.crypto-payment-card {
+  gap: 18px;
+}
+
+.crypto-payment-header {
+  padding: 0.85rem 1rem;
+  border-radius: 16px 16px 0 0;
+  background: rgba(9, 22, 48, 0.12);
+}
+
+.crypto-payment-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.crypto-payment-row {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.crypto-payment-row > span {
+  color: var(--blue-600);
+  font-weight: 700;
+}
+
+.crypto-payment-value-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(10, 23, 48, 0.1);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.crypto-payment-value,
+.crypto-payment-address {
+  flex: 1 1 auto;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.copy-chip {
+  flex: 0 0 auto;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid rgba(10, 23, 48, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crypto-payment-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.crypto-payment-qr-wrap {
+  display: grid;
+  place-items: center;
+  padding: 0.8rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(10, 23, 48, 0.1);
+}
+
+.crypto-payment-qr {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+}
+
+.crypto-payment-status-block {
+  display: grid;
+  gap: 10px;
+}
+
+.crypto-payment-status-block strong {
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.crypto-payment-status-block p {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.crypto-payment-timer {
+  width: fit-content;
+  padding: 0.7rem 1rem;
+  border-radius: 14px;
+  background: rgba(9, 22, 48, 0.9);
+  color: #ffffff;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+}
+
+.crypto-payment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.payment-wallet-btn {
+  width: fit-content;
+}
+
 @media (max-width: 1120px) {
   .footer-grid-enhanced,
   .checkout-grid,
@@ -657,6 +772,10 @@
   }
 
   .checkout-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crypto-payment-layout {
     grid-template-columns: 1fr;
   }
 }
@@ -702,6 +821,20 @@
 
   .checkout-choice input {
     margin-top: 0;
+  }
+
+  .crypto-payment-row {
+    grid-template-columns: 1fr;
+  }
+
+  .crypto-payment-value-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .crypto-payment-qr {
+    width: min(100%, 220px);
+    height: auto;
   }
 
   .product-main-image-enhanced .product-visual-stage {

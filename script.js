@@ -7,7 +7,7 @@ const FREE_SHIPPING_THRESHOLD = 200;
 const SITE_EMAIL = "contact@peptidos-primus.com";
 const SITE_DOMAIN = "peptidos-primus.com";
 const BRAND_LOGO_SRC = "assets/store-logo.png";
-const PAYMENT_METHODS = ["USDT (TRC20)", "Bank Transfer"];
+const PAYMENT_METHODS = ["BTC", "USDT", "ETH", "Bank Transfer"];
 const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
 const IMAGE_SET = [
@@ -294,8 +294,8 @@ const PRODUCTS = [
 const COPY = {
   shell: {
     topbar: {
-      en: "COA-backed batches, HPLC-tested listings, and hosted crypto checkout links with bank transfer fallback.",
-      es: "Lotes con COA, listados verificados por HPLC y enlaces de checkout crypto alojados con transferencia bancaria como alternativa."
+      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with bank transfer fallback.",
+      es: "Lotes con COA, listados verificados por HPLC y checkout seguro con criptomonedas y transferencia bancaria como alternativa."
     },
     brandTag: {
       en: "Research-grade peptide store",
@@ -312,7 +312,7 @@ const COPY = {
     linkColumn: { en: "Links", es: "Enlaces" },
     contactColumn: { en: "Contact", es: "Contacto" },
     shippingLine: { en: "EU dispatch target: 24h", es: "Objetivo de despacho UE: 24h" },
-    paymentsLine: { en: "Payments: USDT (TRC20) / Bank Transfer", es: "Pagos: USDT (TRC20) / Transferencia bancaria" },
+    paymentsLine: { en: "Payments: BTC / USDT / ETH / Bank Transfer", es: "Pagos: BTC / USDT / ETH / Transferencia bancaria" },
     cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
     cookieBody: {
       en: "This storefront uses cookies to remember language preference, cart contents, and consent choices.",
@@ -495,7 +495,7 @@ const COPY = {
     shippingTitle: { en: "Shipping coverage", es: "Cobertura de envío" },
     shippingBody: { en: "EU-first fulfilment, tracked dispatch, and international options from the shipping table.", es: "Cumplimiento UE primero, envío con tracking y opciones internacionales según la tabla de envíos." },
     paymentTitle: { en: "Payment", es: "Pago" },
-    paymentBody: { en: "USDT (TRC20) now uses hosted ArionPay payment links, while bank transfer stays available as the manual fallback.", es: "USDT (TRC20) ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual." },
+    paymentBody: { en: "BTC, USDT, and ETH are available through secure cryptocurrency checkout, while bank transfer stays available as the manual fallback.", es: "BTC, USDT y ETH estan disponibles mediante checkout seguro con criptomonedas, mientras que la transferencia bancaria sigue disponible como alternativa manual." },
     formTitle: { en: "Send a message", es: "Enviar un mensaje" },
     formBody: { en: "In a live build this form would route to your inbox or CRM while keeping the same visual treatment.", es: "En una versión real este formulario enviaría los datos a tu correo o CRM manteniendo el mismo tratamiento visual." },
     nameLabel: { en: "Name", es: "Nombre" },
