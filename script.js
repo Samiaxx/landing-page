@@ -21,6 +21,13 @@ const IMAGE_SET = [
   "assets/vial-slate.svg"
 ];
 
+const KPV_IMAGE_SET = [
+  "assets/kpv-label.jpg",
+  "assets/kpv-vial-1.jpg",
+  "assets/kpv-vial-2.jpg",
+  "assets/brand-caps.jpg"
+];
+
 const NAV_ITEMS = [
   { key: "home", href: "index.html" },
   { key: "shop", href: "shop.html" },
@@ -250,8 +257,8 @@ const PRODUCTS = [
     dosage: "10mg",
     price: null,
     status: "coming",
-    image: IMAGE_SET[6],
-    gallery: [IMAGE_SET[6], IMAGE_SET[5], IMAGE_SET[1]],
+    image: KPV_IMAGE_SET[0],
+    gallery: [KPV_IMAGE_SET[0], KPV_IMAGE_SET[1], KPV_IMAGE_SET[2], KPV_IMAGE_SET[3]],
     short: {
       en: "Styled as a waiting-list product without pulling attention from live SKUs.",
       es: "Diseñado como producto en espera sin competir con las referencias activas."

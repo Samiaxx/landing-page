@@ -2,9 +2,8 @@ const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const { URL } = require("url");
-const createNowPaymentsPayment = require("./api/create-nowpayments-payment");
-const getNowPaymentsPayment = require("./api/get-nowpayments-payment");
-const refreshNowPaymentsPayment = require("./api/refresh-nowpayments-payment");
+const createArionPayInvoice = require("./api/create-arionpay-invoice");
+const arionPayWebhook = require("./api/arionpay-webhook");
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
@@ -62,6 +61,73 @@ function sendJson(res, statusCode, payload) {
   res.end(body);
 }
 
+function createResponseAdapter(res) {
+  return {
+    statusCode: 200,
+    headersSent: false,
+    setHeader(name, value) {
+      res.setHeader(name, value);
+    },
+    status(code) {
+      this.statusCode = code;
+      return this;
+    },
+    json(payload) {
+      if (this.headersSent) {
+        return this;
+      }
+
+      const body = JSON.stringify(payload);
+      res.writeHead(this.statusCode, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": Buffer.byteLength(body)
+      });
+      res.end(body);
+      this.headersSent = true;
+      return this;
+    }
+  };
+}
+
+function readRequestBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+
+    req.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+
+    req.on("end", () => {
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+
+    req.on("error", reject);
+  });
+}
+
+async function handleApiRoute(handler, req, res) {
+  const rawBody = await readRequestBody(req);
+  let parsedBody = {};
+
+  if (rawBody) {
+    try {
+      parsedBody = JSON.parse(rawBody);
+    } catch {
+      parsedBody = {};
+    }
+  }
+
+  const request = {
+    method: req.method,
+    headers: req.headers,
+    body: parsedBody,
+    rawBody
+  };
+
+  const response = createResponseAdapter(res);
+  await handler(request, response);
+}
+
 function resolveStaticPath(urlPath) {
   const normalized = urlPath === "/" ? "/index.html" : urlPath;
   const filepath = path.join(ROOT, normalized.replace(/^\/+/, ""));
@@ -101,18 +167,13 @@ const server = http.createServer(async (req, res) => {
   const { pathname } = currentUrl;
 
   try {
-    if (pathname === "/api/create-nowpayments-payment") {
-      await createNowPaymentsPayment(req, res);
+    if (pathname === "/api/create-arionpay-invoice") {
+      await handleApiRoute(createArionPayInvoice, req, res);
       return;
     }
 
-    if (pathname === "/api/get-nowpayments-payment") {
-      await getNowPaymentsPayment(req, res);
-      return;
-    }
-
-    if (pathname === "/api/refresh-nowpayments-payment") {
-      await refreshNowPaymentsPayment(req, res);
+    if (pathname === "/api/arionpay-webhook") {
+      await handleApiRoute(arionPayWebhook, req, res);
       return;
     }
 

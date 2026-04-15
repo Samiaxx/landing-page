@@ -9,9 +9,7 @@
   const LAST_ORDER_STORE = typeof LAST_ORDER_KEY === "string"
     ? LAST_ORDER_KEY
     : "primus-last-order-v1";
-  const NOWPAYMENTS_SESSION_MS = ((2 * 60) + 15) * 60 * 1000;
-  let nowPaymentsStatusTimer = null;
-  let nowPaymentsCountdownTimer = null;
+  const ARIONPAY_INVOICE_ENDPOINT = "/api/create-arionpay-invoice";
   // Legacy hosted-link structure kept only as fallback reference.
   // Each product can use either:
   // 1. a single string URL if one hosted link covers that product, or
@@ -81,8 +79,8 @@
       label: { en: "Cryptocurrency", es: "Criptomoneda" },
       chip: "CRYPTO",
       note: {
-        en: "Complete your order with a secure crypto payment in USDT, BTC, or ETH once your checkout details are confirmed.",
-        es: "Usa enlaces de pago alojados de ArionPay configurados por producto y opción de envío."
+        en: "Complete your order through secure ArionPay cryptocurrency checkout once your details are confirmed.",
+        es: "Completa tu pedido mediante el checkout seguro de criptomonedas de ArionPay una vez confirmados los datos."
       }
     },
     {
@@ -117,7 +115,7 @@
   ];
 
   const ACTIVE_PAYMENT_OPTIONS = PAYMENT_OPTIONS.filter((item) => item.enabled !== false);
-  PAYMENT_OPTIONS[0].note.es = "Completa tu pedido con un pago seguro en criptomonedas usando USDT, BTC o ETH una vez confirmados los datos del checkout.";
+  PAYMENT_OPTIONS[0].note.es = "Completa tu pedido mediante el checkout seguro de criptomonedas de ArionPay una vez confirmados los datos.";
   PAYMENT_OPTIONS[1].note.es = "Realiza el pedido ahora y completa el pago despues de que soporte confirme la cuenta receptora.";
   const CRYPTO_CURRENCY_OPTIONS = [
     {
@@ -277,6 +275,617 @@
       }
     }
   };
+
+  PRODUCT_PROFILES["kpv-10mg"] = {
+    short: {
+      en: "Upcoming inflammation-support listing upgraded with real Primus packaging visuals and a more specialist catalogue position.",
+      es: "Ficha proxima orientada a soporte inflamatorio, mejorada con visuales reales de Primus y una posicion mas especialista en el catalogo."
+    },
+    focus: {
+      en: "Positioned around gut-barrier, local tissue-response, and anti-inflammatory pathway review for lower-volume recovery workflows.",
+      es: "Posicionado alrededor de la barrera intestinal, la respuesta tisular local y la revision de vias antiinflamatorias para flujos de recuperacion de bajo volumen."
+    }
+  };
+
+  const STACK_SERIES = {
+    regenerative: {
+      title: { en: "Regenerative support stack", es: "Stack regenerativo" },
+      summary: {
+        en: "Pairs tissue support, barrier repair, and copper-peptide positioning into one cleaner recovery story.",
+        es: "Une soporte tisular, reparacion de barrera y posicionamiento de peptidos de cobre en una historia de recuperacion mas clara."
+      },
+      products: ["tb-500-20mg", "bpc-157-10mg", "ghk-cu-50mg", "kpv-10mg"]
+    },
+    inflammation: {
+      title: { en: "Inflammation and barrier stack", es: "Stack de inflamacion y barrera" },
+      summary: {
+        en: "Built around BPC-157 and KPV for anti-inflammatory positioning, gut-barrier context, and a clearer specialist lane inside the Primus guide library.",
+        es: "Construido alrededor de BPC-157 y KPV para posicionamiento antiinflamatorio, contexto de barrera intestinal y una linea especialista mas clara dentro de la biblioteca de Primus."
+      },
+      products: ["bpc-157-10mg", "kpv-10mg"]
+    },
+    metabolic: {
+      title: { en: "Metabolic research stack", es: "Stack metabolico" },
+      summary: {
+        en: "Built around incretin signalling, weekly handling, and mitochondrial support for body-composition research.",
+        es: "Construido alrededor de senalizacion incretinica, manejo semanal y soporte mitocondrial para investigacion de composicion corporal."
+      },
+      products: ["tirzepatide-30mg", "retatrutide-30mg", "mots-c-40mg", "nad-1000mg"]
+    },
+    nervousSystem: {
+      title: { en: "Mental performance stack", es: "Stack de rendimiento mental" },
+      summary: {
+        en: "Frames focus, calm, and overnight recovery as one connected system instead of separate product pages.",
+        es: "Enfoca concentracion, calma y recuperacion nocturna como un sistema conectado y no como paginas separadas."
+      },
+      products: ["semax-30mg", "selank-10mg", "dsip-10mg"]
+    },
+    energy: {
+      title: { en: "Mitochondrial energy stack", es: "Stack de energia mitocondrial" },
+      summary: {
+        en: "Positions cellular energy, mitochondrial stability, and recovery efficiency in one premium performance lane.",
+        es: "Posiciona energia celular, estabilidad mitocondrial y eficiencia de recuperacion en una sola linea premium."
+      },
+      products: ["mots-c-40mg", "ss-31-50mg", "nad-1000mg"]
+    },
+    libido: {
+      title: { en: "Connection and libido stack", es: "Stack de conexion y libido" },
+      summary: {
+        en: "Combines central-arousal research with social-bonding context for a more complete desire-focused story.",
+        es: "Combina investigacion sobre activacion central con contexto de vinculo social para una historia de deseo mas completa."
+      },
+      products: ["pt141-10mg", "oxytocin-10mg", "melanotan-mt2-10mg"]
+    },
+    longevity: {
+      title: { en: "Longevity and recovery stack", es: "Stack de longevidad y recuperacion" },
+      summary: {
+        en: "Brings together circadian support, GH-secretagogue positioning, and deeper sleep recovery in one series.",
+        es: "Reune soporte circadiano, enfoque secretagogo de GH y recuperacion profunda del sueno en una sola serie."
+      },
+      products: ["epithalon-40mg", "ipamorelin-10mg", "dsip-10mg"]
+    }
+  };
+
+  const PRODUCT_GUIDES = {};
+
+  Object.assign(PRODUCT_GUIDES, {
+    "retatrutide-30mg": {
+      summary: {
+        en: "Built from the new Primus guide as a triple-agonist weekly reference focused on GLP-1, GIP, and glucagon-pathway research.",
+        es: "Construido desde la nueva guia de Primus como referencia semanal de agonista triple centrada en investigacion sobre GLP-1, GIP y glucagon."
+      },
+      howItWorks: {
+        en: "Retatrutide combines GLP-1, GIP, and glucagon receptor activity, so the guide frames it around appetite regulation, energy expenditure, and broader metabolic-response modelling.",
+        es: "Retatrutide combina actividad sobre GLP-1, GIP y glucagon, por lo que la guia lo presenta alrededor de regulacion del apetito, gasto energetico y modelado metabolico mas amplio."
+      },
+      benefits: {
+        en: "Guide language highlights weight-management research, metabolic-marker support, and weekly handling convenience, while keeping tolerance notes centered on nausea and slower escalation.",
+        es: "La guia destaca investigacion sobre control de peso, soporte de marcadores metabolicos y conveniencia semanal, manteniendo las notas de tolerancia centradas en nauseas y subida gradual."
+      },
+      protocolOverview: {
+        en: "This product follows a once-weekly structure supported by a long half-life, with multi-week review blocks before moving upward.",
+        es: "Este producto sigue una estructura semanal apoyada por una vida media larga, con bloques de revision de varias semanas antes de subir."
+      },
+      dosing: {
+        en: "The uploaded guide positions Retatrutide in a 2 mg to 12 mg weekly range with staged escalation across a 12-plus-week structure.",
+        es: "La guia cargada posiciona Retatrutide en un rango semanal de 2 mg a 12 mg con escalada por fases a lo largo de una estructura de 12 o mas semanas."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 10 mg/mL concentration, keeping weekly measuring cleaner and easier.",
+        es: "La guia utiliza 3,0 mL de agua bacteriostatica para una concentracion aproximada de 10 mg/mL, dejando una medicion semanal mas limpia y sencilla."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold and keep reconstituted solution refrigerated within a practical two-to-four-week window.",
+        es: "Guardar el liofilizado congelado o muy frio y mantener la solucion reconstituida refrigerada dentro de una ventana practica de dos a cuatro semanas."
+      },
+      stackKeys: ["metabolic"]
+    },
+    "tb-500-20mg": {
+      summary: {
+        en: "Structured from the Primus guide as a recovery-oriented tissue-support reference with daily handling and a cleaner regeneration narrative.",
+        es: "Estructurado desde la guia de Primus como una referencia de soporte tisular orientada a recuperacion, con manejo diario y una narrativa regenerativa mas clara."
+      },
+      howItWorks: {
+        en: "TB-500 is presented as the active-region fragment of thymosin beta-4, so the guide focuses on tissue repair, cell migration, and regeneration-oriented signalling.",
+        es: "TB-500 se presenta como el fragmento activo de la timosina beta-4, por lo que la guia se centra en reparacion tisular, migracion celular y senalizacion regenerativa."
+      },
+      benefits: {
+        en: "Guide positioning emphasizes repair support, recovery efficiency, and anti-inflammatory interest while keeping the claims tied to research models.",
+        es: "El posicionamiento de la guia enfatiza soporte de reparacion, eficiencia de recuperacion e interes antiinflamatorio, manteniendo las afirmaciones dentro del marco de investigacion."
+      },
+      protocolOverview: {
+        en: "The guide uses a once-daily subcutaneous structure with practical syringe measurements across an 8-to-12-week frame.",
+        es: "La guia usa una estructura subcutanea diaria con mediciones practicas en jeringa a lo largo de un marco de 8 a 12 semanas."
+      },
+      dosing: {
+        en: "The uploaded guide places TB-500 in an educational range of 500 mcg to 1000 mcg once daily, with a progressive step-up through the early weeks.",
+        es: "La guia cargada coloca TB-500 en un rango educativo de 500 mcg a 1000 mcg una vez al dia, con subida progresiva durante las primeras semanas."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 6.67 mg/mL concentration, keeping injection volumes small and easier to measure.",
+        es: "La guia utiliza 3,0 mL de agua bacteriostatica para una concentracion aproximada de 6,67 mg/mL, manteniendo los volumenes de inyeccion pequenos y faciles de medir."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold. After reconstitution, keep the solution refrigerated at 2 to 8 C and do not refreeze the mixed vial.",
+        es: "Guardar el liofilizado congelado o muy frio. Tras la reconstitucion, mantener la solucion entre 2 y 8 C y no volver a congelar el vial mezclado."
+      },
+      stackKeys: ["regenerative"]
+    },
+    "bpc-157-10mg": {
+      summary: {
+        en: "Positioned from the new guide as a barrier-support and tissue-protection entry with a simpler daily workflow for recovery-focused buyers.",
+        es: "Posicionado desde la nueva guia como una referencia de soporte de barrera y proteccion tisular con un flujo diario sencillo para compradores orientados a recuperacion."
+      },
+      howItWorks: {
+        en: "BPC-157 is framed as a 15-amino-acid gastric-protein fragment studied for cytoprotective behaviour, tissue support, and repair-oriented signalling in preclinical models.",
+        es: "BPC-157 se presenta como un fragmento de 15 aminoacidos derivado de una proteina gastrica, estudiado por su comportamiento citoprotector, soporte tisular y senalizacion reparadora en modelos preclinicos."
+      },
+      benefits: {
+        en: "The guide highlights wound-healing interest, anti-inflammatory behaviour, and softer recovery positioning, while noting that human data remain limited.",
+        es: "La guia destaca interes en cicatrizacion, comportamiento antiinflamatorio y un posicionamiento de recuperacion mas suave, recordando que los datos en humanos siguen siendo limitados."
+      },
+      protocolOverview: {
+        en: "This product is set up as a once-daily subcutaneous reference with a practical dilution model and a short, easy-to-read progression structure.",
+        es: "Este producto se presenta como una referencia subcutanea diaria con un modelo de dilucion practico y una estructura de progresion corta y facil de leer."
+      },
+      dosing: {
+        en: "The uploaded guide uses a daily range of roughly 200 mcg to 600 mcg, starting conservatively and stepping upward instead of pushing the top end immediately.",
+        es: "La guia cargada utiliza un rango diario aproximado de 200 mcg a 600 mcg, empezando de forma conservadora y subiendo por fases en lugar de ir al extremo alto de inmediato."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which keeps syringe conversions clean on a U-100 scale.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando conversiones limpias en jeringa U-100."
+      },
+      storage: {
+        en: "Keep the lyophilized vial cold and dry. After mixing, refrigerate, protect from light, and avoid repeated freeze-thaw cycles.",
+        es: "Mantener el vial liofilizado en frio y seco. Tras la mezcla, refrigerar, proteger de la luz y evitar ciclos repetidos de congelacion y descongelacion."
+      },
+      stackKeys: ["regenerative", "inflammation"]
+    },
+    "ghk-cu-50mg": {
+      summary: {
+        en: "Refined as a copper-peptide specialist page with stronger cosmetic-science and tissue-remodelling language from the updated guide.",
+        es: "Refinado como una pagina especialista en peptido de cobre con lenguaje mas claro de ciencia cosmetica y remodelacion tisular tomado de la guia actualizada."
+      },
+      howItWorks: {
+        en: "GHK-Cu is positioned around collagen-related gene expression, antioxidant defence, wound support, and broader tissue-remodelling pathways linked to a naturally occurring copper complex.",
+        es: "GHK-Cu se posiciona alrededor de expresion genetica relacionada con colageno, defensa antioxidante, soporte de heridas y vias de remodelacion tisular ligadas a un complejo natural de cobre."
+      },
+      benefits: {
+        en: "Guide copy emphasizes skin quality, repair signalling, and recovery-facing use cases while keeping the page anchored in pathway research rather than cosmetic overstatement.",
+        es: "El texto de la guia enfatiza calidad de piel, senalizacion reparadora y casos de uso orientados a recuperacion, manteniendo la pagina anclada en investigacion de vias y no en exageracion cosmetica."
+      },
+      protocolOverview: {
+        en: "The Primus guide frames GHK-Cu around 5-day-per-week or 3-times-per-week injection patterns, which helps it read differently from the daily neuro and metabolic entries.",
+        es: "La guia de Primus presenta GHK-Cu alrededor de patrones de inyeccion de 5 dias por semana o 3 veces por semana, ayudando a diferenciarlo de las entradas neuro y metabolicas diarias."
+      },
+      dosing: {
+        en: "The current guide places GHK-Cu in a practical 1.0 mg to 2.0 mg per-injection range, with a conservative starting phase before moving higher.",
+        es: "La guia actual coloca GHK-Cu en un rango practico de 1,0 mg a 2,0 mg por inyeccion, con una fase conservadora antes de subir."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of sterile water for an approximate 16.67 mg/mL concentration, allowing low-volume injections and clean measuring math.",
+        es: "La guia usa 3,0 mL de agua esteril para una concentracion aproximada de 16,67 mg/mL, permitiendo inyecciones de bajo volumen y mediciones limpias."
+      },
+      storage: {
+        en: "Store the lyophilized vial frozen or away from thermal stress. After mixing, refrigerate and use within roughly 30 days.",
+        es: "Guardar el vial liofilizado congelado o lejos de estres termico. Tras la mezcla, refrigerar y usar dentro de un plazo aproximado de 30 dias."
+      },
+      stackKeys: ["regenerative"]
+    }
+  });
+
+  Object.assign(PRODUCT_GUIDES, {
+    "mots-c-40mg": {
+      summary: {
+        en: "Rebuilt as a mitochondrial-metabolism page anchored in AMPK signalling, nutrient use, and exercise-capacity research for high-intent buyers.",
+        es: "Reconstruido como una pagina de metabolismo mitocondrial anclada en senalizacion AMPK, uso de nutrientes y capacidad de ejercicio para compradores de alta intencion."
+      },
+      howItWorks: {
+        en: "MOTS-c is a mitochondrial-derived peptide guide positioned around AMPK activation, fuel selection, and communication between mitochondria and the nucleus during metabolic stress.",
+        es: "MOTS-c es un peptido derivado de la mitocondria posicionado alrededor de activacion de AMPK, seleccion de combustible y comunicacion entre mitocondria y nucleo durante estres metabolico."
+      },
+      benefits: {
+        en: "The guide emphasizes insulin sensitivity, fat oxidation, exercise-capacity support, and age-related metabolic resilience, while noting that human clinical data remain limited.",
+        es: "La guia destaca sensibilidad a la insulina, oxidacion de grasa, soporte de capacidad de ejercicio y resiliencia metabolica asociada a la edad, recordando que los datos clinicos en humanos siguen siendo limitados."
+      },
+      protocolOverview: {
+        en: "This entry uses a once-daily subcutaneous structure over a roughly 10-week progression, which fits naturally into the site's premium energy category.",
+        es: "Esta referencia usa una estructura subcutanea diaria a lo largo de una progresion aproximada de 10 semanas, encajando de forma natural en la categoria premium de energia del sitio."
+      },
+      dosing: {
+        en: "The uploaded guide places MOTS-c in a 200 mcg to 1000 mcg daily range, typically spending about two weeks at each step before moving upward.",
+        es: "La guia cargada situa MOTS-c en un rango diario de 200 mcg a 1000 mcg, permaneciendo normalmente unas dos semanas en cada nivel antes de subir."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 13.33 mg/mL concentration, keeping the draw volume very small on a U-100 syringe.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 13,33 mg/mL, manteniendo el volumen de carga muy pequeno en jeringa U-100."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold. After reconstitution, refrigerate and aim to use the mixed vial within seven days.",
+        es: "Guardar el material liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar y procurar usar el vial mezclado dentro de siete dias."
+      },
+      stackKeys: ["energy", "metabolic"]
+    },
+    "melanotan-mt2-10mg": {
+      summary: {
+        en: "Updated as a pigmentation-oriented guide page that keeps the clinical look clean while acknowledging the different behaviour of this category.",
+        es: "Actualizado como una pagina orientada a pigmentacion que mantiene el aspecto clinico limpio mientras reconoce el comportamiento distinto de esta categoria."
+      },
+      howItWorks: {
+        en: "Melanotan II is framed as an alpha-MSH analogue studied for pigmentation signalling, with guide language also noting its known downstream arousal effects in some settings.",
+        es: "Melanotan II se presenta como un analogo de alfa-MSH estudiado para senalizacion de pigmentacion, y la guia tambien recuerda sus efectos posteriores sobre activacion en algunos contextos."
+      },
+      benefits: {
+        en: "Guide-style positioning centers on tanning and melanocortin-pathway work. The most common caution notes are nausea, flushing, and the need to begin conservatively.",
+        es: "El posicionamiento de la guia se centra en trabajo sobre bronceado y vias melanocortinas. Las notas de cautela mas comunes son nauseas, enrojecimiento y la necesidad de empezar de forma conservadora."
+      },
+      protocolOverview: {
+        en: "The current guide uses an initial daily titration phase followed by a lighter maintenance rhythm, which makes the product read clearly in both launch and long-tail catalogue contexts.",
+        es: "La guia actual usa una fase inicial de titulacion diaria seguida de un ritmo de mantenimiento mas ligero, haciendo que el producto se lea con claridad tanto en lanzamiento como a largo plazo."
+      },
+      dosing: {
+        en: "The uploaded guide positions Melanotan II in a 250 mcg to 1000 mcg daily range during the opening phase, then a 500 mcg to 1000 mcg maintenance rhythm once or twice weekly.",
+        es: "La guia cargada posiciona Melanotan II en un rango diario de 250 mcg a 1000 mcg durante la fase inicial, seguido de un mantenimiento de 500 mcg a 1000 mcg una o dos veces por semana."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which keeps syringe math easy for small-step titration.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando una titulacion por pequenos pasos facil de medir."
+      },
+      storage: {
+        en: "Keep lyophilized material frozen or below room temperature. After reconstitution, refrigerate and use the mixed vial within roughly one to two weeks.",
+        es: "Mantener el material liofilizado congelado o por debajo de temperatura ambiente. Tras la reconstitucion, refrigerar y usar el vial mezclado en una o dos semanas aproximadamente."
+      },
+      stackKeys: ["libido"]
+    },
+    "ss-31-50mg": {
+      summary: {
+        en: "Positioned as a flagship mitochondrial-protection page with stronger specialist language, higher-ticket trust, and a more clinical daily-use narrative.",
+        es: "Posicionado como una pagina insignia de proteccion mitocondrial con lenguaje mas especialista, mas confianza para ticket alto y una narrativa diaria mas clinica."
+      },
+      howItWorks: {
+        en: "SS-31 is framed around cardiolipin binding inside the mitochondrial membrane, where it helps stabilize electron transport, reduce oxidative stress, and support ATP production.",
+        es: "SS-31 se enmarca alrededor de la union a cardiolipina dentro de la membrana mitocondrial, donde ayuda a estabilizar el transporte de electrones, reducir estres oxidativo y apoyar la produccion de ATP."
+      },
+      benefits: {
+        en: "The guide emphasizes mitochondrial resilience, energy maintenance, and recovery-oriented research across stress-heavy models. Advanced daily ranges are kept as higher-review territory.",
+        es: "La guia enfatiza resiliencia mitocondrial, mantenimiento energetico e investigacion orientada a recuperacion en modelos exigentes. Los rangos diarios avanzados se mantienen como territorio de revision mas alta."
+      },
+      protocolOverview: {
+        en: "This entry uses a daily subcutaneous structure with a short loading phase and a longer mid-cycle phase, which fits well inside a premium energy-support sequence.",
+        es: "Esta referencia usa una estructura subcutanea diaria con una fase corta de inicio y una fase media mas larga, encajando bien en una secuencia premium de soporte energetico."
+      },
+      dosing: {
+        en: "The uploaded guide positions SS-31 in a 5 mg to 10 mg daily range, while noting that more advanced protocols may extend beyond that only with tighter review.",
+        es: "La guia cargada posiciona SS-31 en un rango diario de 5 mg a 10 mg, indicando que los protocolos mas avanzados solo deberian ir mas arriba con una revision mas estricta."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 16.67 mg/mL concentration, keeping larger daily draws workable without excessive volume.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 16,67 mg/mL, manteniendo manejables las cargas diarias mas altas sin volumen excesivo."
+      },
+      storage: {
+        en: "Store the lyophilized vial frozen or very cold. Once reconstituted, keep refrigerated and work within a practical four-week handling window.",
+        es: "Guardar el vial liofilizado congelado o muy frio. Una vez reconstituido, mantener refrigerado y trabajar dentro de una ventana practica de cuatro semanas."
+      },
+      stackKeys: ["energy"]
+    },
+    "nad-1000mg": {
+      summary: {
+        en: "Refined as a coenzyme and mitochondrial-support page with stronger dosage clarity, cleaner energy language, and better daily-tolerance framing.",
+        es: "Refinado como una pagina de coenzima y soporte mitocondrial con mayor claridad de dosificacion, lenguaje energetico mas limpio y mejor enfoque en tolerancia diaria."
+      },
+      howItWorks: {
+        en: "NAD+ is positioned around cellular energy transfer, DNA-repair support, and mitochondrial function, which is why the guide treats it as a foundational energy compound.",
+        es: "NAD+ se posiciona alrededor de transferencia de energia celular, soporte de reparacion de ADN y funcion mitocondrial, por eso la guia lo trata como un compuesto base de energia."
+      },
+      benefits: {
+        en: "Guide material emphasizes energy support, cellular maintenance, and recovery-facing use cases. The main caution note is starting too high, which can affect sleep, anxiety, or fatigue tolerance.",
+        es: "El material de guia enfatiza soporte energetico, mantenimiento celular y casos de uso orientados a recuperacion. La principal cautela es empezar demasiado alto, lo que puede afectar sueno, ansiedad o tolerancia a la fatiga."
+      },
+      protocolOverview: {
+        en: "The guide uses a daily subcutaneous titration structure that starts lower, reviews response, and then moves into a steadier maintenance phase.",
+        es: "La guia usa una estructura diaria de titulacion subcutanea que empieza mas baja, revisa respuesta y despues entra en una fase de mantenimiento mas estable."
+      },
+      dosing: {
+        en: "The uploaded guide places NAD+ in a 50 mg to 100 mg daily range, beginning at the lower end before holding a steadier 100 mg phase.",
+        es: "La guia cargada situa NAD+ en un rango diario de 50 mg a 100 mg, empezando por el extremo bajo antes de sostener una fase mas estable de 100 mg."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 333.3 mg/mL concentration, creating a practical daily draw for maintenance research.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 333,3 mg/mL, creando una carga diaria practica para investigacion de mantenimiento."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold. After reconstitution, refrigerate, protect from light, and aim to use the mixed vial within roughly 14 days.",
+        es: "Guardar el material liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar, proteger de la luz y procurar usar el vial mezclado dentro de unos 14 dias."
+      },
+      stackKeys: ["energy", "metabolic"]
+    }
+  });
+
+  Object.assign(PRODUCT_GUIDES, {
+    "semax-30mg": {
+      summary: {
+        en: "Adapted from the uploaded Semax guide as a sharper neurocognitive page with clearer focus, recovery, and protocol positioning for serious buyers.",
+        es: "Adaptado desde la guia cargada de Semax como una pagina neurocognitiva mas clara en foco, recuperacion y posicionamiento de protocolo para compradores serios."
+      },
+      howItWorks: {
+        en: "Semax is presented as an ACTH(4-10) analogue studied for cognitive support, neuroprotection, and BDNF-related signalling, with the guide noting that intranasal use is more common in published human work.",
+        es: "Semax se presenta como un analogo de ACTH(4-10) estudiado para soporte cognitivo, neuroproteccion y senalizacion relacionada con BDNF, recordando que el uso intranasal es mas comun en la literatura humana publicada."
+      },
+      benefits: {
+        en: "Guide language focuses on attention, mental clarity, and neuroprotective interest. The main caution point is keeping claims aligned with research context rather than promising direct outcomes.",
+        es: "El lenguaje de la guia se centra en atencion, claridad mental e interes neuroprotector. El principal punto de cautela es mantener las afirmaciones dentro del contexto de investigacion."
+      },
+      protocolOverview: {
+        en: "The uploaded protocol uses a once-daily subcutaneous structure, a gradual upward rhythm, and a practical eight-week frame that can be extended more carefully with review breaks.",
+        es: "El protocolo cargado usa una estructura subcutanea diaria, una subida gradual y un marco practico de ocho semanas que puede ampliarse con mas cuidado usando pausas de revision."
+      },
+      dosing: {
+        en: "The guide places Semax in a 300 mcg to 800 mcg daily range, with a staged build across weeks one to eight rather than a front-loaded jump.",
+        es: "La guia coloca Semax en un rango diario de 300 mcg a 800 mcg, con una construccion por etapas entre la semana uno y la ocho en lugar de una subida brusca."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which makes small-step measuring straightforward on a U-100 syringe.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, lo que hace muy sencilla la medicion por pequenos pasos en jeringa U-100."
+      },
+      storage: {
+        en: "Store the lyophilized vial frozen or very cold. After reconstitution, refrigerate at 2 to 8 C and avoid repeated freeze-thaw handling.",
+        es: "Guardar el vial liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar entre 2 y 8 C y evitar ciclos repetidos de congelacion y descongelacion."
+      },
+      stackKeys: ["nervousSystem"]
+    },
+    "selank-10mg": {
+      summary: {
+        en: "Refined from the new guide as a calm-performance neuropeptide page that balances anti-anxiety positioning with a cleaner premium storefront tone.",
+        es: "Refinado desde la nueva guia como una pagina de neuropetido orientada a calma y rendimiento que equilibra posicionamiento antiestres con un tono premium mas limpio."
+      },
+      howItWorks: {
+        en: "Selank is framed as a tuftsin analogue studied for anxiolytic and anti-asthenic effects, with guide positioning centered on calm focus rather than sedative suppression.",
+        es: "Selank se enmarca como un analogo de tuftsin estudiado por efectos ansioliticos y antiastenicos, con una posicion centrada en foco tranquilo y no en sedacion."
+      },
+      benefits: {
+        en: "Guide material highlights reduced anxiety, steadier mental energy, and the absence of typical benzodiazepine-style sedation in older study language. The page should still keep outcomes tied to research context.",
+        es: "El material de guia destaca reduccion de ansiedad, energia mental mas estable y ausencia de sedacion tipo benzodiacepina en el lenguaje de estudios antiguos. Aun asi, la pagina debe mantener los resultados dentro del contexto de investigacion."
+      },
+      protocolOverview: {
+        en: "The uploaded guide uses a once-daily subcutaneous structure, with optional cycling patterns such as four weeks on and four weeks off or five days on and two off.",
+        es: "La guia cargada usa una estructura subcutanea diaria, con patrones opcionales de ciclos como cuatro semanas on y cuatro off o cinco dias on y dos off."
+      },
+      dosing: {
+        en: "The guide places Selank in a 300 mcg to 500 mcg daily range, using a small-volume step-up rather than a wide multi-phase escalation.",
+        es: "La guia coloca Selank en un rango diario de 300 mcg a 500 mcg, usando una subida de pequeno volumen en lugar de una escalada mas amplia."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, making short daily measurements easy to track.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando mediciones diarias cortas y faciles de seguir."
+      },
+      storage: {
+        en: "Store the lyophilized vial frozen or very cold. After reconstitution, keep refrigerated at 2 to 8 C and protect the mixed vial from unnecessary temperature swings.",
+        es: "Guardar el vial liofilizado congelado o muy frio. Tras la reconstitucion, mantener refrigerado entre 2 y 8 C y proteger el vial mezclado de cambios innecesarios de temperatura."
+      },
+      stackKeys: ["nervousSystem"]
+    },
+    "dsip-10mg": {
+      summary: {
+        en: "Presented from the new guide as a sleep-recovery reference that completes the day-to-night nervous-system series with a stronger research-first tone.",
+        es: "Presentado desde la nueva guia como una referencia de sueno y recuperacion que completa la serie dia-noche del sistema nervioso con un tono mas cientifico."
+      },
+      howItWorks: {
+        en: "DSIP is framed as a delta-sleep-inducing nonapeptide studied for slow-wave sleep support, stress-pattern regulation, and more stable overnight recovery.",
+        es: "DSIP se enmarca como un nonapeptido inductor del sueno delta estudiado para soporte del sueno profundo, regulacion de patrones de estres y recuperacion nocturna mas estable."
+      },
+      benefits: {
+        en: "The guide emphasizes sleep quality, sleep-architecture support, cortisol-pattern review, and mood stability. The page should keep those points tied to study language rather than broad promises.",
+        es: "La guia enfatiza calidad del sueno, soporte de arquitectura del sueno, revision de patrones de cortisol y estabilidad del estado de animo. La pagina debe mantener estos puntos ligados al lenguaje de estudio."
+      },
+      protocolOverview: {
+        en: "This guide uses a nightly subcutaneous structure taken roughly 30 to 60 minutes before sleep, with a gradual build through the first weeks and a steadier block after that.",
+        es: "Esta guia utiliza una estructura subcutanea nocturna tomada unos 30 a 60 minutos antes de dormir, con una subida gradual en las primeras semanas y un bloque mas estable despues."
+      },
+      dosing: {
+        en: "The uploaded guide places DSIP in a 100 mcg to 300 mcg nightly range, with higher steps held only after early tolerance is established.",
+        es: "La guia cargada situa DSIP en un rango nocturno de 100 mcg a 300 mcg, manteniendo los escalones mas altos solo despues de establecer tolerancia inicial."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, giving very small nightly draw volumes on a U-100 syringe.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando volumenes nocturnos muy pequenos en jeringa U-100."
+      },
+      storage: {
+        en: "Store the lyophilized vial frozen or very cold. After reconstitution, refrigerate at 2 to 8 C and avoid repeated freeze-thaw exposure.",
+        es: "Guardar el vial liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar entre 2 y 8 C y evitar exposicion repetida a ciclos de congelacion y descongelacion."
+      },
+      stackKeys: ["nervousSystem", "longevity"]
+    },
+    "epithalon-40mg": {
+      summary: {
+        en: "Structured as a pineal and longevity-oriented page that feels more specialist, more orderly, and better aligned with premium research positioning.",
+        es: "Estructurado como una pagina orientada a pineal y longevidad que se siente mas especialista, mas ordenada y mejor alineada con un posicionamiento premium."
+      },
+      howItWorks: {
+        en: "Epithalon is framed around telomerase-related research, melatonin support, circadian regulation, and broader healthy-ageing models linked to pineal signalling.",
+        es: "Epithalon se enmarca alrededor de investigacion relacionada con telomerasa, soporte de melatonina, regulacion circadiana y modelos mas amplios de envejecimiento saludable ligados a la pineal."
+      },
+      benefits: {
+        en: "Guide language highlights sleep-rhythm support, cardiovascular and longevity interest, and systemic recovery positioning. The page keeps this framed as guide-level scientific context.",
+        es: "El lenguaje de la guia destaca soporte del ritmo de sueno, interes cardiovascular y de longevidad, y posicionamiento de recuperacion sistemica. La pagina lo mantiene como contexto cientifico de guia."
+      },
+      protocolOverview: {
+        en: "The uploaded guide uses a very specific cycle structure rather than open-ended daily use: a short active block followed by a long rest window before another cycle.",
+        es: "La guia cargada usa una estructura de ciclo muy concreta en lugar de un uso diario indefinido: un bloque activo corto seguido de una ventana larga de descanso antes del siguiente ciclo."
+      },
+      dosing: {
+        en: "The guide positions Epithalon at 5 mg once daily for 20 consecutive days, then a four-to-six-month break before repeating.",
+        es: "La guia posiciona Epithalon en 5 mg una vez al dia durante 20 dias consecutivos y despues un descanso de cuatro a seis meses antes de repetir."
+      },
+      reconstitution: {
+        en: "Guide handling uses 2.0 mL of bacteriostatic water for an approximate 5 mg/mL concentration, which makes the daily draw simple during the short active phase.",
+        es: "La guia usa 2,0 mL de agua bacteriostatica para una concentracion aproximada de 5 mg/mL, lo que hace simple la carga diaria durante la fase activa corta."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold. After reconstitution, refrigerate at 2 to 8 C and avoid repeated freeze-thaw handling.",
+        es: "Guardar el material liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar entre 2 y 8 C y evitar manejo repetido con congelacion y descongelacion."
+      },
+      stackKeys: ["longevity"]
+    }
+  });
+
+  Object.assign(PRODUCT_GUIDES, {
+    "tirzepatide-30mg": {
+      summary: {
+        en: "Adapted as a premium weekly reference focused on dual GIP and GLP-1 signalling, appetite-pathway review, and cleaner metabolic positioning for research buyers.",
+        es: "Adaptado como una referencia semanal premium centrada en senalizacion dual GIP y GLP-1, revision de vias de apetito y un posicionamiento metabolico mas claro para compradores de investigacion."
+      },
+      howItWorks: {
+        en: "Tirzepatide combines GIP and GLP-1 receptor activity, so most guide material frames it around satiety signalling, slower gastric emptying, insulin-response support, and longer weekly handling windows.",
+        es: "Tirzepatide combina actividad sobre receptores GIP y GLP-1, por eso la mayor parte del material lo enfoca en senales de saciedad, vaciado gastrico mas lento, soporte de respuesta insulinica y ventanas semanales mas largas."
+      },
+      benefits: {
+        en: "Research-led discussions usually highlight appetite control, body-composition modelling, and glycaemic handling. The main caution points are gastrointestinal discomfort, strong appetite suppression, and the need for slower escalation.",
+        es: "Las discusiones orientadas a investigacion suelen destacar control del apetito, modelado de composicion corporal y manejo glucemico. Los puntos de cautela mas comunes son molestias gastrointestinales, supresion fuerte del apetito y necesidad de subir de forma lenta."
+      },
+      protocolOverview: {
+        en: "The usual structure is once-weekly handling with a low starting phase, several review blocks, and gradual progression only after tolerance is clear.",
+        es: "La estructura habitual es un manejo semanal con fase inicial baja, varios bloques de revision y progresion gradual solo cuando la tolerancia esta clara."
+      },
+      dosing: {
+        en: "Keep Tirzepatide on a slow weekly ramp rather than jumping to a high target early, and align any public dose ladder with the finalized Primus internal guide before launch.",
+        es: "Mantener Tirzepatide en una subida semanal lenta en lugar de saltar pronto a un objetivo alto, y alinear cualquier escalado publico con la guia interna final de Primus antes del lanzamiento."
+      },
+      reconstitution: {
+        en: "Standard handling uses bacteriostatic water, wall-side reconstitution, careful label tracking, and cold storage after mixing so each weekly draw remains consistent.",
+        es: "El manejo estandar usa agua bacteriostatica, reconstitucion por la pared del vial, trazabilidad clara en la etiqueta y refrigeracion tras la mezcla para que cada carga semanal sea consistente."
+      },
+      storage: {
+        en: "Store lyophilized material cold, dry, and protected from light. After reconstitution, keep refrigerated and avoid repeated temperature swings.",
+        es: "Guardar el material liofilizado en frio, seco y protegido de la luz. Tras la reconstitucion, mantener refrigerado y evitar cambios repetidos de temperatura."
+      },
+      stackKeys: ["metabolic"]
+    },
+    "ipamorelin-10mg": {
+      summary: {
+        en: "Refined as a cleaner GH-secretagogue page with stronger sleep-timing context and lower-friction copy for buyers comparing nightly-use products.",
+        es: "Refinado como una pagina mas limpia de secretagogo de GH con mejor contexto de uso nocturno y copy mas directo para compradores que comparan productos de toma nocturna."
+      },
+      howItWorks: {
+        en: "Ipamorelin is positioned as a selective ghrelin-receptor agonist used to stimulate growth-hormone release while keeping ACTH and cortisol spillover lower than broader secretagogues.",
+        es: "Ipamorelin se posiciona como un agonista selectivo del receptor de grelina utilizado para estimular la liberacion de hormona de crecimiento manteniendo mas bajo el arrastre sobre ACTH y cortisol que otros secretagogos."
+      },
+      benefits: {
+        en: "Guide language focuses on cleaner GH release, lower hormonal noise, and overnight recovery positioning. The site keeps those points grounded in protocol context rather than promising guaranteed outcomes.",
+        es: "El lenguaje de la guia se centra en liberacion de GH mas limpia, menor ruido hormonal y posicionamiento de recuperacion nocturna. El sitio mantiene esos puntos dentro del contexto de protocolo y no como resultados garantizados."
+      },
+      protocolOverview: {
+        en: "The uploaded guide uses a once-daily subcutaneous structure, ideally in a fasting window before sleep, and builds more gradually across the first 8 to 12 weeks.",
+        es: "La guia cargada usa una estructura subcutanea diaria, idealmente en ayunas antes de dormir, y construye de forma mas gradual a lo largo de las primeras 8 a 12 semanas."
+      },
+      dosing: {
+        en: "The guide places Ipamorelin in a 100 mcg to 300 mcg daily range, with an orderly step-up that keeps the early phase conservative.",
+        es: "La guia coloca Ipamorelin en un rango diario de 100 mcg a 300 mcg, con una subida ordenada que mantiene conservadora la fase inicial."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which leaves a very manageable daily volume.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando un volumen diario muy manejable."
+      },
+      storage: {
+        en: "Store lyophilized material at 2 to 8 C or frozen at lower temperatures. After reconstitution, refrigerate and use within roughly four weeks.",
+        es: "Guardar el material liofilizado entre 2 y 8 C o congelado a menor temperatura. Tras la reconstitucion, refrigerar y usar en unas cuatro semanas."
+      },
+      stackKeys: ["longevity"]
+    },
+    "pt141-10mg": {
+      summary: {
+        en: "Built as a premium libido-focused page that keeps the tone scientific while still acknowledging the use-case buyers associate with the compound.",
+        es: "Construido como una pagina premium enfocada en libido que mantiene el tono cientifico mientras reconoce el caso de uso que muchos compradores asocian con el compuesto."
+      },
+      howItWorks: {
+        en: "PT-141, or bremelanotide, is framed as a melanocortin-receptor agonist linked to central arousal signalling and dopaminergic reward pathways rather than local vascular action alone.",
+        es: "PT-141, o bremelanotida, se presenta como un agonista de receptores melanocortina ligado a senalizacion central de excitacion y vias dopaminergicas de recompensa, no solo a accion vascular local."
+      },
+      benefits: {
+        en: "Guide material highlights desire and arousal research. The main caution notes are nausea, flushing, and the need for careful expectation-setting when translating protocol language onto a storefront.",
+        es: "El material de guia destaca investigacion sobre deseo y excitacion. Las principales cautelas son nauseas, enrojecimiento y la necesidad de ajustar muy bien las expectativas al trasladar lenguaje de protocolo a una tienda."
+      },
+      protocolOverview: {
+        en: "The uploaded guide uses a daily progressive structure for educational purposes, while also noting that on-demand use appears in formal literature.",
+        es: "La guia cargada usa una estructura diaria progresiva con fines educativos, al tiempo que recuerda que en la literatura formal aparece un uso a demanda."
+      },
+      dosing: {
+        en: "The guide places PT-141 in a 500 mcg to 1500 mcg daily range across a staged 16-week progression, starting conservatively before moving to stronger steps.",
+        es: "La guia posiciona PT-141 en un rango diario de 500 mcg a 1500 mcg a lo largo de una progresion por fases de 16 semanas, empezando de forma conservadora antes de pasar a escalones mas altos."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which keeps measurement simple for a stepped programme.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, lo que deja una medicion simple para un programa por etapas."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or very cold. After reconstitution, refrigerate at 2 to 8 C and avoid repeated freeze-thaw exposure.",
+        es: "Guardar el material liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar entre 2 y 8 C y evitar exposicion repetida a congelacion y descongelacion."
+      },
+      stackKeys: ["libido"]
+    },
+    "oxytocin-10mg": {
+      summary: {
+        en: "Reworked as a social-bonding and stress-context page that complements the libido category without making the storefront feel generic or exaggerated.",
+        es: "Reelaborado como una pagina de vinculo social y contexto de estres que complementa la categoria de libido sin hacer que la tienda se sienta generica o exagerada."
+      },
+      howItWorks: {
+        en: "Oxytocin is framed around social connection, pair bonding, stress modulation, and social-cognition research, which gives it a distinctly different role from PT-141 even when they are discussed together.",
+        es: "La oxitocina se presenta alrededor de conexion social, vinculo de pareja, modulacion del estres e investigacion sobre cognicion social, lo que le da un papel distinto al de PT-141 incluso cuando se comentan juntos."
+      },
+      benefits: {
+        en: "Guide language emphasizes relationship context, social ease, and calmer stress response. The page keeps that messaging tied to research context and away from broad emotional claims.",
+        es: "El lenguaje de guia enfatiza contexto relacional, mayor facilidad social y respuesta al estres mas calmada. La pagina mantiene ese mensaje dentro del contexto de investigacion y lejos de afirmaciones emocionales amplias."
+      },
+      protocolOverview: {
+        en: "The uploaded guide uses a daily subcutaneous structure with progressive increases, which makes the page fit cleanly inside a guided libido-and-connection series.",
+        es: "La guia cargada usa una estructura subcutanea diaria con subidas progresivas, lo que hace que la pagina encaje de forma limpia dentro de una serie guiada de libido y conexion."
+      },
+      dosing: {
+        en: "The guide positions Oxytocin in a 100 mcg to 500 mcg daily range, using a step-up approach across the first weeks before a steadier mid-cycle phase.",
+        es: "La guia posiciona Oxitocina en un rango diario de 100 mcg a 500 mcg, usando una subida por etapas durante las primeras semanas antes de una fase media mas estable."
+      },
+      reconstitution: {
+        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which keeps small daily measurements clean on a U-100 syringe.",
+        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, lo que mantiene limpias las mediciones pequenas en jeringa U-100."
+      },
+      storage: {
+        en: "Store lyophilized material frozen or refrigerated. After reconstitution, keep at 2 to 8 C and work within a roughly 28-to-30-day refrigerated window.",
+        es: "Guardar el material liofilizado congelado o refrigerado. Tras la reconstitucion, mantener entre 2 y 8 C y trabajar dentro de una ventana refrigerada de aproximadamente 28 a 30 dias."
+      },
+      stackKeys: ["libido"]
+    },
+    "kpv-10mg": {
+      summary: {
+        en: "Added as a lighter anti-inflammatory and barrier-support reference so the upcoming catalogue does not rely only on heavier regeneration products.",
+        es: "Anadido como referencia mas ligera de soporte antiinflamatorio y de barrera para que el catalogo futuro no dependa solo de productos regenerativos mas pesados."
+      },
+      howItWorks: {
+        en: "KPV is typically framed as a short alpha-MSH fragment studied for anti-inflammatory signalling, gut-barrier support, and calmer local tissue response in gastrointestinal and skin-focused models.",
+        es: "KPV suele presentarse como un fragmento corto de alfa-MSH estudiado por su senalizacion antiinflamatoria, soporte de barrera intestinal y respuesta tisular local mas calmada en modelos gastrointestinales y de piel."
+      },
+      benefits: {
+        en: "This lane is positioned around inflammatory moderation, digestive-barrier support, and calmer local tissue response, giving Primus a clearer specialist option beside the heavier regenerative pages.",
+        es: "Esta linea se posiciona alrededor de la moderacion inflamatoria, el soporte de barrera digestiva y una respuesta tisular local mas calmada, dando a Primus una opcion mas especialista junto a las paginas regenerativas mas intensas."
+      },
+      protocolOverview: {
+        en: "KPV is framed as a lower-volume daily workflow with conservative escalation, tighter handling discipline, and a shorter path from barrier-support interest to checkout.",
+        es: "KPV se presenta como un flujo diario de menor volumen con escalada conservadora, disciplina de manejo mas estricta y un recorrido mas corto desde el interes por soporte de barrera hasta el checkout."
+      },
+      dosing: {
+        en: "The Primus positioning keeps KPV in a conservative microgram-range workflow, favouring consistency, low-volume handling, and staged progression rather than aggressive front-loading.",
+        es: "El posicionamiento de Primus mantiene KPV en un flujo conservador de microgramos, priorizando consistencia, manejo de bajo volumen y progresion por etapas en lugar de una carga agresiva al inicio."
+      },
+      reconstitution: {
+        en: "Guide handling uses bacteriostatic-water reconstitution, gentle vial-wall mixing, clear labelling, and refrigerated storage so repeated low-volume draws stay easier to measure.",
+        es: "La guia utiliza reconstitucion con agua bacteriostatica, mezcla suave por la pared del vial, etiquetado claro y almacenamiento refrigerado para que las cargas repetidas de bajo volumen sean mas faciles de medir."
+      },
+      storage: {
+        en: "Store lyophilized material cold, dry, and protected from light. After reconstitution, keep refrigerated and avoid unnecessary temperature cycling.",
+        es: "Guardar el material liofilizado en frio, seco y protegido de la luz. Tras la reconstitucion, mantener refrigerado y evitar cambios innecesarios de temperatura."
+      },
+      stackKeys: ["regenerative", "inflammation"]
+    }
+  });
 
   const LEGAL_PAGES = {};
 
@@ -907,7 +1516,7 @@
   function checkoutPendingStatus(payment) {
     return isBankTransferPayment(payment)
       ? tx("Saving your order and opening bank transfer instructions...", "Guardando tu pedido y abriendo las instrucciones de transferencia bancaria...")
-      : tx("Preparing your cryptocurrency checkout...", "Preparando tu checkout con criptomonedas...");
+      : tx("Creating your secure ArionPay invoice...", "Creando tu factura segura de ArionPay...");
   }
 
   function checkoutHelperCopy(payment) {
@@ -917,8 +1526,8 @@
         "Primero se reservara tu pedido y despues se mostraran las instrucciones de transferencia bancaria en la pantalla de confirmacion."
       )
       : tx(
-        "You will continue to a secure cryptocurrency payment screen with the amount, wallet address, QR code, and live payment status.",
-        "Continuaras a una pantalla segura de pago con criptomonedas con el importe, la direccion de wallet, el codigo QR y el estado del pago en vivo."
+        "You will continue to a secure hosted ArionPay payment page for the selected cryptocurrency.",
+        "Continuaras a una pagina de pago alojada y segura de ArionPay para la criptomoneda seleccionada."
       );
   }
 
@@ -1016,171 +1625,6 @@
           <a class="btn btn-secondary" href="contact.html">${tx("Open support page", "Abrir pagina de soporte")}</a>
         </div>
       </div>
-    `;
-  }
-
-  function nowPaymentsStatusCopy(status) {
-    const normalized = String(status || "waiting").toLowerCase();
-
-    if (normalized === "finished") {
-      return tx("Payment finished", "Pago finalizado");
-    }
-
-    if (normalized === "confirmed") {
-      return tx("Payment confirmed", "Pago confirmado");
-    }
-
-    if (normalized === "confirming") {
-      return tx("Confirming on-chain", "Confirmando en cadena");
-    }
-
-    if (normalized === "failed") {
-      return tx("Payment failed", "Pago fallido");
-    }
-
-    if (normalized === "expired") {
-      return tx("Payment expired", "Pago expirado");
-    }
-
-    return tx("Awaiting payment", "Esperando pago");
-  }
-
-  function nowPaymentsCountdown(expirationEstimateDate) {
-    if (!expirationEstimateDate) {
-      return "--:--:--";
-    }
-
-    const target = new Date(expirationEstimateDate).getTime();
-
-    if (!Number.isFinite(target)) {
-      return "--:--:--";
-    }
-
-    const remaining = Math.max(0, target - Date.now());
-    const hours = Math.floor(remaining / 3600000);
-    const minutes = Math.floor((remaining % 3600000) / 60000);
-    const seconds = Math.floor((remaining % 60000) / 1000);
-
-    return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
-  }
-
-  function nowPaymentsSessionExpiresAt(order) {
-    const preset = order?.paymentSessionExpiresAt || "";
-    if (Number.isFinite(new Date(preset).getTime())) {
-      return preset;
-    }
-
-    const createdAt = new Date(order?.createdAt || "").getTime();
-    if (!Number.isFinite(createdAt)) {
-      return "";
-    }
-
-    return new Date(createdAt + NOWPAYMENTS_SESSION_MS).toISOString();
-  }
-
-  function nowPaymentsSessionActive(order) {
-    const target = new Date(nowPaymentsSessionExpiresAt(order)).getTime();
-    return Number.isFinite(target) && target > Date.now();
-  }
-
-  function nowPaymentsQrSource(order) {
-    const payment = order?.nowPayments || {};
-    const qrPayload = payment.payAddress || "";
-    return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrPayload)}`;
-  }
-
-  function nowPaymentsWalletHref(order) {
-    const payment = order?.nowPayments || {};
-    const address = payment.payAddress || "";
-    const amount = payment.payAmount || "";
-
-    if (!address) {
-      return "";
-    }
-
-    if (payment.payCurrency === "BTC") {
-      return `bitcoin:${address}${amount ? `?amount=${encodeURIComponent(amount)}` : ""}`;
-    }
-
-    if (payment.payCurrency === "ETH") {
-      return `ethereum:${address}${amount ? `?value=${encodeURIComponent(amount)}` : ""}`;
-    }
-
-    return "";
-  }
-
-  function renderNowPaymentsWalletAction(order) {
-    const payment = order?.nowPayments || {};
-    const walletHref = nowPaymentsWalletHref(order);
-
-    if (walletHref) {
-      return `<a class="btn btn-primary payment-wallet-btn" href="${walletHref}">${tx("Open in wallet", "Abrir en wallet")}</a>`;
-    }
-
-    return `<button class="btn btn-primary payment-wallet-btn" type="button" data-copy-value="${payment.payAddress || ""}" data-copy-label="${tx("Wallet address copied.", "Direccion copiada.")}">${tx("Copy wallet address", "Copiar direccion")}</button>`;
-  }
-
-  function renderNowPaymentsPaymentScreen(order) {
-    const payment = order?.nowPayments || {};
-    const sessionExpiresAt = nowPaymentsSessionExpiresAt(order);
-
-    return `
-      <section class="page-hero">
-        <div class="container checkout-shell">
-          <div class="checkout-banner reveal">${tx("Shopping Cart > Checkout details > Order Complete", "Carrito > Detalles del checkout > Pedido completado")}</div>
-          <div class="checkout-grid checkout-grid-pro">
-            <section class="checkout-main reveal">
-              <article class="checkout-card crypto-payment-card" data-nowpayments-payment data-payment-id="${payment.paymentId || ""}" data-payment-expires="${payment.expirationEstimateDate || ""}" data-session-expires="${sessionExpiresAt}">
-                <div class="crypto-payment-header">
-                  <h1>${tx("To complete your order", "Para completar tu pedido")}</h1>
-                </div>
-                <div class="crypto-payment-row">
-                  <span>${tx("Send", "Enviar")}</span>
-                  <div class="crypto-payment-value-group">
-                    <strong class="crypto-payment-value" data-payment-amount>${payment.payAmount ? `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}` : tx("Pending amount", "Importe pendiente")}</strong>
-                    <button class="copy-chip" type="button" data-copy-value="${payment.payAmount ? `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}` : ""}" data-copy-label="${tx("Payment amount copied.", "Importe copiado.")}">${tx("Copy", "Copiar")}</button>
-                  </div>
-                </div>
-                <div class="crypto-payment-row">
-                  <span>${tx("To", "A")}</span>
-                  <div class="crypto-payment-value-group">
-                    <strong class="crypto-payment-address" data-payment-address>${payment.payAddress || tx("Waiting for deposit address", "Esperando direccion de deposito")}</strong>
-                    <button class="copy-chip" type="button" data-copy-value="${payment.payAddress || ""}" data-copy-label="${tx("Wallet address copied.", "Direccion copiada.")}">${tx("Copy", "Copiar")}</button>
-                  </div>
-                </div>
-                <div class="crypto-payment-layout">
-                  <div class="crypto-payment-qr-wrap">
-                    <img class="crypto-payment-qr" data-payment-qr src="${nowPaymentsQrSource(order)}" alt="${tx("NOWPayments QR code", "Codigo QR de NOWPayments")}">
-                  </div>
-                  <div class="crypto-payment-status-block">
-                    <strong data-payment-status>${nowPaymentsStatusCopy(payment.paymentStatus)}</strong>
-                    <p data-payment-helper>${tx("Your payment details stay active for up to 2 hours 15 minutes, and the crypto quote refreshes automatically in the background.", "Tus datos de pago permanecen activos hasta 2 horas y 15 minutos, y la cotizacion crypto se actualiza automaticamente en segundo plano.")}</p>
-                    <div class="crypto-payment-timer" data-payment-countdown>${nowPaymentsCountdown(sessionExpiresAt)}</div>
-                    <div class="crypto-payment-actions" data-payment-wallet-action>${renderNowPaymentsWalletAction(order)}</div>
-                  </div>
-                </div>
-              </article>
-            </section>
-            <aside class="summary-card checkout-side reveal reveal-delay">
-              <div class="section-header">
-                <p class="section-kicker">${tx("Thank you", "Gracias")}</p>
-                <h2 class="section-title">${tx("Your crypto payment is ready.", "Tu pago crypto esta listo.")}</h2>
-              </div>
-              <div class="summary-list">
-                <div class="summary-row"><span class="summary-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong></div>
-                <div class="summary-row"><span class="summary-label">${tx("Total due", "Total a pagar")}</span><strong>${formatPrice(order.total)}</strong></div>
-                <div class="summary-row"><span class="summary-label">${tx("Selected currency", "Moneda elegida")}</span><strong>${paymentDisplayLabel(order.payment, { label: { en: payment.payCurrencyCode || payment.payCurrency || "Crypto", es: payment.payCurrencyCode || payment.payCurrency || "Crypto" } })}</strong></div>
-              </div>
-              <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
-              <div class="policy-callout">
-                <strong>${tx("Send the exact amount shown on this page.", "Envia el importe exacto mostrado en esta pagina.")}</strong>
-                <p>${tx("The payment status refreshes automatically. Your crypto quote can keep updating during the reserved 2 hour 15 minute checkout window, and the order will complete as soon as the payment is confirmed.", "El estado del pago se actualiza automaticamente. La cotizacion crypto puede seguir actualizandose durante la ventana reservada de 2 horas y 15 minutos, y el pedido se completara en cuanto el pago quede confirmado.")}</p>
-              </div>
-              <a class="btn btn-secondary btn-block" href="cart.html">${tx("Back to cart", "Volver al carrito")}</a>
-            </aside>
-          </div>
-        </div>
-      </section>
     `;
   }
 
@@ -1424,7 +1868,95 @@
     `;
   }
 
-  function renderProductDescriptionEnhanced(product) {
+  function buildFallbackGuide(product) {
+    return {
+      summary: {
+        en: `Guide-style content for ${localize(product.name)} ${product.dosage} can be expanded further as the Primus library grows.`,
+        es: `El contenido tipo guia para ${localize(product.name)} ${product.dosage} puede ampliarse aun mas a medida que crece la biblioteca de Primus.`
+      },
+      howItWorks: {
+        en: `${localize(product.name)} ${product.dosage} is positioned as a research-grade reference inside the Primus catalogue, with focus placed on documented pathway behaviour and controlled laboratory handling.`,
+        es: `${localize(product.name)} ${product.dosage} se posiciona como una referencia grado investigacion dentro del catalogo de Primus, con foco en comportamiento de vias documentadas y manejo controlado de laboratorio.`
+      },
+      benefits: {
+        en: "Use this section for a careful summary of documented pathway interest, expected research context, and the main tolerance or handling notes tied to the product category.",
+        es: "Usa esta seccion para un resumen cuidadoso del interes documentado en la via, el contexto esperado de investigacion y las principales notas de tolerancia o manejo ligadas a la categoria del producto."
+      },
+      protocolOverview: {
+        en: "The on-site structure is designed for a short protocol summary, clean reading flow, and a faster transition from product review to checkout.",
+        es: "La estructura del sitio esta pensada para un resumen corto de protocolo, una lectura limpia y una transicion mas rapida desde la revision del producto hasta el checkout."
+      },
+      dosing: {
+        en: "Publish the finalized Primus internal schedule here once the peptide-specific guide is approved for launch.",
+        es: "Publica aqui la pauta interna final de Primus una vez que la guia especifica del peptido quede aprobada para lanzamiento."
+      },
+      reconstitution: {
+        en: "Standard handling should note solvent choice, careful vial-wall mixing, syringe conversion clarity, and refrigerated storage after reconstitution.",
+        es: "El manejo estandar debe indicar tipo de solvente, mezcla cuidadosa por la pared del vial, claridad en conversiones de jeringa y almacenamiento refrigerado tras la reconstitucion."
+      },
+      storage: {
+        en: "Store lyophilized material cold, dry, and protected from light. After reconstitution, keep refrigerated and avoid repeated temperature swings.",
+        es: "Guardar el material liofilizado en frio, seco y protegido de la luz. Tras la reconstitucion, mantener refrigerado y evitar cambios repetidos de temperatura."
+      },
+      stackKeys: []
+    };
+  }
+
+  function getProductGuide(product) {
+    return PRODUCT_GUIDES[product.slug] || buildFallbackGuide(product);
+  }
+
+  function renderGuideStackSeries(product) {
+    const guide = getProductGuide(product);
+    const stackKeys = Array.isArray(guide.stackKeys) ? guide.stackKeys : [];
+
+    if (!stackKeys.length) {
+      return "";
+    }
+
+    const cards = stackKeys
+      .map((key) => {
+        const stack = STACK_SERIES[key];
+
+        if (!stack) {
+          return "";
+        }
+
+        const members = stack.products
+          .map((slug) => {
+            const item = PRODUCTS.find((entry) => entry.slug === slug);
+            return item ? `${localize(item.name)} ${item.dosage}` : "";
+          })
+          .filter(Boolean)
+          .join(" · ");
+
+        return `
+          <article class="detail-card">
+            <span class="detail-label">${tx("Stack series", "Serie de stacks")}</span>
+            <strong>${localize(stack.title)}</strong>
+            <p>${localize(stack.summary)}</p>
+            <p class="section-copy">${members}</p>
+          </article>
+        `;
+      })
+      .join("");
+
+    if (!cards.trim()) {
+      return "";
+    }
+
+    return `
+      <div class="section-stack">
+        <div class="section-header">
+          <p class="section-kicker">${tx("Stack series", "Serie de stacks")}</p>
+          <h3>${tx("How this peptide connects with the wider Primus guide library.", "Como se conecta este peptido con la biblioteca ampliada de Primus.")}</h3>
+        </div>
+        <div class="detail-grid">${cards}</div>
+      </div>
+    `;
+  }
+
+  function renderProductDescriptionLegacy(product) {
     return `
       <div class="section-stack">
         <p class="section-copy">${tx(
@@ -1469,7 +2001,7 @@
     `;
   }
 
-  function renderProductAdditionalEnhanced(product) {
+  function renderProductAdditionalLegacy(product) {
     return `
       <div class="section-stack">
         <p class="section-copy">${tx(
@@ -1514,6 +2046,88 @@
           "For launch, connect this tab to compliance-reviewed scientific copy rather than generic public claims.",
           "Para el lanzamiento, conecta esta pestaña con contenido científico revisado en lugar de afirmaciones genéricas."
         )}</div>
+      </div>
+    `;
+  }
+
+  function renderProductDescriptionEnhanced(product) {
+    const guide = getProductGuide(product);
+    return `
+      <div class="section-stack">
+        <p class="section-copy">${localize(guide.summary)}</p>
+        <div class="detail-grid">
+          <article class="detail-card">
+            <span class="detail-label">${tx("Material", "Material")}</span>
+            <strong>${localize(product.name)} ${tx("synthetic peptide reference", "peptido sintetico de referencia")}</strong>
+            <p>${tx("Prepared for catalogue, batch, and laboratory documentation workflows.", "Preparado para flujos de catalogo, lote y documentacion de laboratorio.")}</p>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">${tx("Form", "Forma")}</span>
+            <strong>${tx("Lyophilized powder", "Polvo liofilizado")}</strong>
+            <p>${tx("White-background vial imagery reinforces a clinical and controlled visual direction.", "La imagineria de viales sobre fondo blanco refuerza una direccion visual clinica y controlada.")}</p>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">${tx("Manufacturing", "Fabricacion")}</span>
+            <strong>${tx("Synthetic peptide production", "Produccion sintetica de peptidos")}</strong>
+            <p>${tx("Positioned with batch visibility, purity-driven presentation, and trust-first copy.", "Posicionado con visibilidad por lote, presentacion orientada a pureza y copy centrado en confianza.")}</p>
+          </article>
+          <article class="detail-card">
+            <span class="detail-label">${tx("Storage", "Almacenamiento")}</span>
+            <strong>${tx("Cool, dry, protected from light", "Lugar fresco, seco y protegido de la luz")}</strong>
+            <p>${localize(guide.storage)}</p>
+          </article>
+        </div>
+        <div class="product-support-grid">
+          <article class="assurance-card">
+            <span class="detail-label">${tx("Research focus", "Foco de investigacion")}</span>
+            <strong>${localize(product.name)} ${product.dosage}</strong>
+            <p>${localize(product.focus)}</p>
+          </article>
+          <article class="assurance-card">
+            <span class="detail-label">${tx("Batch traceability", "Trazabilidad")}</span>
+            <strong>${tx("COA-ready batch reference", "Referencia de lote lista para COA")}</strong>
+            <p>${tx("Batch", "Lote")}: ${product.batch} · ${tx("Last analysis", "Ultimo analisis")}: ${formatDate(product.coaDate)}</p>
+          </article>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderProductAdditionalEnhanced(product) {
+    const guide = getProductGuide(product);
+    return `
+      <div class="section-stack">
+        <p class="section-copy">${tx(
+          "This section now mirrors the uploaded Primus guide structure while keeping the on-site copy cleaner, faster to scan, and easier to review in both languages.",
+          "Esta seccion ahora refleja la estructura de las guias cargadas de Primus manteniendo el contenido mas limpio, mas rapido de escanear y mas facil de revisar en ambos idiomas."
+        )}</p>
+        <div class="protocol-grid">
+          <article class="protocol-section detail-card">
+            <h3>${tx("How This Works", "Como funciona")}</h3>
+            <p class="protocol-text">${localize(guide.howItWorks)}</p>
+          </article>
+          <article class="protocol-section detail-card">
+            <h3>${tx("Potential Benefits & Side Effects", "Beneficios potenciales y efectos")}</h3>
+            <p class="protocol-text">${localize(guide.benefits)}</p>
+          </article>
+          <article class="protocol-section detail-card">
+            <h3>${tx("Protocol Overview", "Resumen del protocolo")}</h3>
+            <p class="protocol-text">${localize(guide.protocolOverview)}</p>
+          </article>
+          <article class="protocol-section detail-card">
+            <h3>${tx("Dosing Protocol", "Protocolo de dosificacion")}</h3>
+            <p class="protocol-text">${localize(guide.dosing)}</p>
+          </article>
+          <article class="protocol-section detail-card">
+            <h3>${tx("Dosing & Reconstitution Guide", "Guia de dosificacion y reconstitucion")}</h3>
+            <p class="protocol-text">${localize(guide.reconstitution)}</p>
+          </article>
+        </div>
+        <div class="policy-callout">${tx(
+          "Guide summaries are now aligned with the Primus content library. Final legal, scientific, and compliance review should still happen before launch.",
+          "Los resumenes de guia ahora estan alineados con la biblioteca de contenido de Primus. Aun asi, la revision legal, cientifica y de cumplimiento debe hacerse antes del lanzamiento."
+        )}</div>
+        ${renderGuideStackSeries(product)}
       </div>
     `;
   }
@@ -1856,7 +2470,6 @@
   function renderCheckoutPage() {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
-    const paymentPending = params.get("status") === "payment";
     const order = readLastOrder();
     const cart = readCart();
     const total = subtotal(cart);
@@ -1876,10 +2489,6 @@
         : `${localize(item.label)} - ${tx("coming soon", "proximamente")}`;
       return `<option value="${item.id}" ${item.id === cryptoCurrency.id ? "selected" : ""}>${optionLabel}</option>`;
     }).join("");
-
-    if (paymentPending && order && order.nowPayments && !bankTransferOrder) {
-      return renderNowPaymentsPaymentScreen(order);
-    }
 
     if (success && order) {
       return `
@@ -1934,7 +2543,7 @@
                 <div class="section-header">
                   <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
                   <h1>${tx("Billing details and payment selection.", "Datos de facturacion y seleccion de pago.")}</h1>
-                  <p class="lead">${tx("This checkout now uses a direct cryptocurrency flow for USDT, BTC, and ETH, while keeping the cleaner standard storefront layout.", "Este checkout ahora usa un flujo directo con criptomonedas para USDT, BTC y ETH, manteniendo una estructura de tienda mas limpia y estandar.")}</p>
+                  <p class="lead">${tx("This checkout uses a hosted ArionPay cryptocurrency flow while keeping the cleaner standard storefront layout.", "Este checkout usa un flujo alojado de criptomonedas con ArionPay manteniendo una estructura de tienda mas limpia y estandar.")}</p>
                 </div>
                 <form class="form-grid checkout-form-pro" id="checkout-form" data-checkout-form>
                   <div class="full-width checkout-field-grid">
@@ -2037,7 +2646,7 @@
                         ${cryptoCurrencyOptions}
                       </select>
                     </label>
-                    <p class="checkout-side-note">${tx("Choose BTC, USDT, or ETH to continue to the secure cryptocurrency payment screen.", "Elige BTC, USDT o ETH para continuar a la pantalla segura de pago con criptomonedas.")}</p>
+                    <p class="checkout-side-note">${tx("Choose BTC, USDT, or ETH to continue to the secure hosted ArionPay payment page.", "Elige BTC, USDT o ETH para continuar a la pagina de pago alojada y segura de ArionPay.")}</p>
                   `
                 }
               </div>
@@ -2370,45 +2979,49 @@
           return;
         }
 
-        fetch("/api/create-nowpayments-payment", {
+        fetch(ARIONPAY_INVOICE_ENDPOINT, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
             reference,
-            total: Number((total + shippingCost).toFixed(2)),
-            selectedCurrency: paymentCurrency.id,
-            items: cart.map((item) => {
-              const product = getProduct(item.slug);
-              return {
-                slug: item.slug,
-                name: `${localize(product.name)} ${product.dosage}`,
-                quantity: item.quantity
-              };
-            })
+            shippingMethod: shipping.id,
+            paymentMethod: paymentCurrency.id,
+            items: cart.map((item) => ({
+              slug: item.slug,
+              quantity: item.quantity
+            }))
           })
         })
           .then(async (response) => {
             const result = await response.json().catch(() => ({}));
 
-            if (!response.ok || !result.paymentId || !result.payAddress) {
-              throw new Error(result.detail || result.error || tx("Unable to create the cryptocurrency payment.", "No se pudo crear el pago con criptomonedas."));
+            if (!response.ok || !result.invoiceUrl) {
+              const detail = result.error && result.hint
+                ? `${result.error} ${result.hint}`
+                : result.hint
+                || result.error
+                || result.detail?.gatewayMessage
+                || result.detail?.error
+                || result.detail?.message
+                || tx("Unable to create the ArionPay invoice.", "No se pudo crear la factura de ArionPay.");
+              throw new Error(detail);
             }
 
             const order = {
-              reference,
+              reference: result.reference || reference,
               createdAt: new Date().toISOString(),
               customer: draft,
               shipping,
               payment,
-              subtotal: Number(total.toFixed(2)),
-              shippingCost: Number(shippingCost.toFixed(2)),
-              total: Number((total + shippingCost).toFixed(2)),
-              status: "payment_pending",
+              subtotal: Number(result.subtotal || total || 0),
+              shippingCost: Number(result.shipping || shippingCost || 0),
+              total: Number(result.total || (total + shippingCost) || 0),
+              status: "invoice_created",
               paymentCurrency,
-              paymentSessionExpiresAt: new Date(Date.now() + NOWPAYMENTS_SESSION_MS).toISOString(),
-              nowPayments: result,
+              invoiceId: result.invoiceId,
+              invoiceUrl: result.invoiceUrl,
               items: cart.map((item) => ({
                 slug: item.slug,
                 quantity: item.quantity,
@@ -2420,17 +3033,17 @@
 
             if (statusNode) {
               statusNode.textContent = tx(
-                "Crypto payment created. Opening the payment screen...",
-                "Pago con criptomonedas creado. Abriendo la pantalla de pago..."
+                "Secure invoice created. Redirecting to ArionPay...",
+                "Factura segura creada. Redirigiendo a ArionPay..."
               );
             }
 
-            window.location.href = "checkout.html?status=payment";
+            window.location.href = result.invoiceUrl;
           })
           .catch((error) => {
             const message = error instanceof Error && error.message
               ? error.message
-              : tx("Unable to create the cryptocurrency payment.", "No se pudo crear el pago con criptomonedas.");
+              : tx("Unable to create the ArionPay invoice.", "No se pudo crear la factura de ArionPay.");
 
             if (statusNode) {
               statusNode.textContent = message;
@@ -2464,191 +3077,6 @@
       });
     });
 
-    const nowPaymentsRoot = document.querySelector("[data-nowpayments-payment]");
-    if (nowPaymentsStatusTimer) {
-      window.clearInterval(nowPaymentsStatusTimer);
-      nowPaymentsStatusTimer = null;
-    }
-    if (nowPaymentsCountdownTimer) {
-      window.clearInterval(nowPaymentsCountdownTimer);
-      nowPaymentsCountdownTimer = null;
-    }
-
-    if (nowPaymentsRoot) {
-      const paymentId = nowPaymentsRoot.getAttribute("data-payment-id") || "";
-      let expiresAt = nowPaymentsRoot.getAttribute("data-payment-expires") || "";
-      const sessionExpiresAt = nowPaymentsRoot.getAttribute("data-session-expires") || "";
-      const countdownNode = document.querySelector("[data-payment-countdown]");
-      const statusNode = document.querySelector("[data-payment-status]");
-      const helperNode = document.querySelector("[data-payment-helper]");
-      const amountNode = document.querySelector("[data-payment-amount]");
-      const addressNode = document.querySelector("[data-payment-address]");
-      const qrNode = document.querySelector("[data-payment-qr]");
-      const walletActionNode = document.querySelector("[data-payment-wallet-action]");
-      let refreshingEstimate = false;
-
-      const syncNowPaymentsNodes = (order) => {
-        const payment = order?.nowPayments || {};
-        expiresAt = payment.expirationEstimateDate || expiresAt;
-        nowPaymentsRoot.setAttribute("data-payment-expires", expiresAt);
-
-        if (statusNode) {
-          statusNode.textContent = nowPaymentsStatusCopy(payment.paymentStatus);
-        }
-
-        if (helperNode) {
-          helperNode.textContent = nowPaymentsSessionActive(order)
-            ? tx("Your payment details stay active for up to 2 hours 15 minutes, and the crypto quote refreshes automatically in the background.", "Tus datos de pago permanecen activos hasta 2 horas y 15 minutos, y la cotizacion crypto se actualiza automaticamente en segundo plano.")
-            : tx("This reserved crypto checkout window has expired. Return to checkout to create a fresh payment.", "Esta ventana reservada para pago crypto ha expirado. Vuelve al checkout para crear un nuevo pago.");
-        }
-
-        if (amountNode && payment.payAmount) {
-          amountNode.textContent = `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}`;
-          if (amountNode.nextElementSibling) {
-            amountNode.nextElementSibling.setAttribute("data-copy-value", `${payment.payAmount} ${payment.payCurrencyCode || payment.payCurrency || ""}`);
-          }
-        }
-
-        if (addressNode && payment.payAddress) {
-          addressNode.textContent = payment.payAddress;
-          if (addressNode.nextElementSibling) {
-            addressNode.nextElementSibling.setAttribute("data-copy-value", payment.payAddress);
-          }
-        }
-
-        if (qrNode) {
-          qrNode.setAttribute("src", nowPaymentsQrSource(order));
-        }
-
-        if (walletActionNode) {
-          walletActionNode.innerHTML = renderNowPaymentsWalletAction(order);
-          const walletCopyButton = walletActionNode.querySelector("[data-copy-value]");
-          if (walletCopyButton) {
-            walletCopyButton.addEventListener("click", async () => {
-              const value = walletCopyButton.getAttribute("data-copy-value") || "";
-              const label = walletCopyButton.getAttribute("data-copy-label") || tx("Copied.", "Copiado.");
-
-              if (!value) {
-                return;
-              }
-
-              try {
-                await navigator.clipboard.writeText(value);
-                showToast(label);
-              } catch (error) {
-                showToast(tx("Unable to copy automatically.", "No se pudo copiar automaticamente."));
-              }
-            });
-          }
-        }
-      };
-
-      const refreshEstimate = () => {
-        if (refreshingEstimate || !paymentId) {
-          return;
-        }
-
-        const order = readLastOrder();
-        if (!order || !order.nowPayments || order.nowPayments.paymentId !== paymentId || !nowPaymentsSessionActive(order)) {
-          return;
-        }
-
-        refreshingEstimate = true;
-        if (statusNode) {
-          statusNode.textContent = tx("Refreshing payment quote...", "Actualizando cotizacion del pago...");
-        }
-
-        fetch("/api/refresh-nowpayments-payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ paymentId })
-        })
-          .then((response) => response.json().then((payload) => ({ ok: response.ok, payload })))
-          .then(({ ok, payload }) => {
-            if (!ok) {
-              throw new Error(payload.detail || payload.error || "Unable to refresh payment.");
-            }
-
-            const latestOrder = readLastOrder();
-            if (!latestOrder || !latestOrder.nowPayments || latestOrder.nowPayments.paymentId !== paymentId) {
-              return;
-            }
-
-            latestOrder.nowPayments = { ...latestOrder.nowPayments, ...payload };
-            saveLastOrder(latestOrder);
-            syncNowPaymentsNodes(latestOrder);
-          })
-          .catch(() => {
-            const latestOrder = readLastOrder();
-            if (latestOrder && latestOrder.nowPayments) {
-              syncNowPaymentsNodes(latestOrder);
-            }
-          })
-          .finally(() => {
-            refreshingEstimate = false;
-          });
-      };
-
-      const refreshCountdown = () => {
-        if (countdownNode) {
-          countdownNode.textContent = nowPaymentsCountdown(sessionExpiresAt);
-        }
-
-        const rateExpiresAt = new Date(expiresAt).getTime();
-        if (Number.isFinite(rateExpiresAt) && rateExpiresAt <= Date.now()) {
-          refreshEstimate();
-        }
-      };
-
-      const refreshPaymentStatus = () => {
-        if (!paymentId) {
-          return;
-        }
-
-        fetch(`/api/get-nowpayments-payment?payment_id=${encodeURIComponent(paymentId)}`)
-          .then((response) => response.json().then((payload) => ({ ok: response.ok, payload })))
-          .then(({ ok, payload }) => {
-            if (!ok) {
-              throw new Error(payload.detail || payload.error || "Unable to refresh payment.");
-            }
-
-            const order = readLastOrder();
-            if (!order || !order.nowPayments || order.nowPayments.paymentId !== paymentId) {
-              return;
-            }
-
-            order.nowPayments = { ...order.nowPayments, ...payload };
-            saveLastOrder(order);
-            syncNowPaymentsNodes(order);
-
-            if (payload.paymentStatus === "finished") {
-              order.status = "finished";
-              saveLastOrder(order);
-              if (typeof saveCart === "function") {
-                saveCart([]);
-              }
-              if (typeof updateCartBadges === "function") {
-                updateCartBadges();
-              }
-              window.location.href = "checkout.html?status=success";
-            }
-          })
-          .catch(() => {
-            // Keep the current screen stable if a refresh fails.
-          });
-      };
-
-      const initialOrder = readLastOrder();
-      if (initialOrder && initialOrder.nowPayments && initialOrder.nowPayments.paymentId === paymentId) {
-        syncNowPaymentsNodes(initialOrder);
-      }
-      refreshCountdown();
-      refreshPaymentStatus();
-      nowPaymentsCountdownTimer = window.setInterval(refreshCountdown, 1000);
-      nowPaymentsStatusTimer = window.setInterval(refreshPaymentStatus, 15000);
-    }
   };
 
   patchSharedCopy();
