@@ -352,7 +352,7 @@
     "retatrutide-30mg": {
       summary: {
         en: "Retatrutide is a triple GLP-1/GIP/glucagon receptor agonist developed for advanced metabolic research, combining three incretin pathways in a single molecule. This weekly injection protocol provides a comprehensive approach for studying appetite regulation, energy expenditure, and metabolic markers. The guide presents a structured escalation method for optimal tolerance and response assessment.",
-        es: "Retatrutide es un agonista triple de receptores GLP-1/GIP/glucagón desarrollado para investigación metabólica avanzada, combinando tres vías incretinas en una sola molécula. Este protocolo de inyección semanal proporciona un enfoque integral para estudiar regulación del apetito, gasto energético y marcadores metabólicos. La guía presenta un método de escalada estructurado para una tolerancia óptima y evaluación de respuesta."
+        es: "Retatrutide es un nuevo agonista triple dirigido a GLP-1, GIP y receptores de glucagón, estudiado para la pérdida de peso sustancial y la mejora metabólica en la obesidad y la diabetes tipo 2. Con una vida media prolongada de aproximadamente 6 días, este péptido permite una dosificación subcutánea conveniente una vez por semana con un protocolo de aumento gradual para optimizar la tolerabilidad."
       },
       howItWorks: {
         en: "Retatrutide activates GLP-1, GIP, and glucagon receptors simultaneously, creating a synergistic metabolic effect. This triple mechanism enhances insulin secretion, reduces glucagon release, slows gastric emptying, and increases energy expenditure. The molecule's extended half-life allows for once-weekly dosing, making it suitable for chronic metabolic studies. Research suggests it modulates appetite centers while improving peripheral glucose utilization and fat metabolism.",
@@ -395,7 +395,7 @@
     "tb-500-20mg": {
       summary: {
         en: "TB-500 is a synthetic peptide fragment derived from Thymosin Beta-4, developed for tissue repair and recovery research. This daily injection protocol provides a structured approach for studying cellular migration, angiogenesis, and regenerative processes. The guide presents a gradual escalation method suitable for chronic recovery studies.",
-        es: "TB-500 es un fragmento de péptido sintético derivado de Timosina Beta-4, desarrollado para investigación de reparación tisular y recuperación. Este protocolo de inyección diaria proporciona un enfoque estructurado para estudiar migración celular, angiogénesis y procesos regenerativos. La guía presenta un método de escalada gradual adecuado para estudios de recuperación crónica."
+        es: "TB-500 es un fragmento peptídico sintético correspondiente a la región activa de la timosina beta-4 (Tβ4), una proteína de 43 aminoácidos de origen natural implicada en la reparación y regeneración de tejidos. Este protocolo educativo presenta un enfoque subcutáneo una vez al día utilizando una dilución práctica para mediciones precisas con jeringa de insulina en entornos de investigación."
       },
       howItWorks: {
         en: "TB-500 is the active fragment of Thymosin Beta-4, promoting cellular migration, differentiation, and angiogenesis. It modulates actin cytoskeleton dynamics, enhancing cell motility and tissue repair processes. Research suggests it accelerates wound healing, reduces inflammation, and supports muscle recovery through improved blood vessel formation and cellular regeneration pathways.",
@@ -438,7 +438,7 @@
     "bpc-157-10mg": {
       summary: {
         en: "BPC-157 is a synthetic peptide derived from Body Protection Compound, developed for tissue repair and gastrointestinal research. This daily injection protocol provides a structured approach for studying angiogenesis, tendon healing, and gastrointestinal barrier function. The guide presents a gradual escalation method suitable for chronic recovery studies.",
-        es: "BPC-157 es un péptido sintético derivado de Body Protection Compound, desarrollado para investigación de reparación tisular y gastrointestinal. Este protocolo de inyección diaria proporciona un enfoque estructurado para estudiar angiogénesis, cicatrización de tendones y función de barrera gastrointestinal. La guía presenta un método de escalada gradual adecuado para estudios de recuperación crónica."
+        es: "BPC-157 (Compuesto de Protección Corporal-157) es un péptido sintético de 15 aminoácidos derivado de una secuencia de proteína gástrica estudiada para la curación de tejidos y propiedades citoprotectoras. Los modelos preclínicos demuestran la reparación acelerada de heridas y la actividad antiinflamatoria, aunque los datos clínicos en humanos siguen limitados a los ensayos de seguridad de fase temprana y los informes de casos pequeños. Este protocolo educativo presenta un enfoque subcutáneo una vez al día utilizando una dilución práctica para mediciones claras de la insulina-jeringa."
       },
       howItWorks: {
         en: "BPC-157 is a 15-amino acid peptide fragment that promotes angiogenesis, fibroblast proliferation, and tissue regeneration. It modulates growth factors and inflammatory pathways, supporting tendon, ligament, and gastrointestinal healing. Research suggests it accelerates wound healing, reduces inflammation, and supports muscle recovery through improved blood vessel formation and cellular repair mechanisms.",
@@ -481,7 +481,7 @@
     "ghk-cu-50mg": {
       summary: {
         en: "Refined as a copper-peptide specialist page with stronger cosmetic-science and tissue-remodelling language from the updated guide.",
-        es: "Refinado como una pagina especialista en peptido de cobre con lenguaje mas claro de ciencia cosmetica y remodelacion tisular tomado de la guia actualizada."
+        es: "GHK-Cu (complejo glicil-L-histidil-L-lisina:cobre) es un péptido de cobre presente de forma natural con funciones documentadas en la cicatrización de heridas, remodelación tisular y regeneración de la piel. La investigación demuestra actividad en la regulación génica relacionada con la síntesis de colágeno, la defensa antioxidante y las vías antiinflamatorias. Este protocolo educativo presenta enfoques prácticos de administración subcutánea basados en patrones de práctica clínica."
       },
       howItWorks: {
         en: "GHK-Cu is positioned around collagen-related gene expression, antioxidant defence, wound support, and broader tissue-remodelling pathways linked to a naturally occurring copper complex.",
@@ -515,7 +515,7 @@
     "mots-c-40mg": {
       summary: {
         en: "Rebuilt as a mitochondrial-metabolism page anchored in AMPK signalling, nutrient use, and exercise-capacity research for high-intent buyers.",
-        es: "Reconstruido como una pagina de metabolismo mitocondrial anclada en senalizacion AMPK, uso de nutrientes y capacidad de ejercicio para compradores de alta intencion."
+        es: "MOTS-c es un péptido derivado de la mitocondria (MDP) de 16 aminoácidos que actúa como regulador metabólico, principalmente a través de la activación de AMPK. Los estudios preclínicos muestran que mejora la sensibilidad a la insulina, promueve la oxidación de grasas, mejora la capacidad de ejercicio y contrarresta el deterioro metabólico relacionado con la edad. Hasta la fecha, no se han completado ensayos clínicos en humanos. Este protocolo educativo presenta un enfoque de administración subcutánea una vez al día con titulación gradual."
       },
       howItWorks: {
         en: "MOTS-c is a mitochondrial-derived peptide guide positioned around AMPK activation, fuel selection, and communication between mitochondria and the nucleus during metabolic stress.",
@@ -546,7 +546,7 @@
     "melanotan-mt2-10mg": {
       summary: {
         en: "Updated as a pigmentation-oriented guide page that keeps the clinical look clean while acknowledging the different behaviour of this category.",
-        es: "Actualizado como una pagina orientada a pigmentacion que mantiene el aspecto clinico limpio mientras reconoce el comportamiento distinto de esta categoria."
+        es: "Melanotan II es un análogo sintético de la hormona estimulante de melanocitos alfa, estudiado por su capacidad para aumentar la pigmentación de la piel y conocido por inducir actividad eréctil como efecto secundario. Los primeros ensayos en humanos identificaron dosis efectivas en el rango de 1–2 mg diarios para bronceado, con protocolos conservadores que comienzan más bajos para minimizar efectos secundarios como náuseas y enrojecimiento. Este protocolo educativo presenta un enfoque de titulación subcutánea diaria con una dilución práctica para facilitar la medición con jeringa de insulina."
       },
       howItWorks: {
         en: "Melanotan II is framed as an alpha-MSH analogue studied for pigmentation signalling, with guide language also noting its known downstream arousal effects in some settings.",
@@ -577,7 +577,7 @@
     "ss-31-50mg": {
       summary: {
         en: "Positioned as a flagship mitochondrial-protection page with stronger specialist language, higher-ticket trust, and a more clinical daily-use narrative.",
-        es: "Posicionado como una pagina insignia de proteccion mitocondrial con lenguaje mas especialista, mas confianza para ticket alto y una narrativa diaria mas clinica."
+        es: "SS-31 (elamipretida) es un tetrapéptido dirigido a las mitocondrias que se une selectivamente a la cardiolipina en la membrana mitocondrial interna, estabilizando los complejos de la cadena de transporte de electrones y reduciendo la producción de especies reactivas de oxígeno, al mismo tiempo que mejora la síntesis de ATP. Este péptido ha demostrado efectos protectores en modelos preclínicos de insuficiencia cardíaca, enfermedades neurodegenerativas y atrofia muscular relacionada con la edad, y recibió aprobación acelerada de la FDA en 2025 como el primer tratamiento para el síndrome de Barth. Este protocolo educativo presenta un enfoque de administración subcutánea diaria utilizando viales de 50 mg con una reconstitución práctica para facilitar la medición con jeringa de insulina."
       },
       howItWorks: {
         en: "SS-31 is framed around cardiolipin binding inside the mitochondrial membrane, where it helps stabilize electron transport, reduce oxidative stress, and support ATP production.",
@@ -608,7 +608,7 @@
     "nad-1000mg": {
       summary: {
         en: "Refined as a coenzyme and mitochondrial-support page with stronger dosage clarity, cleaner energy language, and better daily-tolerance framing.",
-        es: "Refinado como una pagina de coenzima y soporte mitocondrial con mayor claridad de dosificacion, lenguaje energetico mas limpio y mejor enfoque en tolerancia diaria."
+        es: "NAD+ (nicotinamida adenina dinucleótido) es una coenzima clave implicada en el metabolismo energético celular, la reparación del ADN y la función mitocondrial. La investigación clínica ha utilizado principalmente infusiones intravenosas a dosis altas, aunque la administración subcutánea a dosis más bajas está emergiendo como una alternativa práctica de mantenimiento. Este protocolo educativo presenta un enfoque subcutáneo diario con titulación gradual para mejorar la tolerancia."
       },
       howItWorks: {
         en: "NAD+ is positioned around cellular energy transfer, DNA-repair support, and mitochondrial function, which is why the guide treats it as a foundational energy compound.",
@@ -685,7 +685,7 @@
     "selank-10mg": {
       summary: {
         en: "Refined from the new guide as a calm-performance neuropeptide page that balances anti-anxiety positioning with a cleaner premium storefront tone.",
-        es: "Refinado desde la nueva guia como una pagina de neuropetido orientada a calma y rendimiento que equilibra posicionamiento antiestres con un tono premium mas limpio."
+        es: "Selank es un heptapéptido sintético análogo de tuftsin con propiedades ansiolíticas y antiasténicas (aumento de energía) demostradas en ensayos clínicos en humanos. En estudios rusos, el Selank intranasal produjo efectos ansiolíticos comparables a las benzodiacepinas sin sedación ni riesgo de dependencia. Este protocolo educativo presenta un enfoque subcutáneo de una vez al día utilizando una dilución práctica para mediciones precisas con jeringa de insulina."
       },
       howItWorks: {
         en: "Selank is framed as a tuftsin analogue studied for anxiolytic and anti-asthenic effects, with guide positioning centered on calm focus rather than sedative suppression.",
@@ -716,7 +716,7 @@
     "dsip-10mg": {
       summary: {
         en: "Presented from the new guide as a sleep-recovery reference that completes the day-to-night nervous-system series with a stronger research-first tone.",
-        es: "Presentado desde la nueva guia como una referencia de sueno y recuperacion que completa la serie dia-noche del sistema nervioso con un tono mas cientifico."
+        es: "Los protocolos de dosificación de DSIP pueden ayudar a promover un sueño profundo y reparador (ondas delta) y apoyar una respuesta saludable al estrés. El péptido inductor del sueño delta (DSIP) es un nonapéptido natural (9 aminoácidos) aislado inicialmente del cerebro de conejo por su capacidad para mejorar el sueño de ondas lentas. La investigación indica que DSIP puede mejorar la calidad del sueño, normalizar la arquitectura del sueño, reducir patrones de cortisol relacionados con el estrés y favorecer la estabilidad del estado de ánimo sin somnolencia al día siguiente. Este protocolo educativo presenta un enfoque subcutáneo nocturno de una vez al día utilizando una dilución práctica para mediciones claras con jeringa de insulina."
       },
       howItWorks: {
         en: "DSIP is framed as a delta-sleep-inducing nonapeptide studied for slow-wave sleep support, stress-pattern regulation, and more stable overnight recovery.",
@@ -747,7 +747,7 @@
     "epithalon-40mg": {
       summary: {
         en: "Structured as a pineal and longevity-oriented page that feels more specialist, more orderly, and better aligned with premium research positioning.",
-        es: "Estructurado como una pagina orientada a pineal y longevidad que se siente mas especialista, mas ordenada y mejor alineada con un posicionamiento premium."
+        es: "Epitalon (Epithalon) es un tetrapéptido sintético (Ala-Glu-Asp-Gly) desarrollado a partir de investigaciones sobre la glándula pineal por su potencial geroprotector. Epitalon activa la telomerasa para favorecer el alargamiento de los telómeros, apoya la producción saludable de melatonina para mejorar el sueño y la regulación del ritmo circadiano, y ha demostrado aumentar la longevidad en modelos animales. Estudios en humanos sugieren beneficios potenciales para la longevidad, la salud cardiovascular y la función fisiológica en adultos mayores. Este protocolo educativo presenta un enfoque subcutáneo de una vez al día con una dilución práctica para mediciones claras con jeringa de insulina."
       },
       howItWorks: {
         en: "Epithalon is framed around telomerase-related research, melatonin support, circadian regulation, and broader healthy-ageing models linked to pineal signalling.",
@@ -781,7 +781,7 @@
     "tirzepatide-30mg": {
       summary: {
         en: "Tirzepatide is a dual GLP-1/GIP receptor agonist developed for metabolic research, combining the benefits of GLP-1 and GIP pathways in a single molecule. This weekly injection protocol provides a convenient research approach for studying appetite regulation, body composition, and metabolic markers. The guide presents a structured escalation method for optimal tolerance and response assessment.",
-        es: "Tirzepatide es un agonista dual de receptores GLP-1/GIP desarrollado para investigación metabólica, combinando los beneficios de las vías GLP-1 y GIP en una sola molécula. Este protocolo de inyección semanal proporciona un enfoque conveniente de investigación para estudiar la regulación del apetito, composición corporal y marcadores metabólicos. La guía presenta un método de escalada estructurado para una tolerancia óptima y evaluación de respuesta."
+        es: "Tirzepatide es un agonista del receptor de incretina dual de 39 aminoácidos que activa los receptores GLP-1 y GIP, mejorando la secreción de insulina dependiente de la glucosa, suprimiendo el glucagón, ralentizando el vaciamiento gástrico y reduciendo el apetito. Su ~5-día de semi-vida permite la dosificación subcutánea conveniente una vez por semana."
       },
       howItWorks: {
         en: "Tirzepatide activates both GLP-1 and GIP receptors, leading to enhanced insulin secretion, reduced glucagon release, and slowed gastric emptying. This dual mechanism provides superior metabolic effects compared to single-pathway agonists. The molecule's long half-life allows for once-weekly dosing, making it suitable for chronic metabolic studies. Research suggests it modulates appetite centers in the brain while improving peripheral glucose utilization.",
@@ -824,7 +824,7 @@
     "ipamorelin-10mg": {
       summary: {
         en: "Refined as a cleaner GH-secretagogue page with stronger sleep-timing context and lower-friction copy for buyers comparing nightly-use products.",
-        es: "Refinado como una pagina mas limpia de secretagogo de GH con mejor contexto de uso nocturno y copy mas directo para compradores que comparan productos de toma nocturna."
+        es: "Ipamorelin es un pentapéptido sintético que actúa como secretagogo selectivo de la hormona del crecimiento al imitar la grelina en su receptor. Su principal ventaja es su alta especificidad para estimular la liberación de GH sin provocar aumentos de ACTH o cortisol, lo que lo convierte en uno de los secretagogos más seguros con mínimos efectos hormonales no deseados. Este protocolo educativo presenta un enfoque subcutáneo de una vez al día utilizando una dilución práctica para mediciones precisas con jeringa de insulina."
       },
       howItWorks: {
         en: "Ipamorelin is positioned as a selective ghrelin-receptor agonist used to stimulate growth-hormone release while keeping ACTH and cortisol spillover lower than broader secretagogues.",
@@ -855,7 +855,7 @@
     "pt141-10mg": {
       summary: {
         en: "Built as a premium libido-focused page that keeps the tone scientific while still acknowledging the use-case buyers associate with the compound.",
-        es: "Construido como una pagina premium enfocada en libido que mantiene el tono cientifico mientras reconoce el caso de uso que muchos compradores asocian con el compuesto."
+        es: "PT-141 (bremelanotida) es un heptapéptido cíclico sintético y agonista no selectivo de los receptores melanocortina (MC3R/MC4R), derivado como metabolito activo de Melanotan II. Fue aprobado en 2019 para el trastorno de deseo sexual hipoactivo en mujeres premenopáusicas. La bremelanotida aumenta el deseo sexual activando el receptor MC4R en las vías cerebrales de recompensa y excitación, incrementando la liberación de dopamina en áreas clave del cerebro. Este protocolo educativo presenta un enfoque subcutáneo diario con titulación gradual y una dilución práctica para mediciones precisas con jeringa de insulina."
       },
       howItWorks: {
         en: "PT-141, or bremelanotide, is framed as a melanocortin-receptor agonist linked to central arousal signalling and dopaminergic reward pathways rather than local vascular action alone.",
@@ -886,7 +886,7 @@
     "oxytocin-10mg": {
       summary: {
         en: "Reworked as a social-bonding and stress-context page that complements the libido category without making the storefront feel generic or exaggerated.",
-        es: "Reelaborado como una pagina de vinculo social y contexto de estres que complementa la categoria de libido sin hacer que la tienda se sienta generica o exagerada."
+        es: "La oxitocina es una hormona peptídica (nonapéptido) conocida por su papel en el vínculo social y el comportamiento. En entornos de investigación, la oxitocina sintética se utiliza para estudiar efectos sobre las relaciones de pareja, el estrés, la ansiedad y la cognición social. La oxitocina en formato de 10 mg se presenta como polvo liofilizado para investigación, por lo que requiere reconstitución antes de su uso. Este protocolo recopila pautas sobre dosificación, administración y almacenamiento."
       },
       howItWorks: {
         en: "Oxytocin is framed around social connection, pair bonding, stress modulation, and social-cognition research, which gives it a distinctly different role from PT-141 even when they are discussed together.",
