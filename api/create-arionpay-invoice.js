@@ -179,6 +179,8 @@ module.exports = async function handler(req, res) {
     .update(payloadJson)
     .digest("hex");
 
+  let invoice;
+
   try {
     const response = await fetch("https://api.arionpay.com/api/v1/invoices", {
       method: "POST",
@@ -192,7 +194,7 @@ module.exports = async function handler(req, res) {
 
     const rawText = await response.text();
     const result = safeJsonParse(rawText) || {};
-    const invoice = extractInvoiceData(result);
+    invoice = extractInvoiceData(result);
 
     if (!response.ok || !invoice.invoiceUrl) {
       const gatewayMessage = normalizeGatewayMessage(result, rawText);
@@ -209,45 +211,51 @@ module.exports = async function handler(req, res) {
         }
       });
     }
-
-    const order = {
-      reference,
-      createdAt: new Date().toISOString(),
-      status: "invoice_created",
-      customer,
-      items: serializeItems(items),
-      shippingMethod,
-      paymentMethod: paymentAsset.chain,
-      subtotal: Number(totals.subtotal.toFixed(2)),
-      shippingCost: Number(totals.shipping.toFixed(2)),
-      total: Number(totals.total.toFixed(2)),
-      invoiceId: invoice.invoiceId,
-      invoiceUrl: invoice.invoiceUrl,
-      storeCurrency: fiatCurrency,
-      gatewayCurrency: invoice.currency || paymentAsset.currency
-    };
-
-    saveOrder(order);
-    const notifications = await sendOrderCreatedEmails(order);
-
-    return res.status(200).json({
-      reference,
-      invoiceId: invoice.invoiceId,
-      invoiceUrl: invoice.invoiceUrl,
-      currency: invoice.currency || paymentAsset.currency,
-      storeCurrency: fiatCurrency,
-      subtotal: Number(totals.subtotal.toFixed(2)),
-      shipping: Number(totals.shipping.toFixed(2)),
-      total: Number(totals.total.toFixed(2)),
-      paymentMethod: paymentAsset.chain,
-      paymentLabel: (PAYMENT_OPTIONS[paymentAsset.chain] || PAYMENT_OPTIONS.USDT_TRC20).label,
-      shippingLabel: (SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"]).label,
-      notifications
-    });
   } catch (error) {
     return res.status(502).json({
       error: "Unable to reach ArionPay.",
       detail: error instanceof Error ? error.message : "Unknown network error"
     });
   }
+
+  const order = {
+    reference,
+    createdAt: new Date().toISOString(),
+    status: "invoice_created",
+    customer,
+    items: serializeItems(items),
+    shippingMethod,
+    paymentMethod: paymentAsset.chain,
+    subtotal: Number(totals.subtotal.toFixed(2)),
+    shippingCost: Number(totals.shipping.toFixed(2)),
+    total: Number(totals.total.toFixed(2)),
+    invoiceId: invoice.invoiceId,
+    invoiceUrl: invoice.invoiceUrl,
+    storeCurrency: fiatCurrency,
+    gatewayCurrency: invoice.currency || paymentAsset.currency
+  };
+
+  let notifications = null;
+
+  try {
+    saveOrder(order);
+    notifications = await sendOrderCreatedEmails(order);
+  } catch (error) {
+    console.warn("ArionPay invoice created, but local order post-processing failed.", error);
+  }
+
+  return res.status(200).json({
+    reference,
+    invoiceId: invoice.invoiceId,
+    invoiceUrl: invoice.invoiceUrl,
+    currency: invoice.currency || paymentAsset.currency,
+    storeCurrency: fiatCurrency,
+    subtotal: Number(totals.subtotal.toFixed(2)),
+    shipping: Number(totals.shipping.toFixed(2)),
+    total: Number(totals.total.toFixed(2)),
+    paymentMethod: paymentAsset.chain,
+    paymentLabel: (PAYMENT_OPTIONS[paymentAsset.chain] || PAYMENT_OPTIONS.USDT_TRC20).label,
+    shippingLabel: (SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"]).label,
+    notifications
+  });
 };
