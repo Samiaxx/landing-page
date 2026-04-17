@@ -1276,12 +1276,12 @@
   function productProfile(product) {
     return PRODUCT_PROFILES[product.slug] || {
       short: {
-        en: "Pre-launch listing prepared inside the same research-grade catalogue system.",
-        es: "Listado de prelanzamiento preparado dentro del mismo sistema de catálogo."
+        en: "This product is reserved for an upcoming batch release and will be available soon with full documentation.",
+        es: "Este producto está reservado para un próximo lote y estará disponible pronto con documentación completa."
       },
       focus: {
-        en: "Launch copy, pricing, and supporting documentation can be connected once the batch is released.",
-        es: "El copy de lanzamiento, el precio y la documentación podrán conectarse cuando el lote se libere."
+        en: "Pricing, availability, and batch certification will be confirmed as the release date approaches.",
+        es: "El precio, la disponibilidad y la certificación por lote se confirmarán a medida que se acerque la fecha de lanzamiento."
       }
     };
   }
@@ -1296,8 +1296,8 @@
       es: "Lotes respaldados por COA, fichas analizadas por HPLC y checkout seguro con criptomonedas y transferencia bancaria como alternativa."
     };
     COPY.shell.toastContact = {
-      en: "Email draft ready.",
-      es: "Borrador de correo listo."
+      en: "Message composer opened.",
+      es: "Composición de correo abierta."
     };
     COPY.labels.checkout = {
       en: "Checkout",
@@ -2413,7 +2413,7 @@
           <article class="contact-card reveal reveal-delay">
             <div class="section-header">
               <p class="section-kicker">${tx("Send a message", "Enviar mensaje")}</p>
-              <h2 class="section-title">${tx("Open a ready-made email draft instead of a dead-end placeholder form.", "Abre un borrador de correo real en lugar de un formulario vacío.")}</h2>
+              <h2 class="section-title">${tx("Send your request directly by email through a live support workflow.", "Envía tu solicitud directamente por correo mediante un flujo de soporte activo.")}</h2>
             </div>
             <form class="form-grid" data-contact-form>
               <label class="full-width"><span>${tx("Name", "Nombre")}</span><input class="form-input" name="name" required></label>
@@ -2422,7 +2422,7 @@
               <label class="full-width"><span>${tx("Message", "Mensaje")}</span><textarea class="form-textarea" name="message" placeholder="${tx("Tell us what you need and we will route it through the right support flow.", "Indícanos lo que necesitas y lo encaminaremos por el flujo de soporte adecuado.")}"></textarea></label>
               <div class="full-width form-row">
                 <p class="form-status" data-contact-status></p>
-                <button class="btn btn-primary" type="submit">${tx("Open email draft", "Abrir borrador")}</button>
+                <button class="btn btn-primary" type="submit">${tx("Compose email", "Redactar correo")}</button>
               </div>
             </form>
           </article>
