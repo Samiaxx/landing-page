@@ -82,58 +82,16 @@
         en: "Complete your order through secure ArionPay cryptocurrency checkout once your details are confirmed.",
         es: "Completa tu pedido mediante el checkout seguro de criptomonedas de ArionPay una vez confirmados los datos."
       }
-    },
-    {
-      id: "BANK_TRANSFER",
-      label: { en: "Direct bank transfer", es: "Transferencia bancaria directa" },
-      chip: "BANK",
-      note: {
-        en: "Place the order now and complete payment after support confirms the receiving account.",
-        es: "Reserva el pedido ahora y completa el pago manualmente por transferencia bancaria tras la revisión."
-      }
-    },
-    {
-      id: "ETH",
-      label: "ETH",
-      chip: "ETH",
-      enabled: false,
-      note: {
-        en: "Enable the ETH asset in ArionPay before offering this method to buyers.",
-        es: "Activa el asset ETH en ArionPay antes de ofrecer este método a compradores."
-      }
-    },
-    {
-      id: "BTC",
-      label: "BTC",
-      chip: "BTC",
-      enabled: false,
-      note: {
-        en: "Enable the BTC asset in ArionPay before offering this method to buyers.",
-        es: "Activa el asset BTC en ArionPay antes de ofrecer este método a compradores."
-      }
     }
   ];
 
   const ACTIVE_PAYMENT_OPTIONS = PAYMENT_OPTIONS.filter((item) => item.enabled !== false);
   PAYMENT_OPTIONS[0].note.es = "Completa tu pedido mediante el checkout seguro de criptomonedas de ArionPay una vez confirmados los datos.";
-  PAYMENT_OPTIONS[1].note.es = "Realiza el pedido ahora y completa el pago despues de que soporte confirme la cuenta receptora.";
   const CRYPTO_CURRENCY_OPTIONS = [
     {
       id: "USDT_TRC20",
       label: { en: "Tether (USDT - TRC20)", es: "Tether (USDT - TRC20)" },
       shortLabel: "USDT",
-      live: true
-    },
-    {
-      id: "BTC",
-      label: { en: "Bitcoin (BTC)", es: "Bitcoin (BTC)" },
-      shortLabel: "BTC",
-      live: true
-    },
-    {
-      id: "ETH",
-      label: { en: "Ethereum (ETH)", es: "Ethereum (ETH)" },
-      shortLabel: "ETH",
       live: true
     }
   ];
@@ -1059,8 +1017,8 @@
               es: "Todos los precios se muestran en EUR salvo indicación en contrario. Las variaciones del tipo de cambio y las comisiones de red pueden afectar al valor final de los pagos en crypto."
             },
             {
-              en: "Cryptocurrency checkout and manual bank transfer can both be used during the current launch phase, with a deeper card gateway integration added later if needed.",
-              es: "El checkout con criptomonedas y la transferencia bancaria manual pueden usarse durante la fase actual de lanzamiento, con una integracion de tarjeta mas profunda añadida mas adelante si fuera necesario."
+              en: "Cryptocurrency checkout is live now with USDT payments through ArionPay.",
+              es: "El checkout con criptomonedas está activo ahora con pagos USDT a través de ArionPay."
             }
           ]
         },
@@ -1235,7 +1193,8 @@
 
   function selectedCryptoCurrency() {
     const saved = readCheckoutDraft();
-    return CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === saved.paymentCurrency)
+    return CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === saved.paymentCurrency && item.live)
+      || CRYPTO_CURRENCY_OPTIONS.find((item) => item.live)
       || CRYPTO_CURRENCY_OPTIONS[0];
   }
 
@@ -1292,8 +1251,8 @@
       es: "Tienda de péptidos para investigación"
     };
     COPY.shell.topbar = {
-      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with bank transfer fallback.",
-      es: "Lotes respaldados por COA, fichas analizadas por HPLC y checkout seguro con criptomonedas y transferencia bancaria como alternativa."
+      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with live USDT.",
+      es: "Lotes respaldados por COA, fichas analizadas por HPLC y checkout seguro con USDT en vivo."
     };
     COPY.shell.toastContact = {
       en: "Message composer opened.",
@@ -1575,15 +1534,15 @@
 
   function checkoutPendingStatus(payment) {
     return isBankTransferPayment(payment)
-      ? tx("Saving your order and opening bank transfer instructions...", "Guardando tu pedido y abriendo las instrucciones de transferencia bancaria...")
+      ? tx("Saving your order and opening payment instructions...", "Guardando tu pedido y abriendo las instrucciones de pago...")
       : tx("Creating your secure ArionPay invoice...", "Creando tu factura segura de ArionPay...");
   }
 
   function checkoutHelperCopy(payment) {
     return isBankTransferPayment(payment)
       ? tx(
-        "Your order will be reserved first, then bank transfer instructions will be shown on the confirmation screen.",
-        "Primero se reservara tu pedido y despues se mostraran las instrucciones de transferencia bancaria en la pantalla de confirmacion."
+        "Your order will be reserved first, then payment instructions will be shown on the confirmation screen.",
+        "Primero se reservara tu pedido y despues se mostraran las instrucciones de pago en la pantalla de confirmacion."
       )
       : tx(
         "You will continue to a secure hosted ArionPay payment page for the selected cryptocurrency.",
@@ -1641,8 +1600,8 @@
         ready: false,
         url: "",
         reason: tx(
-          "This cryptocurrency option is not active yet. Choose USDT, BTC, or ETH when available.",
-          "Esta opcion de criptomoneda aun no esta activa. Elige USDT, BTC o ETH cuando este disponible."
+          "This cryptocurrency option is not active yet. Choose USDT when available.",
+          "Esta opcion de criptomoneda aun no esta activa. Elige USDT cuando este disponible."
         )
       };
     }
@@ -1654,7 +1613,7 @@
     const customerName = order?.customer
       ? [order.customer.firstName, order.customer.lastName].filter(Boolean).join(" ").trim()
       : "";
-    const subject = `Bank transfer request ${order.reference}`;
+    const subject = `Payment request ${order.reference}`;
     const lines = [
       `Order reference: ${order.reference}`,
       customerName ? `Customer: ${customerName}` : "",
@@ -1662,7 +1621,7 @@
       order?.customer?.phone ? `Phone: ${order.customer.phone}` : "",
       `Amount due: ${formatPrice(order.total)}`,
       "",
-      "Please send the current bank transfer instructions for this order."
+      "Please request the current payment instructions for this order."
     ].filter(Boolean);
 
     return `mailto:${SITE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
@@ -1671,7 +1630,7 @@
   function renderBankTransferInstructions(order) {
     return `
       <div class="policy-callout">
-        <strong>${tx("Bank transfer details are shared only after manual review.", "Los datos de transferencia bancaria se comparten solo tras una revision manual.")}</strong>
+        <strong>${tx("Payment details are shared only after manual review.", "Los datos de pago se comparten solo tras una revision manual.")}</strong>
         <p>${tx(
           `This store is still validating the final receiving account, so bank details are intentionally not shown on the public checkout page. Use the order reference ${order.reference} and request the current transfer instructions from ${SITE_EMAIL}.`,
           `Esta tienda sigue validando la cuenta receptora final, por lo que los datos bancarios no se muestran en la pagina publica de checkout. Usa la referencia ${order.reference} y solicita las instrucciones vigentes a ${SITE_EMAIL}.`
@@ -1728,13 +1687,13 @@
       const copy = document.querySelector(".success-copy");
 
       if (kicker) {
-        kicker.textContent = tx("Bank transfer selected", "Transferencia bancaria seleccionada");
+        kicker.textContent = tx("Manual payment selected", "Pago manual seleccionado");
       }
 
       if (title) {
         title.textContent = bankTransferConfigured()
-          ? tx("Complete your bank transfer to confirm this order.", "Completa tu transferencia bancaria para confirmar este pedido.")
-          : tx("Your order is reserved pending bank transfer instructions.", "Tu pedido esta reservado mientras se comparten las instrucciones de transferencia bancaria.");
+          ? tx("Complete your manual payment to confirm this order.", "Completa tu pago manual para confirmar este pedido.")
+          : tx("Your order is reserved pending payment instructions.", "Tu pedido esta reservado mientras se comparten las instrucciones de pago.");
       }
 
       if (copy) {
@@ -1783,7 +1742,7 @@
             <div class="footer-title">${tx("Support", "Soporte")}</div>
             <a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a>
             <p class="footer-note">${tx("EU dispatch target: 24h", "Objetivo de salida UE: 24h")}</p>
-            <p class="footer-note">${tx("Payments: BTC / USDT / ETH / Bank transfer", "Pagos: BTC / USDT / ETH / Transferencia bancaria")}</p>
+            <p class="footer-note">${tx("Payments: USDT", "Pagos: USDT")}</p>
             <div class="footer-payments">${payments}</div>
           </div>
         </div>
@@ -2342,7 +2301,7 @@
             <div class="section-header">
               <p class="section-kicker">${tx("Cart", "Carrito")}</p>
               <h1>${tx("Review your order before checkout.", "Revisa tu pedido antes del checkout.")}</h1>
-              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery selection, secure cryptocurrency checkout, and bank transfer fallback.", "El carrito ahora lleva directamente a un checkout invitado más limpio con selección de envío, checkout seguro con criptomonedas y transferencia bancaria como alternativa.")}</p>
+              <p class="lead">${tx("The cart now leads directly into a cleaner guest-checkout flow with delivery selection and secure USDT cryptocurrency checkout.", "El carrito ahora lleva directamente a un checkout invitado más limpio con selección de envío y checkout seguro USDT con criptomonedas.")}</p>
             </div>
             ${renderCartItems(cart)}
           </section>
@@ -2407,7 +2366,7 @@
             <div class="contact-points">
               <div class="contact-point"><strong>${tx("Email", "Correo")}</strong><a href="mailto:${SITE_EMAIL}">${SITE_EMAIL}</a></div>
               <div class="contact-point"><strong>${tx("Shipping window", "Ventana de envío")}</strong><p>${tx("EU dispatch target: 24h once payment and order review are complete.", "Objetivo de salida UE: 24h una vez completada la revisión de pago y pedido.")}</p></div>
-              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("BTC, USDT, and ETH are available through secure cryptocurrency checkout, with bank transfer available as fallback.", "BTC, USDT y ETH estan disponibles mediante checkout seguro con criptomonedas, con transferencia bancaria como alternativa.")}</p><div class="payment-chips">${["BTC", "USDT", "ETH", tx("Bank Transfer", "Transferencia bancaria")].map((item) => `<span class="payment-chip">${item}</span>`).join("")}</div></div>
+              <div class="contact-point"><strong>${tx("Accepted payments", "Pagos aceptados")}</strong><p>${tx("USDT is available through secure cryptocurrency checkout.", "USDT está disponible mediante checkout seguro con criptomonedas.")}</p><div class="payment-chips">${["USDT"].map((item) => `<span class="payment-chip">${item}</span>`).join("")}</div></div>
             </div>
           </article>
           <article class="contact-card reveal reveal-delay">
@@ -2452,12 +2411,12 @@
         <section class="page-hero">
           <div class="container section-stack">
             <article class="success-card reveal">
-              <p class="section-kicker">${bankTransferOrder ? tx("Bank transfer selected", "Transferencia bancaria seleccionada") : tx("Order received", "Pedido recibido")}</p>
+              <p class="section-kicker">${bankTransferOrder ? tx("Manual payment selected", "Pago manual seleccionado") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
-              <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links, while bank transfer remains available as the manual-payment fallback.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay, mientras que la transferencia bancaria sigue disponible como alternativa manual.")}</p>
+              <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links for USDT orders.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay para pedidos USDT.")}</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
-                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual bank transfer pending confirmation.", "Transferencia bancaria manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual payment pending confirmation.", "Pago manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
                 <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
               </div>
               <div class="summary-divider"></div>
@@ -2496,7 +2455,7 @@
             <div class="section-header">
               <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
               <h1>${tx("Guest checkout with delivery and payment selection.", "Checkout invitado con seleccion de envio y pago.")}</h1>
-              <p class="lead">${tx("Choose delivery, then continue with a hosted ArionPay payment link or reserve the order for manual bank transfer.", "Elige el envio y luego continua con un enlace de pago alojado de ArionPay o reserva el pedido para transferencia bancaria manual.")}</p>
+              <p class="lead">${tx("Choose delivery, then continue with a hosted ArionPay payment link for USDT checkout.", "Elige el envío y continúa con un enlace de pago alojado de ArionPay para checkout USDT.")}</p>
             </div>
             <form class="form-grid" id="checkout-form" data-checkout-form>
               <label><span>${tx("First name", "Nombre")}</span><input class="form-input" name="firstName" required value="${draft.firstName || ""}"></label>
@@ -2561,27 +2520,27 @@
     const grandTotal = total + shippingCost;
     const bankTransferOrder = success && order && isBankTransferPayment(order.payment);
     const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
-    const cryptoCurrencyOptions = CRYPTO_CURRENCY_OPTIONS.map((item) => {
-      const optionLabel = item.live
-        ? localize(item.label)
-        : `${localize(item.label)} - ${tx("coming soon", "proximamente")}`;
-      return `<option value="${item.id}" ${item.id === cryptoCurrency.id ? "selected" : ""}>${optionLabel}</option>`;
-    }).join("");
+    const cryptoCurrencyOptions = CRYPTO_CURRENCY_OPTIONS
+      .filter((item) => item.live)
+      .map((item) => {
+        const optionLabel = localize(item.label);
+        return `<option value="${item.id}" ${item.id === cryptoCurrency.id ? "selected" : ""}>${optionLabel}</option>`;
+      }).join("");
 
     if (success && order) {
       return `
         <section class="page-hero">
           <div class="container section-stack">
             <article class="success-card reveal">
-              <p class="section-kicker">${bankTransferOrder ? tx("Bank transfer selected", "Transferencia bancaria seleccionada") : tx("Order received", "Pedido recibido")}</p>
+              <p class="section-kicker">${bankTransferOrder ? tx("Manual payment selected", "Pago manual seleccionado") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
               <p class="success-copy">${bankTransferOrder
-                ? tx("Bank transfer remains available as a manual-payment fallback when needed.", "La transferencia bancaria sigue disponible como alternativa de pago manual cuando sea necesario.")
+                ? tx("Manual payment remains available when needed.", "El pago manual sigue disponible cuando sea necesario.")
                 : tx("Your cryptocurrency payment is completed and the order is now confirmed.", "Tu pago con criptomonedas se ha completado y el pedido ya esta confirmado.")
               }</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
-                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual bank transfer pending confirmation.", "Transferencia bancaria manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${bankTransferOrder ? tx("Amount due", "Importe a pagar") : tx("Payment", "Pago")}</span><strong>${bankTransferOrder ? formatPrice(order.total) : paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${bankTransferOrder ? tx("Manual payment pending confirmation.", "Pago manual pendiente de confirmacion.") : localize(order.payment.note)}</p></article>
                 <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
               </div>
               <div class="summary-divider"></div>
@@ -2724,7 +2683,7 @@
                         ${cryptoCurrencyOptions}
                       </select>
                     </label>
-                    <p class="checkout-side-note">${tx("Choose BTC, USDT, or ETH to continue to the secure hosted ArionPay payment page.", "Elige BTC, USDT o ETH para continuar a la pagina de pago alojada y segura de ArionPay.")}</p>
+                    <p class="checkout-side-note">${tx("Choose USDT to continue to the secure hosted ArionPay payment page.", "Elige USDT para continuar a la pagina de pago alojada y segura de ArionPay.")}</p>
                   `
                 }
               </div>
@@ -2993,7 +2952,7 @@
         if (submitButton) {
           submitButton.disabled = true;
           submitButton.textContent = isBankTransferPayment(payment)
-            ? tx("Preparing bank transfer instructions...", "Preparando instrucciones de transferencia bancaria...")
+            ? tx("Preparing payment instructions...", "Preparando instrucciones de pago...")
             : tx("Creating your crypto payment...", "Creando tu pago con criptomonedas...");
         }
 
@@ -3004,35 +2963,79 @@
         saveCheckoutDraft(draft);
 
         if (isBankTransferPayment(payment)) {
-          const order = {
+          const payload = {
             reference,
-            createdAt: new Date().toISOString(),
+            shippingMethod: shipping.id,
             customer: draft,
-            shipping,
-            payment,
-            subtotal: Number(total.toFixed(2)),
-            shippingCost: Number(shippingCost.toFixed(2)),
-            total: Number((total + shippingCost).toFixed(2)),
-            status: "bank_transfer_pending",
-            paymentCurrency,
             items: cart.map((item) => ({
               slug: item.slug,
-              quantity: item.quantity,
-              lineTotal: (getProduct(item.slug).price || 0) * item.quantity
+              quantity: item.quantity
             }))
           };
 
-          saveLastOrder(order);
+          fetch("/api/create-bank-transfer-order", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          })
+            .then(async (response) => {
+              const result = await response.json().catch(() => ({}));
 
-          if (typeof saveCart === "function") {
-            saveCart([]);
-          }
+              if (!response.ok) {
+                const message = result.error || tx("Unable to reserve your order.", "No se pudo reservar tu pedido.");
+                throw new Error(message);
+              }
 
-          if (typeof updateCartBadges === "function") {
-            updateCartBadges();
-          }
+              const order = {
+                reference,
+                createdAt: new Date().toISOString(),
+                customer: draft,
+                shipping,
+                payment,
+                subtotal: Number(total.toFixed(2)),
+                shippingCost: Number(shippingCost.toFixed(2)),
+                total: Number((total + shippingCost).toFixed(2)),
+                status: "bank_transfer_pending",
+                paymentCurrency,
+                items: cart.map((item) => ({
+                  slug: item.slug,
+                  quantity: item.quantity,
+                  lineTotal: (getProduct(item.slug).price || 0) * item.quantity
+                })),
+                bankTransferDetails: result.bankTransferDetails || null
+              };
 
-          window.location.href = "checkout.html?status=success";
+              saveLastOrder(order);
+
+              if (typeof saveCart === "function") {
+                saveCart([]);
+              }
+
+              if (typeof updateCartBadges === "function") {
+                updateCartBadges();
+              }
+
+              window.location.href = "checkout.html?status=success";
+            })
+            .catch((error) => {
+              const message = error instanceof Error && error.message
+                ? error.message
+                : tx("Unable to reserve your order.", "No se pudo reservar tu pedido.");
+
+              if (statusNode) {
+                statusNode.textContent = message;
+              }
+
+              if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = checkoutSubmitLabel(payment);
+              }
+
+              showToast(message);
+            });
+
           return;
         }
 
@@ -3066,6 +3069,7 @@
             reference,
             shippingMethod: shipping.id,
             paymentMethod: paymentCurrency.id,
+            customer: draft,
             items: cart.map((item) => ({
               slug: item.slug,
               quantity: item.quantity

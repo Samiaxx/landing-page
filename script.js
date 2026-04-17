@@ -7,7 +7,7 @@ const FREE_SHIPPING_THRESHOLD = 200;
 const SITE_EMAIL = "contact@peptidos-primus.com";
 const SITE_DOMAIN = "peptidos-primus.com";
 const BRAND_LOGO_SRC = "assets/store-logo.png";
-const PAYMENT_METHODS = ["BTC", "USDT", "ETH", "Bank Transfer"];
+const PAYMENT_METHODS = ["USDT"];
 const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
 const IMAGE_SET = [
@@ -215,8 +215,8 @@ const PRODUCTS = [
     image: IMAGE_SET[1],
     gallery: [IMAGE_SET[1], IMAGE_SET[2], IMAGE_SET[3]],
     short: {
-      en: "DSIP (Delta Sleep-Inducing Peptide) for sleep and stress research.",
-      es: "DSIP (Péptido Inductor de Sueño Delta) para investigación de sueño y estrés."
+      en: "DSIP dosing protocols support deeper delta sleep and healthier stress response in research settings.",
+      es: "Los protocolos de dosificación de DSIP pueden ayudar a promover un sueño profundo y reparador (ondas delta) y apoyar una respuesta saludable al estrés."
     },
     batch: "PP-DSIP-PRE",
     coaDate: null
@@ -230,8 +230,8 @@ const PRODUCTS = [
     image: IMAGE_SET[2],
     gallery: [IMAGE_SET[2], IMAGE_SET[6], IMAGE_SET[7]],
     short: {
-      en: "Epithalamin (Epithalon) for anti-aging and telomerase research.",
-      es: "Epitalamina (Epithalon) para investigación antienvejecimiento y telomerasa."
+      en: "Epitalon is a synthetic tetrapeptide developed from pineal research for geroprotective and longevity models.",
+      es: "Epitalon (Epithalon) es un tetrapéptido sintético desarrollado a partir de investigaciones sobre la glándula pineal por su potencial geroprotector."
     },
     batch: "PP-EPI-PRE",
     coaDate: null
@@ -245,8 +245,8 @@ const PRODUCTS = [
     image: IMAGE_SET[5],
     gallery: [IMAGE_SET[5], IMAGE_SET[0], IMAGE_SET[4]],
     short: {
-      en: "Ipamorelin is a growth hormone secretagogue for metabolic research.",
-      es: "Ipamorelin es un secretagogo de hormona de crecimiento para investigación metabólica."
+      en: "Ipamorelin is a selective GH secretagogue that mimics ghrelin signaling with low cortisol and ACTH effects.",
+      es: "Ipamorelin es un pentapéptido sintético que actúa como secretagogo selectivo de la hormona del crecimiento al imitar la grelina en su receptor."
     },
     batch: "PP-IPA-PRE",
     coaDate: null
@@ -260,8 +260,8 @@ const PRODUCTS = [
     image: KPV_IMAGE_SET[0],
     gallery: [KPV_IMAGE_SET[0], KPV_IMAGE_SET[1], KPV_IMAGE_SET[2], KPV_IMAGE_SET[3]],
     short: {
-      en: "Styled as a waiting-list product without pulling attention from live SKUs.",
-      es: "Diseñado como producto en espera sin competir con las referencias activas."
+      en: "KPV is presented as a low-volume anti-inflammatory peptide for barrier support and localized tissue response research.",
+      es: "KPV se presenta como un péptido antiinflamatorio de bajo volumen para soporte de barrera y respuesta tisular localizada en investigación."
     },
     batch: "PP-KPV-PRE",
     coaDate: null
@@ -275,8 +275,8 @@ const PRODUCTS = [
     image: IMAGE_SET[7],
     gallery: [IMAGE_SET[7], IMAGE_SET[4], IMAGE_SET[2]],
     short: {
-      en: "Launch-ready placeholder card with consistent price and status handling.",
-      es: "Ficha de pre-lanzamiento con manejo coherente de precio y estado."
+      en: "PT-141 is a synthetic cyclic heptapeptide melanocortin agonist derived from Melanotan II for sexual desire research.",
+      es: "PT-141 (bremelanotida) es un heptapéptido cíclico sintético y agonista no selectivo de los receptores melanocortina (MC3R/MC4R), derivado como metabolito activo de Melanotan II."
     },
     batch: "PP-PT1-PRE",
     coaDate: null
@@ -290,8 +290,8 @@ const PRODUCTS = [
     image: IMAGE_SET[3],
     gallery: [IMAGE_SET[3], IMAGE_SET[2], IMAGE_SET[5]],
     short: {
-      en: "Final Coming May tile completing the upcoming peptide range.",
-      es: "Última ficha Llega en mayo para completar la gama próxima."
+      en: "Oxytocin is a nonapeptide hormone used in research on social bonding, stress, anxiety, and partner behavior.",
+      es: "La oxitocina es una hormona peptídica (nonapéptido) conocida por su papel en el vínculo social y el comportamiento."
     },
     batch: "PP-OXY-PRE",
     coaDate: null
@@ -301,8 +301,8 @@ const PRODUCTS = [
 const COPY = {
   shell: {
     topbar: {
-      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with bank transfer fallback.",
-      es: "Lotes con COA, listados verificados por HPLC y checkout seguro con criptomonedas y transferencia bancaria como alternativa."
+      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with live USDT payment.",
+      es: "Lotes con COA, listados verificados por HPLC y checkout seguro con pagos USDT en vivo."
     },
     brandTag: {
       en: "Research-grade peptide store",
@@ -319,7 +319,7 @@ const COPY = {
     linkColumn: { en: "Links", es: "Enlaces" },
     contactColumn: { en: "Contact", es: "Contacto" },
     shippingLine: { en: "EU dispatch target: 24h", es: "Objetivo de despacho UE: 24h" },
-    paymentsLine: { en: "Payments: BTC / USDT / ETH / Bank Transfer", es: "Pagos: BTC / USDT / ETH / Transferencia bancaria" },
+    paymentsLine: { en: "Payments: USDT", es: "Pagos: USDT" },
     cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
     cookieBody: {
       en: "This storefront uses cookies to remember language preference, cart contents, and consent choices.",
@@ -482,7 +482,7 @@ const COPY = {
       },
       {
         question: { en: "Can shoppers pay with crypto?", es: "¿Se puede pagar con crypto?" },
-        answer: { en: "Shoppers can pay with hosted ArionPay payment links for supported single-product USDT orders, or choose bank transfer as the manual fallback.", es: "Los compradores pueden pagar con enlaces de pago alojados de ArionPay para pedidos USDT compatibles de un solo producto, o elegir transferencia bancaria como alternativa manual." }
+        answer: { en: "Shoppers can pay with hosted ArionPay payment links for supported single-product USDT orders.", es: "Los compradores pueden pagar con enlaces de pago alojados de ArionPay para pedidos USDT compatibles." }
       },
       {
         question: { en: "Why are some products marked Coming May?", es: "¿Por qué algunos productos aparecen como Llega en mayo?" },
@@ -502,7 +502,7 @@ const COPY = {
     shippingTitle: { en: "Shipping coverage", es: "Cobertura de envío" },
     shippingBody: { en: "EU-first fulfilment, tracked dispatch, and international options from the shipping table.", es: "Cumplimiento UE primero, envío con tracking y opciones internacionales según la tabla de envíos." },
     paymentTitle: { en: "Payment", es: "Pago" },
-    paymentBody: { en: "BTC, USDT, and ETH are available through secure cryptocurrency checkout, while bank transfer stays available as the manual fallback.", es: "BTC, USDT y ETH estan disponibles mediante checkout seguro con criptomonedas, mientras que la transferencia bancaria sigue disponible como alternativa manual." },
+    paymentBody: { en: "USDT is available through secure cryptocurrency checkout.", es: "USDT está disponible mediante checkout seguro con criptomonedas." },
     formTitle: { en: "Send a message", es: "Enviar un mensaje" },
     formBody: { en: "In a live build this form would route to your inbox or CRM while keeping the same visual treatment.", es: "En una versión real este formulario enviaría los datos a tu correo o CRM manteniendo el mismo tratamiento visual." },
     nameLabel: { en: "Name", es: "Nombre" },
@@ -519,7 +519,7 @@ const COPY = {
     emptyTitle: { en: "Your cart is empty.", es: "Tu carrito está vacío." },
     emptyBody: { en: "Add a product from the catalogue or product page to test the conversion flow.", es: "Añade un producto desde el catálogo o desde la ficha para probar el flujo de conversión." },
     paymentTitle: { en: "Payment options", es: "Opciones de pago" },
-    paymentBody: { en: "Choose between hosted crypto checkout and manual bank transfer during checkout.", es: "Elige entre checkout crypto alojado y transferencia bancaria manual durante el checkout." },
+    paymentBody: { en: "Use hosted USDT checkout to complete your order.", es: "Usa el checkout USDT alojado para completar tu pedido." },
     thresholdPrefix: { en: "Add", es: "Añade" },
     thresholdSuffix: { en: "more for free shipping.", es: "más para envío gratis." },
     thresholdDone: { en: "Free shipping unlocked.", es: "Envío gratis desbloqueado." }
