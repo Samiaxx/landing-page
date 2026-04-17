@@ -1,26 +1,17 @@
 const crypto = require("crypto");
+const {
+  PAYMENT_OPTIONS,
+  SHIPPING_OPTIONS,
+  calculateTotals,
+  normalizeCustomer,
+  normalizeItems,
+  sanitizeReference,
+  serializeItems,
+  validateCustomer
+} = require("./_catalog");
+const { sendOrderCreatedEmails } = require("./_email");
+const { saveOrder } = require("./_orders");
 
-const PRODUCT_PRICES = {
-  "tirzepatide-30mg": 55,
-  "retatrutide-30mg": 60,
-  "tb-500-20mg": 40,
-  "bpc-157-10mg": 14,
-  "ghk-cu-50mg": 13,
-  "mots-c-40mg": 35,
-  "melanotan-mt2-10mg": 14,
-  "ss-31-50mg": 50,
-  "nad-1000mg": 30,
-  "semax-30mg": 20,
-  "selank-10mg": 18
-};
-
-const SHIPPING_OPTIONS = {
-  "eu-standard": { price: 12, freeEligible: true },
-  "eu-express": { price: 18, freeEligible: true },
-  international: { price: 24, freeEligible: false }
-};
-
-const FREE_SHIPPING_THRESHOLD = 200;
 const PAYMENT_ASSETS = {
   USDT: { currency: "USDT", chain: "USDT_TRC20" },
   USDT_TRC20: { currency: "USDT", chain: "USDT_TRC20" },
@@ -55,6 +46,26 @@ function normalizeGatewayMessage(result, rawText) {
   return "ArionPay invoice creation failed.";
 }
 
+function extractInvoiceData(result) {
+  if (!result || typeof result !== "object") {
+    return {
+      invoiceId: "",
+      invoiceUrl: "",
+      currency: ""
+    };
+  }
+
+  const container = result.data && typeof result.data === "object"
+    ? result.data
+    : result;
+
+  return {
+    invoiceId: container.id || container.invoice_id || container.invoiceId || "",
+    invoiceUrl: container.invoice_url || container.invoiceUrl || result.invoice_url || result.invoiceUrl || "",
+    currency: container.currency || result.currency || ""
+  };
+}
+
 function buildGatewayError(message, paymentMethod) {
   const method = paymentMethod || "selected payment method";
   const normalized = typeof message === "string" ? message.trim() : "";
@@ -70,7 +81,7 @@ function buildGatewayError(message, paymentMethod) {
   if (/payment configuration missing/i.test(normalized)) {
     return {
       error: `ArionPay store setup is incomplete for ${method}.`,
-      hint: "Open your ArionPay store, attach or activate the receiving wallet for this asset, save the payment method configuration, and try checkout again.",
+      hint: "The invoice request is already using the expected asset/network code. In ArionPay, attach or reactivate the receiving wallet for this asset, save the store payment configuration again, and retry checkout.",
       gatewayMessage: normalized
     };
   }
@@ -105,51 +116,6 @@ function parseBody(req) {
   return req.body;
 }
 
-function sanitizeReference(value) {
-  if (typeof value !== "string") {
-    return `PP-${Date.now()}`;
-  }
-
-  const trimmed = value.trim().replace(/[^A-Za-z0-9_-]/g, "");
-  return trimmed || `PP-${Date.now()}`;
-}
-
-function normalizeItems(items) {
-  if (!Array.isArray(items)) {
-    return [];
-  }
-
-  return items
-    .map((item) => {
-      if (!item || typeof item.slug !== "string") {
-        return null;
-      }
-
-      const price = PRODUCT_PRICES[item.slug];
-      if (typeof price !== "number") {
-        return null;
-      }
-
-      const quantity = Math.max(1, Math.min(99, Number(item.quantity) || 1));
-      return { slug: item.slug, quantity, price };
-    })
-    .filter(Boolean);
-}
-
-function calculateTotals(items, shippingMethod) {
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const selectedShipping = SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"];
-  const shipping = selectedShipping.freeEligible && subtotal >= FREE_SHIPPING_THRESHOLD
-    ? 0
-    : selectedShipping.price;
-
-  return {
-    subtotal,
-    shipping,
-    total: subtotal + shipping
-  };
-}
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -175,11 +141,20 @@ module.exports = async function handler(req, res) {
   const body = parseBody(req);
   const items = normalizeItems(body.items);
   const reference = sanitizeReference(body.reference);
+  const customer = normalizeCustomer(body.customer);
+  const missingCustomerFields = validateCustomer(customer);
   const paymentAsset = PAYMENT_ASSETS[body.paymentMethod] || PAYMENT_ASSETS.USDT_TRC20;
   const shippingMethod = typeof body.shippingMethod === "string" ? body.shippingMethod : "eu-standard";
 
   if (!items.length) {
     return res.status(400).json({ error: "Your cart is empty or contains unavailable products." });
+  }
+
+  if (missingCustomerFields.length) {
+    return res.status(400).json({
+      error: "Missing or invalid checkout fields.",
+      missing: missingCustomerFields
+    });
   }
 
   const totals = calculateTotals(items, shippingMethod);
@@ -217,8 +192,9 @@ module.exports = async function handler(req, res) {
 
     const rawText = await response.text();
     const result = safeJsonParse(rawText) || {};
+    const invoice = extractInvoiceData(result);
 
-    if (!response.ok || result?.status !== "success" || !result?.data?.invoice_url) {
+    if (!response.ok || !invoice.invoiceUrl) {
       const gatewayMessage = normalizeGatewayMessage(result, rawText);
       const gatewayError = buildGatewayError(gatewayMessage, paymentAsset.chain);
       return res.status(502).json({
@@ -227,22 +203,46 @@ module.exports = async function handler(req, res) {
         detail: {
           statusCode: response.status,
           paymentMethod: paymentAsset.chain,
+          requestPayload: payload,
           gatewayMessage: gatewayError.gatewayMessage,
           gatewayResponse: result && Object.keys(result).length ? result : rawText || null
         }
       });
     }
 
+    const order = {
+      reference,
+      createdAt: new Date().toISOString(),
+      status: "invoice_created",
+      customer,
+      items: serializeItems(items),
+      shippingMethod,
+      paymentMethod: paymentAsset.chain,
+      subtotal: Number(totals.subtotal.toFixed(2)),
+      shippingCost: Number(totals.shipping.toFixed(2)),
+      total: Number(totals.total.toFixed(2)),
+      invoiceId: invoice.invoiceId,
+      invoiceUrl: invoice.invoiceUrl,
+      storeCurrency: fiatCurrency,
+      gatewayCurrency: invoice.currency || paymentAsset.currency
+    };
+
+    saveOrder(order);
+    const notifications = await sendOrderCreatedEmails(order);
+
     return res.status(200).json({
       reference,
-      invoiceId: result.data.id,
-      invoiceUrl: result.data.invoice_url,
-      currency: result.data.currency || paymentAsset.currency,
+      invoiceId: invoice.invoiceId,
+      invoiceUrl: invoice.invoiceUrl,
+      currency: invoice.currency || paymentAsset.currency,
       storeCurrency: fiatCurrency,
       subtotal: Number(totals.subtotal.toFixed(2)),
       shipping: Number(totals.shipping.toFixed(2)),
       total: Number(totals.total.toFixed(2)),
-      paymentMethod: paymentAsset.chain
+      paymentMethod: paymentAsset.chain,
+      paymentLabel: (PAYMENT_OPTIONS[paymentAsset.chain] || PAYMENT_OPTIONS.USDT_TRC20).label,
+      shippingLabel: (SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"]).label,
+      notifications
     });
   } catch (error) {
     return res.status(502).json({

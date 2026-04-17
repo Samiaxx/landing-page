@@ -4,6 +4,8 @@ const path = require("path");
 const { URL } = require("url");
 const createArionPayInvoice = require("./api/create-arionpay-invoice");
 const arionPayWebhook = require("./api/arionpay-webhook");
+const createBankTransferOrder = require("./api/create-bank-transfer-order");
+const contactHandler = require("./api/contact");
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
@@ -20,6 +22,27 @@ const CONTENT_TYPES = {
   ".txt": "text/plain; charset=utf-8",
   ".webp": "image/webp"
 };
+
+const PUBLIC_FILES = new Set([
+  "/",
+  "/index.html",
+  "/shop.html",
+  "/product.html",
+  "/coa.html",
+  "/faq.html",
+  "/contact.html",
+  "/cart.html",
+  "/checkout.html",
+  "/privacy.html",
+  "/terms.html",
+  "/shipping.html",
+  "/refunds.html",
+  "/style.css",
+  "/enhancements.css",
+  "/script.js",
+  "/enhancements.js",
+  "/favicon.ico"
+]);
 
 function loadEnvFile(filepath) {
   if (!fs.existsSync(filepath)) {
@@ -130,6 +153,16 @@ async function handleApiRoute(handler, req, res) {
 
 function resolveStaticPath(urlPath) {
   const normalized = urlPath === "/" ? "/index.html" : urlPath;
+  const segments = normalized.split("/").filter(Boolean);
+
+  const isPublicAsset = normalized.startsWith("/assets/");
+  const isPublicFile = PUBLIC_FILES.has(normalized);
+  const containsHiddenSegment = segments.some((segment) => segment.startsWith("."));
+
+  if ((!isPublicAsset && !isPublicFile) || containsHiddenSegment || normalized.startsWith("/api/") || normalized === "/api") {
+    return null;
+  }
+
   const filepath = path.join(ROOT, normalized.replace(/^\/+/, ""));
   const resolved = path.resolve(filepath);
 
@@ -174,6 +207,16 @@ const server = http.createServer(async (req, res) => {
 
     if (pathname === "/api/arionpay-webhook") {
       await handleApiRoute(arionPayWebhook, req, res);
+      return;
+    }
+
+    if (pathname === "/api/create-bank-transfer-order") {
+      await handleApiRoute(createBankTransferOrder, req, res);
+      return;
+    }
+
+    if (pathname === "/api/contact") {
+      await handleApiRoute(contactHandler, req, res);
       return;
     }
 

@@ -351,94 +351,130 @@
   Object.assign(PRODUCT_GUIDES, {
     "retatrutide-30mg": {
       summary: {
-        en: "Built from the new Primus guide as a triple-agonist weekly reference focused on GLP-1, GIP, and glucagon-pathway research.",
-        es: "Construido desde la nueva guia de Primus como referencia semanal de agonista triple centrada en investigacion sobre GLP-1, GIP y glucagon."
+        en: "Retatrutide is a triple GLP-1/GIP/glucagon receptor agonist developed for advanced metabolic research, combining three incretin pathways in a single molecule. This weekly injection protocol provides a comprehensive approach for studying appetite regulation, energy expenditure, and metabolic markers. The guide presents a structured escalation method for optimal tolerance and response assessment.",
+        es: "Retatrutide es un agonista triple de receptores GLP-1/GIP/glucagón desarrollado para investigación metabólica avanzada, combinando tres vías incretinas en una sola molécula. Este protocolo de inyección semanal proporciona un enfoque integral para estudiar regulación del apetito, gasto energético y marcadores metabólicos. La guía presenta un método de escalada estructurado para una tolerancia óptima y evaluación de respuesta."
       },
       howItWorks: {
-        en: "Retatrutide combines GLP-1, GIP, and glucagon receptor activity, so the guide frames it around appetite regulation, energy expenditure, and broader metabolic-response modelling.",
-        es: "Retatrutide combina actividad sobre GLP-1, GIP y glucagon, por lo que la guia lo presenta alrededor de regulacion del apetito, gasto energetico y modelado metabolico mas amplio."
+        en: "Retatrutide activates GLP-1, GIP, and glucagon receptors simultaneously, creating a synergistic metabolic effect. This triple mechanism enhances insulin secretion, reduces glucagon release, slows gastric emptying, and increases energy expenditure. The molecule's extended half-life allows for once-weekly dosing, making it suitable for chronic metabolic studies. Research suggests it modulates appetite centers while improving peripheral glucose utilization and fat metabolism.",
+        es: "Retatrutide activa simultáneamente receptores GLP-1, GIP y glucagón, creando un efecto metabólico sinérgico. Este mecanismo triple mejora la secreción de insulina, reduce la liberación de glucagón, ralentiza el vaciamiento gástrico y aumenta el gasto energético. La vida media extendida de la molécula permite una dosificación semanal, haciéndola adecuada para estudios metabólicos crónicos. La investigación sugiere que modula centros de apetito mientras mejora la utilización periférica de glucosa y el metabolismo de grasas."
       },
       benefits: {
-        en: "Guide language highlights weight-management research, metabolic-marker support, and weekly handling convenience, while keeping tolerance notes centered on nausea and slower escalation.",
-        es: "La guia destaca investigacion sobre control de peso, soporte de marcadores metabolicos y conveniencia semanal, manteniendo las notas de tolerancia centradas en nauseas y subida gradual."
+        en: "May support advanced metabolic research through enhanced appetite regulation, increased energy expenditure, and improved glycemic control. Studied for significant weight management and metabolic health improvements with structured titration. Common effects include reduced appetite, mild gastrointestinal discomfort, and gradual metabolic improvements. Effects are dose-dependent; titration helps optimize response. No significant endocrine disruption observed in research protocols.",
+        es: "Puede apoyar la investigación metabólica avanzada a través de regulación del apetito mejorada, aumento del gasto energético y control glucémico mejorado. Estudiado para manejo significativo del peso y mejoras en la salud metabólica con titulación estructurada. Los efectos comunes incluyen reducción del apetito, malestar gastrointestinal leve y mejoras metabólicas graduales. Los efectos dependen de la dosis; la titulación ayuda a optimizar la respuesta. No se ha observado disrupción endocrina significativa en protocolos de investigación."
       },
       protocolOverview: {
-        en: "This product follows a once-weekly structure supported by a long half-life, with multi-week review blocks before moving upward.",
-        es: "Este producto sigue una estructura semanal apoyada por una vida media larga, con bloques de revision de varias semanas antes de subir."
+        en: "Weekly subcutaneous injections over 12-16 weeks with gradual dose escalation. Dosage range: 2-12 mg weekly. Reconstitution: 3.0 mL per vial (~10 mg/mL). Storage: Lyophilized refrigerated; reconstituted refrigerated; use within 28 days.",
+        es: "Inyecciones subcutáneas semanales durante 12-16 semanas con escalada gradual de dosis. Rango de dosis: 2-12 mg semanales. Reconstitución: 3,0 mL por vial (~10 mg/mL). Almacenamiento: Liofilizado refrigerado; reconstituido refrigerado; usar en 28 días."
       },
       dosing: {
-        en: "The uploaded guide positions Retatrutide in a 2 mg to 12 mg weekly range with staged escalation across a 12-plus-week structure.",
-        es: "La guia cargada posiciona Retatrutide en un rango semanal de 2 mg a 12 mg con escalada por fases a lo largo de una estructura de 12 o mas semanas."
+        en: "Start: 2 mg weekly; increase every 4 weeks according to tolerance and response. Weeks 1-4: 2 mg, Weeks 5-8: 4 mg, Weeks 9-12: 8 mg, Weeks 13-16: 12 mg. Frequency: Once weekly (subcutaneous). Cycle duration: 12-16 weeks with assessment breaks. Schedule: Same day each week; rotate injection zones.",
+        es: "Inicio: 2 mg semanales; aumentar cada 4 semanas según tolerancia y respuesta. Semanas 1-4: 2 mg, Semanas 5-8: 4 mg, Semanas 9-12: 8 mg, Semanas 13-16: 12 mg. Frecuencia: Una vez por semana (subcutáneo). Duración del ciclo: 12-16 semanas con pausas de evaluación. Horario: El mismo día cada semana; rotar zonas de inyección."
       },
       reconstitution: {
-        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 10 mg/mL concentration, keeping weekly measuring cleaner and easier.",
-        es: "La guia utiliza 3,0 mL de agua bacteriostatica para una concentracion aproximada de 10 mg/mL, dejando una medicion semanal mas limpia y sencilla."
+        en: "Add 3.0 mL bacteriostatic water (maximum vial capacity) → approximate concentration 10 mg/mL. Easy measurement: At 10 mg/mL, 1 mg = 0.1 mL. Steps: Extract 3.0 mL bacteriostatic water with sterile syringe. Inject slowly by vial wall; avoid foaming. Gently swirl vial until dissolved. Label and refrigerate at 2-8°C, protected from light.",
+        es: "Añadir 3,0 mL de agua bacteriostática (capacidad máxima del vial) → concentración aproximada 10 mg/mL. Medición fácil: A 10 mg/mL, 1 mg = 0,1 mL. Pasos: Extraer 3,0 mL de agua bacteriostática con jeringa estéril. Inyectar lentamente por la pared del vial; evitar formar espuma. Agitar suavemente el vial hasta disolver. Etiquetar y refrigerar a 2-8°C, protegido de la luz."
       },
       storage: {
-        en: "Store lyophilized material frozen or very cold and keep reconstituted solution refrigerated within a practical two-to-four-week window.",
-        es: "Guardar el liofilizado congelado o muy frio y mantener la solucion reconstituida refrigerada dentro de una ventana practica de dos a cuatro semanas."
+        en: "Lyophilized: Refrigerate at 2-8°C; after reconstitution, refrigerate at 2-8°C; avoid freeze-thaw cycles. Let vial reach room temperature before opening to avoid condensation. Protect from light (wrap in aluminum or use opaque container).",
+        es: "Liofilizado: Refrigerar a 2-8°C; tras reconstitución, refrigerar a 2-8°C; evitar ciclos de congelación-descongelación. Dejar el vial a temperatura ambiente antes de abrir para evitar condensación. Proteger de la luz (envolver en aluminio o usar recipiente opaco)."
+      },
+      materials: {
+        en: "Peptide vials (Retatrutide, 30 mg each): 16 weeks ≈ 3 vials. Insulin syringes (U-100) or 1 mL syringes: Per week: 1 syringe. 16 weeks: 16 syringes. Bacteriostatic water (10 mL vials): Use ~3.0 mL per vial. 16 weeks: 9 mL → 1 vial. Alcohol wipes: One per vial + one per injection zone weekly. Per week: 2. 16 weeks: 32 → recommend 1 box of 100.",
+        es: "Viales de péptido (Retatrutide, 30 mg cada uno): 16 semanas ≈ 3 viales. Jeringas de insulina (U-100) o jeringas de 1 mL: Por semana: 1 jeringa. 16 semanas: 16 jeringas. Agua bacteriostática (frascos de 10 mL): Usar ~3,0 mL por vial. 16 semanas: 9 mL → 1 frasco. Toallitas de alcohol: Una por vial + una por zona de inyección semanal. Por semana: 2. 16 semanas: 32 → recomendar 1 caja de 100."
+      },
+      injectionTechnique: {
+        en: "Clean vial and zone with alcohol and let dry. Pinch 2-5 cm skin; insert needle at 45-90°. Do not aspirate; inject slowly. Remove needle at same angle; apply gentle pressure without rubbing. Rotate zones (abdomen, thighs, arms) separating at least 2-5 cm. Use new sterile syringes each injection; dispose in appropriate container. Record weekly dose, date and zone for consistency.",
+        es: "Limpiar el vial y la zona con alcohol y dejar secar. Pellizcar 2-5 cm de piel; insertar la aguja a 45-90°. No aspirar; inyectar lentamente. Retirar la aguja en el mismo ángulo; aplicar presión suave sin frotar. Rotar zonas (abdomen, muslos, brazos) separando al menos 2-5 cm. Usar jeringas nuevas estériles en cada inyección; desechar en contenedor adecuado. Registrar dosis semanal, fecha y zona para mantener consistencia."
+      },
+      lifestyleFactors: {
+        en: "Maintain consistent meal timing and composition. Regular moderate exercise (walking, light resistance). Monitor body composition changes weekly. Adequate protein intake. Stay hydrated. Regular sleep schedule.",
+        es: "Mantener horario y composición de comidas consistente. Ejercicio moderado regular (caminar, resistencia ligera). Monitorear cambios en composición corporal semanalmente. Ingesta adecuada de proteínas. Mantenerse hidratado. Horario regular de sueño."
       },
       stackKeys: ["metabolic"]
     },
     "tb-500-20mg": {
       summary: {
-        en: "Structured from the Primus guide as a recovery-oriented tissue-support reference with daily handling and a cleaner regeneration narrative.",
-        es: "Estructurado desde la guia de Primus como una referencia de soporte tisular orientada a recuperacion, con manejo diario y una narrativa regenerativa mas clara."
+        en: "TB-500 is a synthetic peptide fragment derived from Thymosin Beta-4, developed for tissue repair and recovery research. This daily injection protocol provides a structured approach for studying cellular migration, angiogenesis, and regenerative processes. The guide presents a gradual escalation method suitable for chronic recovery studies.",
+        es: "TB-500 es un fragmento de péptido sintético derivado de Timosina Beta-4, desarrollado para investigación de reparación tisular y recuperación. Este protocolo de inyección diaria proporciona un enfoque estructurado para estudiar migración celular, angiogénesis y procesos regenerativos. La guía presenta un método de escalada gradual adecuado para estudios de recuperación crónica."
       },
       howItWorks: {
-        en: "TB-500 is presented as the active-region fragment of thymosin beta-4, so the guide focuses on tissue repair, cell migration, and regeneration-oriented signalling.",
-        es: "TB-500 se presenta como el fragmento activo de la timosina beta-4, por lo que la guia se centra en reparacion tisular, migracion celular y senalizacion regenerativa."
+        en: "TB-500 is the active fragment of Thymosin Beta-4, promoting cellular migration, differentiation, and angiogenesis. It modulates actin cytoskeleton dynamics, enhancing cell motility and tissue repair processes. Research suggests it accelerates wound healing, reduces inflammation, and supports muscle recovery through improved blood vessel formation and cellular regeneration pathways.",
+        es: "TB-500 es el fragmento activo de Timosina Beta-4, promoviendo migración celular, diferenciación y angiogénesis. Modula la dinámica del citoesqueleto de actina, mejorando la motilidad celular y procesos de reparación tisular. La investigación sugiere que acelera la cicatrización de heridas, reduce la inflamación y apoya la recuperación muscular a través de una mejor formación de vasos sanguíneos y vías de regeneración celular."
       },
       benefits: {
-        en: "Guide positioning emphasizes repair support, recovery efficiency, and anti-inflammatory interest while keeping the claims tied to research models.",
-        es: "El posicionamiento de la guia enfatiza soporte de reparacion, eficiencia de recuperacion e interes antiinflamatorio, manteniendo las afirmaciones dentro del marco de investigacion."
+        en: "May support tissue repair research through enhanced cellular migration, angiogenesis, and recovery processes. Studied for wound healing, muscle recovery, and injury rehabilitation with generally good tolerability. Common effects include improved tissue healing, reduced recovery time, and enhanced cellular repair. Effects are dose-dependent; gradual escalation helps optimize response. No significant systemic side effects observed in research protocols.",
+        es: "Puede apoyar la investigación de reparación tisular a través de migración celular mejorada, angiogénesis y procesos de recuperación. Estudiado para cicatrización de heridas, recuperación muscular y rehabilitación de lesiones con tolerabilidad generalmente buena. Los efectos comunes incluyen mejor cicatrización tisular, tiempo de recuperación reducido y reparación celular mejorada. Los efectos dependen de la dosis; la escalada gradual ayuda a optimizar la respuesta. No se han observado efectos secundarios sistémicos significativos en protocolos de investigación."
       },
       protocolOverview: {
-        en: "The guide uses a once-daily subcutaneous structure with practical syringe measurements across an 8-to-12-week frame.",
-        es: "La guia usa una estructura subcutanea diaria con mediciones practicas en jeringa a lo largo de un marco de 8 a 12 semanas."
+        en: "Daily subcutaneous injections over 8-12 weeks with gradual dose escalation. Dosage range: 500-1000 mcg daily. Reconstitution: 3.0 mL per vial (~6.67 mg/mL). Storage: Lyophilized frozen; reconstituted refrigerated; use within 30 days.",
+        es: "Inyecciones subcutáneas diarias durante 8-12 semanas con escalada gradual de dosis. Rango de dosis: 500-1000 mcg diarios. Reconstitución: 3,0 mL por vial (~6,67 mg/mL). Almacenamiento: Liofilizado congelado; reconstituido refrigerado; usar en 30 días."
       },
       dosing: {
-        en: "The uploaded guide places TB-500 in an educational range of 500 mcg to 1000 mcg once daily, with a progressive step-up through the early weeks.",
-        es: "La guia cargada coloca TB-500 en un rango educativo de 500 mcg a 1000 mcg una vez al dia, con subida progresiva durante las primeras semanas."
+        en: "Start: 500 mcg daily; increase every 2 weeks according to tolerance. Weeks 1-2: 500 mcg, Weeks 3-4: 750 mcg, Weeks 5-8: 1000 mcg. Frequency: Once daily (subcutaneous). Cycle duration: 8-12 weeks with optional maintenance. Schedule: Same time daily; rotate injection zones.",
+        es: "Inicio: 500 mcg diarios; aumentar cada 2 semanas según tolerancia. Semanas 1-2: 500 mcg, Semanas 3-4: 750 mcg, Semanas 5-8: 1000 mcg. Frecuencia: Una vez al día (subcutáneo). Duración del ciclo: 8-12 semanas con mantenimiento opcional. Horario: La misma hora diaria; rotar zonas de inyección."
       },
       reconstitution: {
-        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 6.67 mg/mL concentration, keeping injection volumes small and easier to measure.",
-        es: "La guia utiliza 3,0 mL de agua bacteriostatica para una concentracion aproximada de 6,67 mg/mL, manteniendo los volumenes de inyeccion pequenos y faciles de medir."
+        en: "Add 3.0 mL bacteriostatic water (maximum vial capacity) → approximate concentration 6.67 mg/mL. Easy measurement: At 6.67 mg/mL, 1 mg = 0.15 mL. Steps: Extract 3.0 mL bacteriostatic water with sterile syringe. Inject slowly by vial wall; avoid foaming. Gently move or roll vial until dissolved (do not shake vigorously). Label and refrigerate at 2-8°C, protected from light.",
+        es: "Añadir 3,0 mL de agua bacteriostática (capacidad máxima del vial) → concentración aproximada 6,67 mg/mL. Medición fácil: A 6,67 mg/mL, 1 mg = 0,15 mL. Pasos: Extraer 3,0 mL de agua bacteriostática con jeringa estéril. Inyectar lentamente por la pared del vial; evitar formar espuma. Mover suavemente o rodar el vial hasta disolver (no agitar con fuerza). Etiquetar y refrigerar a 2-8°C, protegido de la luz."
       },
       storage: {
-        en: "Store lyophilized material frozen or very cold. After reconstitution, keep the solution refrigerated at 2 to 8 C and do not refreeze the mixed vial.",
-        es: "Guardar el liofilizado congelado o muy frio. Tras la reconstitucion, mantener la solucion entre 2 y 8 C y no volver a congelar el vial mezclado."
+        en: "Lyophilized: Freeze at -20°C; after reconstitution, refrigerate at 2-8°C; avoid freeze-thaw cycles. Let vial reach room temperature before opening to avoid condensation. Protect from light (wrap in aluminum or use opaque container).",
+        es: "Liofilizado: Congelar a -20°C; tras reconstitución, refrigerar a 2-8°C; evitar ciclos de congelación-descongelación. Dejar el vial a temperatura ambiente antes de abrir para evitar condensación. Proteger de la luz (envolver en aluminio o usar recipiente opaco)."
+      },
+      materials: {
+        en: "Peptide vials (TB-500, 20 mg each): 8 weeks ≈ 3 vials, 12 weeks ≈ 4 vials. Insulin syringes (U-100): Per day: 1 syringe. 8 weeks: 56 syringes, 12 weeks: 84 syringes. Bacteriostatic water (10 mL vials): Use ~3.0 mL per vial. 8 weeks: 9 mL → 1 vial, 12 weeks: 12 mL → 2 vials. Alcohol wipes: One per vial + one per injection zone daily. Per day: 2. 8 weeks: 112 → recommend 2 boxes of 100, 12 weeks: 168 → recommend 2 boxes of 100.",
+        es: "Viales de péptido (TB-500, 20 mg cada uno): 8 semanas ≈ 3 viales, 12 semanas ≈ 4 viales. Jeringas de insulina (U-100): Por día: 1 jeringa. 8 semanas: 56 jeringas, 12 semanas: 84 jeringas. Agua bacteriostática (frascos de 10 mL): Usar ~3,0 mL por vial. 8 semanas: 9 mL → 1 frasco, 12 semanas: 12 mL → 2 frascos. Toallitas de alcohol: Una por vial + una por zona de inyección al día. Por día: 2. 8 semanas: 112 → recomendar 2 cajas de 100, 12 semanas: 168 → recomendar 2 cajas de 100."
+      },
+      injectionTechnique: {
+        en: "Clean vial and zone with alcohol and let dry. Pinch 2-5 cm skin; insert needle at 45-90°. Do not aspirate; inject slowly. Remove needle at same angle; apply gentle pressure without rubbing. Rotate zones (abdomen, thighs, arms) separating at least 2-5 cm. Use new sterile syringes each injection; dispose in appropriate container. Rotate zones to avoid irritation or lipohypertrophy. Record daily dose, time and zone for consistency.",
+        es: "Limpiar el vial y la zona con alcohol y dejar secar. Pellizcar 2-5 cm de piel; insertar la aguja a 45-90°. No aspirar; inyectar lentamente. Retirar la aguja en el mismo ángulo; aplicar presión suave sin frotar. Rotar zonas (abdomen, muslos, brazos) separando al menos 2-5 cm. Usar jeringas nuevas estériles en cada inyección; desechar en contenedor adecuado. Rotar zonas para evitar irritación o lipohipertrofia. Registrar dosis diaria, hora y zona para mantener consistencia."
+      },
+      lifestyleFactors: {
+        en: "Support tissue repair with adequate protein intake (1.6-2.2g/kg body weight). Include collagen-supporting nutrients (vitamin C, zinc). Regular light exercise to promote circulation. Adequate sleep for recovery. Stay hydrated. Avoid anti-inflammatory medications that may interfere with natural repair processes.",
+        es: "Apoyar la reparación tisular con ingesta adecuada de proteínas (1,6-2,2g/kg de peso corporal). Incluir nutrientes que apoyen el colágeno (vitamina C, zinc). Ejercicio ligero regular para promover la circulación. Sueño adecuado para la recuperación. Mantenerse hidratado. Evitar medicamentos antiinflamatorios que puedan interferir con procesos de reparación naturales."
       },
       stackKeys: ["regenerative"]
     },
     "bpc-157-10mg": {
       summary: {
-        en: "Positioned from the new guide as a barrier-support and tissue-protection entry with a simpler daily workflow for recovery-focused buyers.",
-        es: "Posicionado desde la nueva guia como una referencia de soporte de barrera y proteccion tisular con un flujo diario sencillo para compradores orientados a recuperacion."
+        en: "BPC-157 is a synthetic peptide derived from Body Protection Compound, developed for tissue repair and gastrointestinal research. This daily injection protocol provides a structured approach for studying angiogenesis, tendon healing, and gastrointestinal barrier function. The guide presents a gradual escalation method suitable for chronic recovery studies.",
+        es: "BPC-157 es un péptido sintético derivado de Body Protection Compound, desarrollado para investigación de reparación tisular y gastrointestinal. Este protocolo de inyección diaria proporciona un enfoque estructurado para estudiar angiogénesis, cicatrización de tendones y función de barrera gastrointestinal. La guía presenta un método de escalada gradual adecuado para estudios de recuperación crónica."
       },
       howItWorks: {
-        en: "BPC-157 is framed as a 15-amino-acid gastric-protein fragment studied for cytoprotective behaviour, tissue support, and repair-oriented signalling in preclinical models.",
-        es: "BPC-157 se presenta como un fragmento de 15 aminoacidos derivado de una proteina gastrica, estudiado por su comportamiento citoprotector, soporte tisular y senalizacion reparadora en modelos preclinicos."
+        en: "BPC-157 is a 15-amino acid peptide fragment that promotes angiogenesis, fibroblast proliferation, and tissue regeneration. It modulates growth factors and inflammatory pathways, supporting tendon, ligament, and gastrointestinal healing. Research suggests it accelerates wound healing, reduces inflammation, and supports muscle recovery through improved blood vessel formation and cellular repair mechanisms.",
+        es: "BPC-157 es un fragmento de péptido de 15 aminoácidos que promueve angiogénesis, proliferación de fibroblastos y regeneración tisular. Modula factores de crecimiento y vías inflamatorias, apoyando la cicatrización de tendones, ligamentos y gastrointestinal. La investigación sugiere que acelera la cicatrización de heridas, reduce la inflamación y apoya la recuperación muscular a través de una mejor formación de vasos sanguíneos y mecanismos de reparación celular."
       },
       benefits: {
-        en: "The guide highlights wound-healing interest, anti-inflammatory behaviour, and softer recovery positioning, while noting that human data remain limited.",
-        es: "La guia destaca interes en cicatrizacion, comportamiento antiinflamatorio y un posicionamiento de recuperacion mas suave, recordando que los datos en humanos siguen siendo limitados."
+        en: "May support tissue repair research through enhanced angiogenesis, fibroblast activity, and recovery processes. Studied for tendon healing, gastrointestinal protection, and injury rehabilitation with generally good tolerability. Common effects include improved tissue healing, reduced recovery time, and enhanced cellular repair. Effects are dose-dependent; gradual escalation helps optimize response. No significant systemic side effects observed in research protocols.",
+        es: "Puede apoyar la investigación de reparación tisular a través de angiogénesis mejorada, actividad de fibroblastos y procesos de recuperación. Estudiado para cicatrización de tendones, protección gastrointestinal y rehabilitación de lesiones con tolerabilidad generalmente buena. Los efectos comunes incluyen mejor cicatrización tisular, tiempo de recuperación reducido y reparación celular mejorada. Los efectos dependen de la dosis; la escalada gradual ayuda a optimizar la respuesta. No se han observado efectos secundarios sistémicos significativos en protocolos de investigación."
       },
       protocolOverview: {
-        en: "This product is set up as a once-daily subcutaneous reference with a practical dilution model and a short, easy-to-read progression structure.",
-        es: "Este producto se presenta como una referencia subcutanea diaria con un modelo de dilucion practico y una estructura de progresion corta y facil de leer."
+        en: "Daily subcutaneous injections over 8-12 weeks with gradual dose escalation. Dosage range: 200-600 mcg daily. Reconstitution: 3.0 mL per vial (~3.33 mg/mL). Storage: Lyophilized refrigerated; reconstituted refrigerated; use within 30 days.",
+        es: "Inyecciones subcutáneas diarias durante 8-12 semanas con escalada gradual de dosis. Rango de dosis: 200-600 mcg diarios. Reconstitución: 3,0 mL por vial (~3,33 mg/mL). Almacenamiento: Liofilizado refrigerado; reconstituido refrigerado; usar en 30 días."
       },
       dosing: {
-        en: "The uploaded guide uses a daily range of roughly 200 mcg to 600 mcg, starting conservatively and stepping upward instead of pushing the top end immediately.",
-        es: "La guia cargada utiliza un rango diario aproximado de 200 mcg a 600 mcg, empezando de forma conservadora y subiendo por fases en lugar de ir al extremo alto de inmediato."
+        en: "Start: 200 mcg daily; increase every 2 weeks according to tolerance. Weeks 1-2: 200 mcg, Weeks 3-4: 400 mcg, Weeks 5-8: 600 mcg. Frequency: Once daily (subcutaneous). Cycle duration: 8-12 weeks with optional maintenance. Schedule: Same time daily; rotate injection zones.",
+        es: "Inicio: 200 mcg diarios; aumentar cada 2 semanas según tolerancia. Semanas 1-2: 200 mcg, Semanas 3-4: 400 mcg, Semanas 5-8: 600 mcg. Frecuencia: Una vez al día (subcutáneo). Duración del ciclo: 8-12 semanas con mantenimiento opcional. Horario: La misma hora diaria; rotar zonas de inyección."
       },
       reconstitution: {
-        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which keeps syringe conversions clean on a U-100 scale.",
-        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, dejando conversiones limpias en jeringa U-100."
+        en: "Add 3.0 mL bacteriostatic water (maximum vial capacity) → approximate concentration 3.33 mg/mL. Easy measurement: At 3.33 mg/mL, 1 mg = 0.3 mL. Steps: Extract 3.0 mL bacteriostatic water with sterile syringe. Inject slowly by vial wall; avoid foaming. Gently swirl vial until dissolved. Label and refrigerate at 2-8°C, protected from light.",
+        es: "Añadir 3,0 mL de agua bacteriostática (capacidad máxima del vial) → concentración aproximada 3,33 mg/mL. Medición fácil: A 3,33 mg/mL, 1 mg = 0,3 mL. Pasos: Extraer 3,0 mL de agua bacteriostática con jeringa estéril. Inyectar lentamente por la pared del vial; evitar formar espuma. Agitar suavemente el vial hasta disolver. Etiquetar y refrigerar a 2-8°C, protegido de la luz."
       },
       storage: {
-        en: "Keep the lyophilized vial cold and dry. After mixing, refrigerate, protect from light, and avoid repeated freeze-thaw cycles.",
-        es: "Mantener el vial liofilizado en frio y seco. Tras la mezcla, refrigerar, proteger de la luz y evitar ciclos repetidos de congelacion y descongelacion."
+        en: "Lyophilized: Refrigerate at 2-8°C; after reconstitution, refrigerate at 2-8°C; avoid freeze-thaw cycles. Let vial reach room temperature before opening to avoid condensation. Protect from light (wrap in aluminum or use opaque container).",
+        es: "Liofilizado: Refrigerar a 2-8°C; tras reconstitución, refrigerar a 2-8°C; evitar ciclos de congelación-descongelación. Dejar el vial a temperatura ambiente antes de abrir para evitar condensación. Proteger de la luz (envolver en aluminio o usar recipiente opaco)."
+      },
+      materials: {
+        en: "Peptide vials (BPC-157, 10 mg each): 8 weeks ≈ 2 vials, 12 weeks ≈ 3 vials. Insulin syringes (U-100): Per day: 1 syringe. 8 weeks: 56 syringes, 12 weeks: 84 syringes. Bacteriostatic water (10 mL vials): Use ~3.0 mL per vial. 8 weeks: 6 mL → 1 vial, 12 weeks: 9 mL → 1 vial. Alcohol wipes: One per vial + one per injection zone daily. Per day: 2. 8 weeks: 112 → recommend 2 boxes of 100, 12 weeks: 168 → recommend 2 boxes of 100.",
+        es: "Viales de péptido (BPC-157, 10 mg cada uno): 8 semanas ≈ 2 viales, 12 semanas ≈ 3 viales. Jeringas de insulina (U-100): Por día: 1 jeringa. 8 semanas: 56 jeringas, 12 semanas: 84 jeringas. Agua bacteriostática (frascos de 10 mL): Usar ~3,0 mL por vial. 8 semanas: 6 mL → 1 frasco, 12 semanas: 9 mL → 1 frasco. Toallitas de alcohol: Una por vial + una por zona de inyección al día. Por día: 2. 8 semanas: 112 → recomendar 2 cajas de 100, 12 semanas: 168 → recomendar 2 cajas de 100."
+      },
+      injectionTechnique: {
+        en: "Clean vial and zone with alcohol and let dry. Pinch 2-5 cm skin; insert needle at 45-90°. Do not aspirate; inject slowly. Remove needle at same angle; apply gentle pressure without rubbing. Rotate zones (abdomen, thighs, arms) separating at least 2-5 cm. Use new sterile syringes each injection; dispose in appropriate container. Rotate zones to avoid irritation or lipohypertrophy. Record daily dose, time and zone for consistency.",
+        es: "Limpiar el vial y la zona con alcohol y dejar secar. Pellizcar 2-5 cm de piel; insertar la aguja a 45-90°. No aspirar; inyectar lentamente. Retirar la aguja en el mismo ángulo; aplicar presión suave sin frotar. Rotar zonas (abdomen, muslos, brazos) separando al menos 2-5 cm. Usar jeringas nuevas estériles en cada inyección; desechar en contenedor adecuado. Rotar zonas para evitar irritación o lipohipertrofia. Registrar dosis diaria, hora y zona para mantener consistencia."
+      },
+      lifestyleFactors: {
+        en: "Support tissue repair with adequate protein intake (1.6-2.2g/kg body weight). Include collagen-supporting nutrients (vitamin C, zinc). Regular light exercise to promote circulation. Adequate sleep for recovery. Stay hydrated. Avoid anti-inflammatory medications that may interfere with natural repair processes.",
+        es: "Apoyar la reparación tisular con ingesta adecuada de proteínas (1,6-2,2g/kg de peso corporal). Incluir nutrientes que apoyen el colágeno (vitamina C, zinc). Ejercicio ligero regular para promover la circulación. Sueño adecuado para la recuperación. Mantenerse hidratado. Evitar medicamentos antiinflamatorios que puedan interferir con procesos de reparación naturales."
       },
       stackKeys: ["regenerative", "inflammation"]
     },
@@ -605,32 +641,44 @@
   Object.assign(PRODUCT_GUIDES, {
     "semax-30mg": {
       summary: {
-        en: "Adapted from the uploaded Semax guide as a sharper neurocognitive page with clearer focus, recovery, and protocol positioning for serious buyers.",
-        es: "Adaptado desde la guia cargada de Semax como una pagina neurocognitiva mas clara en foco, recuperacion y posicionamiento de protocolo para compradores serios."
+        en: "Semax is a heptapeptide synthetic analog of ACTH(4–10) developed in Russia and studied mainly for its cognitive enhancement and neuroprotective effects. Although intranasal administration is the most common in clinical literature, subcutaneous injection offers a convenient once-daily alternative for research purposes. This educational protocol presents a practical subcutaneous approach using simple reconstitution for precise measurements with insulin syringe.",
+        es: "Semax es un heptapéptido sintético análogo de ACTH(4–10) desarrollado en Rusia y estudiado principalmente por sus efectos en la mejora cognitiva y la neuroprotección. Aunque la administración intranasal es la más común en la literatura clínica, la inyección subcutánea ofrece una alternativa conveniente de una vez al día para fines de investigación. Este protocolo educativo presenta un enfoque práctico subcutáneo utilizando una reconstitución sencilla para mediciones precisas con jeringa de insulina."
       },
       howItWorks: {
-        en: "Semax is presented as an ACTH(4-10) analogue studied for cognitive support, neuroprotection, and BDNF-related signalling, with the guide noting that intranasal use is more common in published human work.",
-        es: "Semax se presenta como un analogo de ACTH(4-10) estudiado para soporte cognitivo, neuroproteccion y senalizacion relacionada con BDNF, recordando que el uso intranasal es mas comun en la literatura humana publicada."
+        en: "Semax is a synthetic analog of the fragment ACTH(4-10) with a tripeptide extension Pro-Gly-Pro that enhances its metabolic stability. Literature suggests it modulates BDNF expression, improves cholinergic and dopaminergic neurotransmission, and presents neuroprotective properties. In human studies in Russia, it has been used for cognitive support in conditions like mild cognitive impairment and recovery after stroke, usually via intranasal route. The subcutaneous route offers a more sustained systemic absorption.",
+        es: "Semax es un análogo sintético del fragmento ACTH(4-10) con una extensión tripeptídica Pro-Gly-Pro que mejora su estabilidad metabólica. La literatura sugiere que modula la expresión de BDNF, mejora la neurotransmisión colinérgica y dopaminérgica, y presenta propiedades neuroprotectoras. En estudios en humanos en Rusia, se ha utilizado para apoyo cognitivo en condiciones como deterioro cognitivo leve y recuperación tras ictus, normalmente por vía intranasal. La vía subcutánea ofrece una absorción sistémica más sostenida."
       },
       benefits: {
-        en: "Guide language focuses on attention, mental clarity, and neuroprotective interest. The main caution point is keeping claims aligned with research context rather than promising direct outcomes.",
-        es: "El lenguaje de la guia se centra en atencion, claridad mental e interes neuroprotector. El principal punto de cautela es mantener las afirmaciones dentro del contexto de investigacion."
+        en: "May improve attention, memory, and learning in populations with cognitive deficits. Studied in stroke, traumatic brain injury, and optic neuropathy with good safety profile in one-month studies. Generally well tolerated; intranasal route may cause mild irritation; subcutaneous may cause local redness or itching. Effects depend on dose; titration helps find minimum effective dose. No significant cortisol increases or relevant endocrine adverse effects observed.",
+        es: "Puede mejorar atención, memoria y aprendizaje en poblaciones con déficit cognitivo. Estudiado en ictus, lesión cerebral traumática y neuropatía óptica con buen perfil de seguridad en estudios de un mes. Generalmente bien tolerado; la vía intranasal puede causar irritación leve; la subcutánea puede causar enrojecimiento o picor local. Los efectos dependen de la dosis; la titulación ayuda a encontrar la dosis mínima efectiva. No se han observado aumentos significativos de cortisol ni efectos endocrinos adversos relevantes."
       },
       protocolOverview: {
-        en: "The uploaded protocol uses a once-daily subcutaneous structure, a gradual upward rhythm, and a practical eight-week frame that can be extended more carefully with review breaks.",
-        es: "El protocolo cargado usa una estructura subcutanea diaria, una subida gradual y un marco practico de ocho semanas que puede ampliarse con mas cuidado usando pausas de revision."
+        en: "Injections subcutaneous daily during 8 weeks (optional extend to 12-16 weeks with rests). Dosage range: 300-800 mcg daily. Reconstitution: 3.0 mL per vial (~3.33 mg/mL). Storage: Lyophilized frozen; reconstituted refrigerated; use within 30 days.",
+        es: "Inyecciones subcutáneas diarias durante 8 semanas (opcional extender a 12-16 semanas con descansos). Rango de dosis: 300-800 mcg diarios. Reconstitución: 3,0 mL por vial (~3,33 mg/mL). Almacenamiento: Liofilizado congelado; reconstituido refrigerado; usar en 30 días."
       },
       dosing: {
-        en: "The guide places Semax in a 300 mcg to 800 mcg daily range, with a staged build across weeks one to eight rather than a front-loaded jump.",
-        es: "La guia coloca Semax en un rango diario de 300 mcg a 800 mcg, con una construccion por etapas entre la semana uno y la ocho en lugar de una subida brusca."
+        en: "Start: 300 mcg daily; increase ~100-200 mcg every 1-2 weeks according to tolerance. Goal: 600-800 mcg daily in weeks 5-8; adjust according to individual response. Frequency: Once daily (subcutaneous). Cycle duration: 8 weeks continuous; optional extend to 12-16 weeks with rests (example: 6 weeks on, 2 off). Schedule: Any constant time; rotate injection zones.",
+        es: "Inicio: 300 mcg diarios; aumentar ~100-200 mcg cada 1-2 semanas según tolerancia. Objetivo: 600-800 mcg diarios en semanas 5-8; ajustar según respuesta individual. Frecuencia: Una vez al día (subcutáneo). Duración del ciclo: 8 semanas continuas; opcional extender a 12-16 semanas con descansos (ejemplo: 6 semanas on, 2 off). Horario: Cualquier hora constante; rotar zonas de inyección."
       },
       reconstitution: {
-        en: "Guide handling uses 3.0 mL of bacteriostatic water for an approximate 3.33 mg/mL concentration, which makes small-step measuring straightforward on a U-100 syringe.",
-        es: "La guia usa 3,0 mL de agua bacteriostatica para una concentracion aproximada de 3,33 mg/mL, lo que hace muy sencilla la medicion por pequenos pasos en jeringa U-100."
+        en: "Add 3.0 mL bacteriostatic water (maximum vial capacity) → approximate concentration 3.33 mg/mL. Easy measurement: At 3.33 mg/mL, 1 unit = 0.01 mL ≈ 33.3 mcg on insulin syringe U-100. Steps: Extract 3.0 mL bacteriostatic water with sterile syringe. Inject slowly by vial wall; avoid foaming. Gently move or roll vial until dissolved (do not shake vigorously). Label and refrigerate at 2-8°C, protected from light.",
+        es: "Añadir 3,0 mL de agua bacteriostática (capacidad máxima del vial) → concentración aproximada de 3,33 mg/mL. Medición fácil: A 3,33 mg/mL, 1 unidad = 0,01 mL ≈ 33,3 mcg en jeringa de insulina U-100. Pasos: Extraer 3,0 mL de agua bacteriostática con jeringa estéril. Inyectar lentamente por la pared del vial; evitar formar espuma. Mover suavemente o rodar el vial hasta disolver (no agitar con fuerza). Etiquetar y refrigerar a 2-8°C, protegido de la luz."
       },
       storage: {
-        en: "Store the lyophilized vial frozen or very cold. After reconstitution, refrigerate at 2 to 8 C and avoid repeated freeze-thaw handling.",
-        es: "Guardar el vial liofilizado congelado o muy frio. Tras la reconstitucion, refrigerar entre 2 y 8 C y evitar ciclos repetidos de congelacion y descongelacion."
+        en: "Lyophilized: Freeze at -20°C; after reconstitution, refrigerate at 2-8°C; avoid freeze-thaw cycles. Let vial reach room temperature before opening to avoid condensation. Protect from light (wrap in aluminum or use opaque container).",
+        es: "Liofilizado: Congelar a -20°C; tras reconstitución, refrigerar a 2-8°C; evitar ciclos de congelación-descongelación. Dejar el vial a temperatura ambiente antes de abrir para evitar condensación. Proteger de la luz (envolver en aluminio o usar recipiente opaco)."
+      },
+      materials: {
+        en: "Peptide vials (Semax, 10 mg each): 8 weeks ≈ 4 vials, 12 weeks ≈ 6 vials, 16 weeks ≈ 8 vials. Insulin syringes (U-100): Per week: 7 syringes. 8 weeks: 56 syringes, 12 weeks: 84 syringes, 16 weeks: 112 syringes. Bacteriostatic water (10 mL vials): Use ~3.0 mL per vial. 8 weeks: 12 mL → 2 vials, 12 weeks: 18 mL → 2 vials, 16 weeks: 24 mL → 3 vials. Alcohol wipes: One per vial + one per injection zone daily. Per week: 14. 8 weeks: 112 → recommend 2 boxes of 100, 12 weeks: 168 → recommend 2 boxes of 100, 16 weeks: 224 → recommend 3 boxes of 100.",
+        es: "Viales de péptido (Semax, 10 mg cada uno): 8 semanas ≈ 4 viales, 12 semanas ≈ 6 viales, 16 semanas ≈ 8 viales. Jeringas de insulina (U-100): Por semana: 7 jeringas. 8 semanas: 56 jeringas, 12 semanas: 84 jeringas, 16 semanas: 112 jeringas. Agua bacteriostática (frascos de 10 mL): Usar ~3,0 mL por vial. 8 semanas: 12 mL → 2 frascos, 12 semanas: 18 mL → 2 frascos, 16 semanas: 24 mL → 3 frascos. Toallitas de alcohol: Una por vial + una por zona de inyección al día. Por semana: 14. 8 semanas: 112 → recomendar 2 cajas de 100, 12 semanas: 168 → recomendar 2 cajas de 100, 16 semanas: 224 → recomendar 3 cajas de 100."
+      },
+      injectionTechnique: {
+        en: "Clean vial and zone with alcohol and let dry. Pinch 2-5 cm skin; insert needle at 45-90°. Do not aspirate; inject slowly. Remove needle at same angle; apply gentle pressure without rubbing. Rotate zones (abdomen, thighs, arms) separating at least 2-5 cm. Use new sterile syringes each injection; dispose in appropriate container. Rotate zones to avoid irritation or lipohypertrophy. Record daily dose, time and zone for consistency. Most data in humans is 4-8 weeks; longer protocols should include rests.",
+        es: "Limpiar el vial y la zona con alcohol y dejar secar. Pellizcar 2-5 cm de piel; insertar la aguja a 45-90°. No aspirar; inyectar lentamente. Retirar la aguja en el mismo ángulo; aplicar presión suave sin frotar. Rotar zonas (abdomen, muslos, brazos) separando al menos 2-5 cm. Usar jeringas nuevas estériles en cada inyección; desechar en contenedor adecuado. Rotar zonas para evitar irritación o lipohipertrofia. Registrar dosis diaria, hora y zona para mantener consistencia. La mayoría de datos en humanos son de 4-8 semanas; protocolos más largos deben incluir descansos."
+      },
+      lifestyleFactors: {
+        en: "Sleep 7-9 hours quality. Regular aerobic exercise and cognitive training. Balanced diet rich in omega-3, antioxidants and micronutrients. Stress management (meditation, mindfulness, etc.). Maintain mental and social activity.",
+        es: "Dormir 7-9 horas de calidad. Ejercicio aeróbico regular y entrenamiento cognitivo. Dieta equilibrada rica en omega-3, antioxidantes y micronutrientes. Gestión del estrés (meditación, mindfulness, etc.). Mantener actividad mental y social."
       },
       stackKeys: ["nervousSystem"]
     },
@@ -732,32 +780,44 @@
   Object.assign(PRODUCT_GUIDES, {
     "tirzepatide-30mg": {
       summary: {
-        en: "Adapted as a premium weekly reference focused on dual GIP and GLP-1 signalling, appetite-pathway review, and cleaner metabolic positioning for research buyers.",
-        es: "Adaptado como una referencia semanal premium centrada en senalizacion dual GIP y GLP-1, revision de vias de apetito y un posicionamiento metabolico mas claro para compradores de investigacion."
+        en: "Tirzepatide is a dual GLP-1/GIP receptor agonist developed for metabolic research, combining the benefits of GLP-1 and GIP pathways in a single molecule. This weekly injection protocol provides a convenient research approach for studying appetite regulation, body composition, and metabolic markers. The guide presents a structured escalation method for optimal tolerance and response assessment.",
+        es: "Tirzepatide es un agonista dual de receptores GLP-1/GIP desarrollado para investigación metabólica, combinando los beneficios de las vías GLP-1 y GIP en una sola molécula. Este protocolo de inyección semanal proporciona un enfoque conveniente de investigación para estudiar la regulación del apetito, composición corporal y marcadores metabólicos. La guía presenta un método de escalada estructurado para una tolerancia óptima y evaluación de respuesta."
       },
       howItWorks: {
-        en: "Tirzepatide combines GIP and GLP-1 receptor activity, so most guide material frames it around satiety signalling, slower gastric emptying, insulin-response support, and longer weekly handling windows.",
-        es: "Tirzepatide combina actividad sobre receptores GIP y GLP-1, por eso la mayor parte del material lo enfoca en senales de saciedad, vaciado gastrico mas lento, soporte de respuesta insulinica y ventanas semanales mas largas."
+        en: "Tirzepatide activates both GLP-1 and GIP receptors, leading to enhanced insulin secretion, reduced glucagon release, and slowed gastric emptying. This dual mechanism provides superior metabolic effects compared to single-pathway agonists. The molecule's long half-life allows for once-weekly dosing, making it suitable for chronic metabolic studies. Research suggests it modulates appetite centers in the brain while improving peripheral glucose utilization.",
+        es: "Tirzepatide activa tanto receptores GLP-1 como GIP, lo que lleva a una mayor secreción de insulina, reducción de la liberación de glucagón y enlentecimiento del vaciamiento gástrico. Este mecanismo dual proporciona efectos metabólicos superiores en comparación con agonistas de vía única. La larga vida media de la molécula permite una dosificación semanal, haciéndola adecuada para estudios metabólicos crónicos. La investigación sugiere que modula centros de apetito en el cerebro mientras mejora la utilización periférica de glucosa."
       },
       benefits: {
-        en: "Research-led discussions usually highlight appetite control, body-composition modelling, and glycaemic handling. The main caution points are gastrointestinal discomfort, strong appetite suppression, and the need for slower escalation.",
-        es: "Las discusiones orientadas a investigacion suelen destacar control del apetito, modelado de composicion corporal y manejo glucemico. Los puntos de cautela mas comunes son molestias gastrointestinales, supresion fuerte del apetito y necesidad de subir de forma lenta."
+        en: "May support metabolic research through appetite regulation, body composition changes, and improved glycemic control. Studied for weight management and metabolic health with generally good tolerability. Common effects include reduced appetite, mild gastrointestinal discomfort, and gradual metabolic improvements. Effects are dose-dependent; titration helps optimize response. No significant endocrine disruption observed in research protocols.",
+        es: "Puede apoyar la investigación metabólica a través de la regulación del apetito, cambios en la composición corporal y control glucémico mejorado. Estudiado para el manejo del peso y la salud metabólica con tolerabilidad generalmente buena. Los efectos comunes incluyen reducción del apetito, malestar gastrointestinal leve y mejoras metabólicas graduales. Los efectos dependen de la dosis; la titulación ayuda a optimizar la respuesta. No se ha observado disrupción endocrina significativa en protocolos de investigación."
       },
       protocolOverview: {
-        en: "The usual structure is once-weekly handling with a low starting phase, several review blocks, and gradual progression only after tolerance is clear.",
-        es: "La estructura habitual es un manejo semanal con fase inicial baja, varios bloques de revision y progresion gradual solo cuando la tolerancia esta clara."
+        en: "Weekly subcutaneous injections over 12-16 weeks with gradual dose escalation. Dosage range: 2.5-15 mg weekly. Reconstitution: 2.0 mL per vial (~15 mg/mL). Storage: Lyophilized refrigerated; reconstituted refrigerated; use within 28 days.",
+        es: "Inyecciones subcutáneas semanales durante 12-16 semanas con escalada gradual de dosis. Rango de dosis: 2,5-15 mg semanales. Reconstitución: 2,0 mL por vial (~15 mg/mL). Almacenamiento: Liofilizado refrigerado; reconstituido refrigerado; usar en 28 días."
       },
       dosing: {
-        en: "Keep Tirzepatide on a slow weekly ramp rather than jumping to a high target early, and align any public dose ladder with the finalized Primus internal guide before launch.",
-        es: "Mantener Tirzepatide en una subida semanal lenta en lugar de saltar pronto a un objetivo alto, y alinear cualquier escalado publico con la guia interna final de Primus antes del lanzamiento."
+        en: "Start: 2.5 mg weekly; increase every 4 weeks according to tolerance and response. Weeks 1-4: 2.5 mg, Weeks 5-8: 5 mg, Weeks 9-12: 10 mg, Weeks 13-16: 15 mg. Frequency: Once weekly (subcutaneous). Cycle duration: 12-16 weeks with assessment breaks. Schedule: Same day each week; rotate injection zones.",
+        es: "Inicio: 2,5 mg semanales; aumentar cada 4 semanas según tolerancia y respuesta. Semanas 1-4: 2,5 mg, Semanas 5-8: 5 mg, Semanas 9-12: 10 mg, Semanas 13-16: 15 mg. Frecuencia: Una vez por semana (subcutáneo). Duración del ciclo: 12-16 semanas con pausas de evaluación. Horario: El mismo día cada semana; rotar zonas de inyección."
       },
       reconstitution: {
-        en: "Standard handling uses bacteriostatic water, wall-side reconstitution, careful label tracking, and cold storage after mixing so each weekly draw remains consistent.",
-        es: "El manejo estandar usa agua bacteriostatica, reconstitucion por la pared del vial, trazabilidad clara en la etiqueta y refrigeracion tras la mezcla para que cada carga semanal sea consistente."
+        en: "Add 2.0 mL bacteriostatic water (maximum vial capacity) → concentration 15 mg/mL. Easy measurement: At 15 mg/mL, 1 mg = 0.067 mL. Steps: Extract 2.0 mL bacteriostatic water with sterile syringe. Inject slowly by vial wall; avoid foaming. Gently swirl vial until dissolved. Label and refrigerate at 2-8°C, protected from light.",
+        es: "Añadir 2,0 mL de agua bacteriostática (capacidad máxima del vial) → concentración 15 mg/mL. Medición fácil: A 15 mg/mL, 1 mg = 0,067 mL. Pasos: Extraer 2,0 mL de agua bacteriostática con jeringa estéril. Inyectar lentamente por la pared del vial; evitar formar espuma. Agitar suavemente el vial hasta disolver. Etiquetar y refrigerar a 2-8°C, protegido de la luz."
       },
       storage: {
-        en: "Store lyophilized material cold, dry, and protected from light. After reconstitution, keep refrigerated and avoid repeated temperature swings.",
-        es: "Guardar el material liofilizado en frio, seco y protegido de la luz. Tras la reconstitucion, mantener refrigerado y evitar cambios repetidos de temperatura."
+        en: "Lyophilized: Refrigerate at 2-8°C; after reconstitution, refrigerate at 2-8°C; avoid freeze-thaw cycles. Let vial reach room temperature before opening to avoid condensation. Protect from light (wrap in aluminum or use opaque container).",
+        es: "Liofilizado: Refrigerar a 2-8°C; tras reconstitución, refrigerar a 2-8°C; evitar ciclos de congelación-descongelación. Dejar el vial a temperatura ambiente antes de abrir para evitar condensación. Proteger de la luz (envolver en aluminio o usar recipiente opaco)."
+      },
+      materials: {
+        en: "Peptide vials (Tirzepatide, 30 mg each): 16 weeks ≈ 2 vials. Insulin syringes (U-100) or 1 mL syringes: Per week: 1 syringe. 16 weeks: 16 syringes. Bacteriostatic water (10 mL vials): Use ~2.0 mL per vial. 16 weeks: 4 mL → 1 vial. Alcohol wipes: One per vial + one per injection zone weekly. Per week: 2. 16 weeks: 32 → recommend 1 box of 100.",
+        es: "Viales de péptido (Tirzepatide, 30 mg cada uno): 16 semanas ≈ 2 viales. Jeringas de insulina (U-100) o jeringas de 1 mL: Por semana: 1 jeringa. 16 semanas: 16 jeringas. Agua bacteriostática (frascos de 10 mL): Usar ~2,0 mL por vial. 16 semanas: 4 mL → 1 frasco. Toallitas de alcohol: Una por vial + una por zona de inyección semanal. Por semana: 2. 16 semanas: 32 → recomendar 1 caja de 100."
+      },
+      injectionTechnique: {
+        en: "Clean vial and zone with alcohol and let dry. Pinch 2-5 cm skin; insert needle at 45-90°. Do not aspirate; inject slowly. Remove needle at same angle; apply gentle pressure without rubbing. Rotate zones (abdomen, thighs, arms) separating at least 2-5 cm. Use new sterile syringes each injection; dispose in appropriate container. Record weekly dose, date and zone for consistency.",
+        es: "Limpiar el vial y la zona con alcohol y dejar secar. Pellizcar 2-5 cm de piel; insertar la aguja a 45-90°. No aspirar; inyectar lentamente. Retirar la aguja en el mismo ángulo; aplicar presión suave sin frotar. Rotar zonas (abdomen, muslos, brazos) separando al menos 2-5 cm. Usar jeringas nuevas estériles en cada inyección; desechar en contenedor adecuado. Registrar dosis semanal, fecha y zona para mantener consistencia."
+      },
+      lifestyleFactors: {
+        en: "Maintain consistent meal timing and composition. Regular moderate exercise (walking, light resistance). Monitor body composition changes weekly. Adequate protein intake. Stay hydrated. Regular sleep schedule.",
+        es: "Mantener horario y composición de comidas consistente. Ejercicio moderado regular (caminar, resistencia ligera). Monitorear cambios en composición corporal semanalmente. Ingesta adecuada de proteínas. Mantenerse hidratado. Horario regular de sueño."
       },
       stackKeys: ["metabolic"]
     },
@@ -2095,12 +2155,12 @@
 
   function renderProductAdditionalEnhanced(product) {
     const guide = getProductGuide(product);
+    const hasMaterials = guide.materials;
+    const hasInjection = guide.injectionTechnique;
+    const hasLifestyle = guide.lifestyleFactors;
+
     return `
       <div class="section-stack">
-        <p class="section-copy">${tx(
-          "This section now mirrors the uploaded Primus guide structure while keeping the on-site copy cleaner, faster to scan, and easier to review in both languages.",
-          "Esta seccion ahora refleja la estructura de las guias cargadas de Primus manteniendo el contenido mas limpio, mas rapido de escanear y mas facil de revisar en ambos idiomas."
-        )}</p>
         <div class="protocol-grid">
           <article class="protocol-section detail-card">
             <h3>${tx("How This Works", "Como funciona")}</h3>
@@ -2122,6 +2182,24 @@
             <h3>${tx("Dosing & Reconstitution Guide", "Guia de dosificacion y reconstitucion")}</h3>
             <p class="protocol-text">${localize(guide.reconstitution)}</p>
           </article>
+          ${hasMaterials ? `
+          <article class="protocol-section detail-card">
+            <h3>${tx("Materials Needed", "Materiales necesarios")}</h3>
+            <p class="protocol-text">${localize(guide.materials)}</p>
+          </article>
+          ` : ''}
+          ${hasInjection ? `
+          <article class="protocol-section detail-card">
+            <h3>${tx("Injection Technique", "Tecnica de inyeccion")}</h3>
+            <p class="protocol-text">${localize(guide.injectionTechnique)}</p>
+          </article>
+          ` : ''}
+          ${hasLifestyle ? `
+          <article class="protocol-section detail-card">
+            <h3>${tx("Lifestyle Factors", "Factores de estilo de vida")}</h3>
+            <p class="protocol-text">${localize(guide.lifestyleFactors)}</p>
+          </article>
+          ` : ''}
         </div>
         <div class="policy-callout">${tx(
           "Guide summaries are now aligned with the Primus content library. Final legal, scientific, and compliance review should still happen before launch.",

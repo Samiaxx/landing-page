@@ -47,8 +47,8 @@ const PRODUCTS = [
     image: IMAGE_SET[0],
     gallery: [IMAGE_SET[0], IMAGE_SET[4], IMAGE_SET[5]],
     short: {
-      en: "Flagship peptide card for a premium, conversion-led catalogue layout.",
-      es: "Tarjeta principal para un catálogo premium y orientado a la conversión."
+      en: "Tirzepatide is a dual GLP-1/GIP receptor agonist used in metabolic research.",
+      es: "Tirzepatide es un agonista dual de receptores GLP-1/GIP utilizado en investigación metabólica."
     },
     batch: "PP-TZP-0426",
     coaDate: "2026-03-28"
@@ -63,8 +63,8 @@ const PRODUCTS = [
     image: IMAGE_SET[3],
     gallery: [IMAGE_SET[3], IMAGE_SET[0], IMAGE_SET[6]],
     short: {
-      en: "Built to sit beside Tirzepatide with matching trust and pricing hierarchy.",
-      es: "Diseñado para convivir con Tirzepatide con la misma jerarquía de confianza y precio."
+      en: "Retatrutide is a triple agonist targeting GLP-1, GIP, and glucagon receptors.",
+      es: "Retatrutide es un agonista triple que apunta a receptores GLP-1, GIP y glucagón."
     },
     batch: "PP-RET-0426",
     coaDate: "2026-03-25"
@@ -79,8 +79,8 @@ const PRODUCTS = [
     image: IMAGE_SET[2],
     gallery: [IMAGE_SET[2], IMAGE_SET[1], IMAGE_SET[4]],
     short: {
-      en: "Research-grade presentation with strong mobile card spacing and trust cues.",
-      es: "Presentación de grado investigación con buen espacio móvil y señales de confianza."
+      en: "TB-500 is a synthetic peptide fragment of Thymosin Beta-4 for tissue repair studies.",
+      es: "TB-500 es un fragmento de péptido sintético de Timosina Beta-4 para estudios de reparación tisular."
     },
     batch: "PP-TB5-0426",
     coaDate: "2026-03-24"
@@ -95,8 +95,8 @@ const PRODUCTS = [
     image: IMAGE_SET[1],
     gallery: [IMAGE_SET[1], IMAGE_SET[5], IMAGE_SET[6]],
     short: {
-      en: "Compact low-ticket product tile suited for quick add-to-cart behavior.",
-      es: "Ficha compacta de ticket bajo, pensada para una compra rápida."
+      en: "BPC-157 is a synthetic peptide known for its regenerative properties in research.",
+      es: "BPC-157 es un péptido sintético conocido por sus propiedades regenerativas en investigación."
     },
     batch: "PP-BPC-0426",
     coaDate: "2026-03-21"
@@ -110,8 +110,8 @@ const PRODUCTS = [
     image: IMAGE_SET[4],
     gallery: [IMAGE_SET[4], IMAGE_SET[2], IMAGE_SET[7]],
     short: {
-      en: "Clean catalogue card with price-first scanning and documentation support.",
-      es: "Tarjeta limpia para escaneo rápido de precio y soporte documental."
+      en: "GHK-Cu is a copper tripeptide complex used in skin and tissue research.",
+      es: "GHK-Cu es un complejo tripeptídico de cobre utilizado en investigación de piel y tejidos."
     },
     batch: "PP-GHK-0426",
     coaDate: "2026-03-19"
@@ -125,8 +125,8 @@ const PRODUCTS = [
     image: IMAGE_SET[6],
     gallery: [IMAGE_SET[6], IMAGE_SET[0], IMAGE_SET[3]],
     short: {
-      en: "Presented with a polished card balance for image, price, and trust notes.",
-      es: "Presentado con un balance cuidado entre imagen, precio y notas de confianza."
+      en: "MOTS-c is a mitochondrial peptide for metabolic and anti-aging research.",
+      es: "MOTS-c es un péptido mitocondrial para investigación metabólica y antienvejecimiento."
     },
     batch: "PP-MOT-0426",
     coaDate: "2026-03-18"
@@ -140,8 +140,8 @@ const PRODUCTS = [
     image: IMAGE_SET[7],
     gallery: [IMAGE_SET[7], IMAGE_SET[1], IMAGE_SET[2]],
     short: {
-      en: "Ready for catalogue segmentation with a strong availability state.",
-      es: "Preparado para una segmentación de catálogo con un estado claro de disponibilidad."
+      en: "Melanotan II is a synthetic peptide for tanning and pigmentation studies.",
+      es: "Melanotan II es un péptido sintético para estudios de bronceado y pigmentación."
     },
     batch: "PP-MT2-0426",
     coaDate: "2026-03-17"
@@ -155,8 +155,8 @@ const PRODUCTS = [
     image: IMAGE_SET[5],
     gallery: [IMAGE_SET[5], IMAGE_SET[3], IMAGE_SET[0]],
     short: {
-      en: "Premium card treatment for higher-ticket peptide entries.",
-      es: "Tratamiento visual premium para referencias de precio más alto."
+      en: "SS-31 is a mitochondrial-targeted peptide for cardiovascular and metabolic research.",
+      es: "SS-31 es un péptido dirigido a mitocondrias para investigación cardiovascular y metabólica."
     },
     batch: "PP-SS31-0426",
     coaDate: "2026-03-15"
@@ -170,8 +170,8 @@ const PRODUCTS = [
     image: IMAGE_SET[0],
     gallery: [IMAGE_SET[0], IMAGE_SET[5], IMAGE_SET[7]],
     short: {
-      en: "Strong dosage emphasis designed to read clearly on mobile product cards.",
-      es: "Énfasis claro en la dosificación para una lectura rápida en móvil."
+      en: "NAD+ precursor for cellular energy and anti-aging research.",
+      es: "Precursor de NAD+ para energía celular e investigación antienvejecimiento."
     },
     batch: "PP-NAD-0426",
     coaDate: "2026-03-14"
@@ -185,8 +185,8 @@ const PRODUCTS = [
     image: IMAGE_SET[3],
     gallery: [IMAGE_SET[3], IMAGE_SET[4], IMAGE_SET[1]],
     short: {
-      en: "Mid-price product card with documentation-led supporting copy.",
-      es: "Tarjeta de precio medio con copy de apoyo orientado a documentación."
+      en: "Semax is a nootropic peptide for cognitive and neuroprotective research.",
+      es: "Semax es un péptido nootrópico para investigación cognitiva y neuroprotectora."
     },
     batch: "PP-SEM-0426",
     coaDate: "2026-03-12"
@@ -200,8 +200,8 @@ const PRODUCTS = [
     image: IMAGE_SET[4],
     gallery: [IMAGE_SET[4], IMAGE_SET[6], IMAGE_SET[2]],
     short: {
-      en: "Balanced product tile with a concise conversion-oriented action row.",
-      es: "Ficha equilibrada con una fila de acción corta y orientada a conversión."
+      en: "Selank is an anxiolytic peptide for stress and cognitive research.",
+      es: "Selank es un péptido ansiolítico para investigación de estrés y cognitivo."
     },
     batch: "PP-SEL-0426",
     coaDate: "2026-03-10"
@@ -215,8 +215,8 @@ const PRODUCTS = [
     image: IMAGE_SET[1],
     gallery: [IMAGE_SET[1], IMAGE_SET[2], IMAGE_SET[3]],
     short: {
-      en: "Coming May card with launch-state styling and non-purchasable CTA treatment.",
-      es: "Ficha Llega en mayo con estilo de lanzamiento y CTA no comprable."
+      en: "DSIP (Delta Sleep-Inducing Peptide) for sleep and stress research.",
+      es: "DSIP (Péptido Inductor de Sueño Delta) para investigación de sueño y estrés."
     },
     batch: "PP-DSIP-PRE",
     coaDate: null
@@ -230,8 +230,8 @@ const PRODUCTS = [
     image: IMAGE_SET[2],
     gallery: [IMAGE_SET[2], IMAGE_SET[6], IMAGE_SET[7]],
     short: {
-      en: "Held in a Coming May state until pricing, COA, and launch copy are ready.",
-      es: "En estado Llega en mayo hasta confirmar precio, COA y copy de lanzamiento."
+      en: "Epithalamin (Epithalon) for anti-aging and telomerase research.",
+      es: "Epitalamina (Epithalon) para investigación antienvejecimiento y telomerasa."
     },
     batch: "PP-EPI-PRE",
     coaDate: null
@@ -245,8 +245,8 @@ const PRODUCTS = [
     image: IMAGE_SET[5],
     gallery: [IMAGE_SET[5], IMAGE_SET[0], IMAGE_SET[4]],
     short: {
-      en: "Prelaunch presentation card matching the rest of the catalogue system.",
-      es: "Tarjeta de pre-lanzamiento alineada con el resto del sistema de catálogo."
+      en: "Ipamorelin is a growth hormone secretagogue for metabolic research.",
+      es: "Ipamorelin es un secretagogo de hormona de crecimiento para investigación metabólica."
     },
     batch: "PP-IPA-PRE",
     coaDate: null
