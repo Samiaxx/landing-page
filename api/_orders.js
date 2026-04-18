@@ -62,13 +62,21 @@ function saveOrder(order) {
 
 function readOrder(reference) {
   const file = orderFile(reference);
+  console.log("readOrder: Looking for reference:", reference);
+  console.log("readOrder: Expected file path:", file);
+  console.log("readOrder: File exists:", fs.existsSync(file));
+  
   if (!fs.existsSync(file)) {
+    console.log("readOrder: File not found at", file);
     return null;
   }
 
   try {
-    return JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {
+    const order = JSON.parse(fs.readFileSync(file, "utf8"));
+    console.log("readOrder: Successfully loaded order from", file);
+    return order;
+  } catch (e) {
+    console.log("readOrder: Error parsing file:", e.message);
     return null;
   }
 }
@@ -89,25 +97,38 @@ function updateOrder(reference, updater) {
 
 function findOrderByInvoiceId(invoiceId) {
   if (!invoiceId) {
+    console.log("findOrderByInvoiceId: No invoiceId provided");
     return null;
   }
 
+  console.log("findOrderByInvoiceId: Searching for invoiceId:", invoiceId);
   ensureDataRoot();
   const files = fs.readdirSync(ordersDir());
+  
+  console.log("findOrderByInvoiceId: Found order files:", files);
 
   for (const file of files) {
     const fullPath = path.join(ordersDir(), file);
 
     try {
       const order = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+      console.log(`findOrderByInvoiceId: Checking ${file}`, {
+        fileInvoiceId: order.invoiceId,
+        targetInvoiceId: invoiceId,
+        match: order.invoiceId === invoiceId
+      });
+      
       if (order.invoiceId === invoiceId) {
+        console.log("findOrderByInvoiceId: Match found in", file);
         return order;
       }
-    } catch {
+    } catch (e) {
+      console.log(`findOrderByInvoiceId: Error reading ${file}:`, e.message);
       // Ignore unreadable files and keep scanning.
     }
   }
 
+  console.log("findOrderByInvoiceId: No matching order found for invoiceId:", invoiceId);
   return null;
 }
 

@@ -2,14 +2,21 @@ const { sendOrderStatusEmails } = require("./_email");
 const { findOrderByInvoiceId, readOrder, saveOrder } = require("./_orders");
 
 function extractPayload(req) {
+  console.log("Raw request body type:", typeof req.body);
+  console.log("Raw request body:", req.body);
+  
   if (typeof req.body === "string") {
     try {
-      return JSON.parse(req.body);
-    } catch {
+      const parsed = JSON.parse(req.body);
+      console.log("Parsed payload from string:", JSON.stringify(parsed, null, 2));
+      return parsed;
+    } catch (e) {
+      console.log("Failed to parse body string:", e.message);
       return {};
     }
   }
 
+  console.log("Payload as object:", JSON.stringify(req.body, null, 2));
   return req.body || {};
 }
 
@@ -52,21 +59,35 @@ module.exports = async function handler(req, res) {
   const reference = extractReference(payload);
   const invoiceId = extractInvoiceId(payload);
   const status = extractStatus(payload);
-  const order = (reference && readOrder(reference)) || findOrderByInvoiceId(invoiceId);
 
-  console.log("ArionPay webhook received", {
-    method: req.method,
-    id: invoiceId,
-    reference,
-    status,
-    chain: payload.chain || payload.data?.chain,
-    fullPayload: JSON.stringify(payload, null, 2)
-  });
+  console.log("=== ArionPay Webhook Extraction ===");
+  console.log("Extracted reference:", reference);
+  console.log("Extracted invoiceId:", invoiceId);
+  console.log("Extracted status:", status);
 
-  if (!order) {
-    console.log("No order found for webhook", { reference, invoiceId });
-    return res.status(200).json({ received: true, matched: false });
+  console.log("=== Attempting Order Lookup ===");
+  let order = null;
+  
+  if (reference) {
+    console.log("Trying readOrder with reference:", reference);
+    order = readOrder(reference);
+    console.log("readOrder result:", order ? "Found" : "Not found");
   }
+  
+  if (!order && invoiceId) {
+    console.log("Trying findOrderByInvoiceId with invoiceId:", invoiceId);
+    order = findOrderByInvoiceId(invoiceId);
+    console.log("findOrderByInvoiceId result:", order ? "Found" : "Not found");
+  }
+
+  console.log("=== Final Results ===");
+  console.log("Order found:", order ? "Yes" : "No");
+  console.log("Payload summary:", {
+    reference,
+    invoiceId,
+    status,
+    payloadKeys: Object.keys(payload)
+  });
 
   const previousStatus = order.status;
   const nextOrder = {
