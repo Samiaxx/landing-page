@@ -374,7 +374,7 @@
   Object.assign(PRODUCT_GUIDES, {
     "retatrutide-30mg": {
       summary: {
-        en: "Retatrutide is a triple GLP-1/GIP/glucagon receptor agonist developed for advanced metabolic research, combining three incretin pathways in a single molecule. This weekly injection protocol provides a comprehensive approach for studying appetite regulation, energy expenditure, and metabolic markers. The guide presents a structured escalation method for optimal tolerance and response assessment.",
+        en: "Retatrutide is a triple GLP-1/GIP/glucagon receptor agonist studied for substantial weight loss and metabolic improvement in obesity and type 2 diabetes. With an extended half-life of approximately 6 days, this peptide allows convenient once-weekly subcutaneous dosing with a gradual escalation protocol to optimize tolerability. Clinical trials have demonstrated significant weight loss (up to 24% at 48 weeks with 12 mg weekly) while minimizing gastrointestinal adverse events through gradual titration.",
         es: "Retatrutide es un nuevo agonista triple dirigido a GLP-1, GIP y receptores de glucagón, estudiado para la pérdida de peso sustancial y la mejora metabólica en la obesidad y la diabetes tipo 2. Con una vida media prolongada de aproximadamente 6 días, este péptido permite una dosificación subcutánea conveniente una vez por semana con un protocolo de aumento gradual para optimizar la tolerabilidad."
       },
       howItWorks: {
@@ -503,15 +503,15 @@
     },
     "ghk-cu-50mg": {
       summary: {
-        en: "Refined as a copper-peptide specialist page with stronger cosmetic-science and tissue-remodelling language from the updated guide.",
+        en: "GHK-Cu (glycyl-L-histidyl-L-lysine:copper complex) is a naturally occurring copper peptide with documented functions in wound healing, tissue remodeling, and skin regeneration. Research demonstrates activity in gene regulation related to collagen synthesis, antioxidant defense, and anti-inflammatory pathways. This educational protocol presents practical subcutaneous administration approaches based on clinical practice patterns.",
         es: "GHK-Cu (complejo glicil-L-histidil-L-lisina:cobre) es un péptido de cobre presente de forma natural con funciones documentadas en la cicatrización de heridas, remodelación tisular y regeneración de la piel. La investigación demuestra actividad en la regulación génica relacionada con la síntesis de colágeno, la defensa antioxidante y las vías antiinflamatorias. Este protocolo educativo presenta enfoques prácticos de administración subcutánea basados en patrones de práctica clínica."
       },
       howItWorks: {
-        en: "GHK-Cu is positioned around collagen-related gene expression, antioxidant defence, wound support, and broader tissue-remodelling pathways linked to a naturally occurring copper complex.",
+        en: "GHK-Cu is a natural tripeptide that forms complexes with copper ions to modulate multiple biological processes. It has been shown to participate in healing by increasing gene expression of collagen and decorin, activating tissue remodeling pathways, and regulating genes associated with antioxidant defense and anti-inflammatory response. Preclinical studies show activity at very low doses in animal models, while in clinical practice, doses in the milligram range are used for systemic effects. The peptide exhibits multifunctional activity in skin, nervous system, and vascular tissue, with regulatory effects beyond simple healing.",
         es: "GHK-Cu se posiciona alrededor de expresion genetica relacionada con colageno, defensa antioxidante, soporte de heridas y vias de remodelacion tisular ligadas a un complejo natural de cobre."
       },
       benefits: {
-        en: "Guide copy emphasizes skin quality, repair signalling, and recovery-facing use cases while keeping the page anchored in pathway research rather than cosmetic overstatement.",
+        en: "Supports healing and tissue repair through collagen synthesis and remodeling. Positive regulatory effects on genes related to antioxidant enzymes, growth factors, and anti-inflammatory signaling. Observed activity in nervous system function in preclinical models. Generally well tolerated; the most common side effects are mild reactions at the injection site. No official dosing guidelines in humans; not FDA approved.",
         es: "El texto de la guia enfatiza calidad de piel, senalizacion reparadora y casos de uso orientados a recuperacion, manteniendo la pagina anclada en investigacion de vias y no en exageracion cosmetica."
       },
       protocolOverview: {
@@ -537,15 +537,15 @@
   Object.assign(PRODUCT_GUIDES, {
     "mots-c-40mg": {
       summary: {
-        en: "Rebuilt as a mitochondrial-metabolism page anchored in AMPK signalling, nutrient use, and exercise-capacity research for high-intent buyers.",
+        en: "MOTS-c is a 16-amino acid mitochondrial-derived peptide (MDP) that acts as a metabolic regulator, primarily through AMPK activation. Preclinical studies show it improves insulin sensitivity, promotes fat oxidation, enhances exercise capacity, and counters age-related metabolic decline. To date, no human clinical trials have been completed. This educational protocol presents a once-daily subcutaneous administration approach with gradual titration.",
         es: "MOTS-c es un péptido derivado de la mitocondria (MDP) de 16 aminoácidos que actúa como regulador metabólico, principalmente a través de la activación de AMPK. Los estudios preclínicos muestran que mejora la sensibilidad a la insulina, promueve la oxidación de grasas, mejora la capacidad de ejercicio y contrarresta el deterioro metabólico relacionado con la edad. Hasta la fecha, no se han completado ensayos clínicos en humanos. Este protocolo educativo presenta un enfoque de administración subcutánea una vez al día con titulación gradual."
       },
       howItWorks: {
-        en: "MOTS-c is a mitochondrial-derived peptide guide positioned around AMPK activation, fuel selection, and communication between mitochondria and the nucleus during metabolic stress.",
+        en: "MOTS-c acts as a 'metabolic stress' signal that optimizes energy use during exercise or caloric restriction. It activates AMPK, making cells function more efficiently: increasing glucose use, fat burning, and mitochondrial function, while reducing fat storage. It may also act at the nuclear level, activating antioxidant and stress response genes. This helps protect cells from oxidative damage and could influence pathways related to longevity and inflammation. Its effects resemble those of exercise or metformin at the cellular level.",
         es: "MOTS-c es un peptido derivado de la mitocondria posicionado alrededor de activacion de AMPK, seleccion de combustible y comunicacion entre mitocondria y nucleo durante estres metabolico."
       },
       benefits: {
-        en: "The guide emphasizes insulin sensitivity, fat oxidation, exercise-capacity support, and age-related metabolic resilience, while noting that human clinical data remain limited.",
+        en: "Based on preclinical studies, not humans: Improved insulin sensitivity, reduced body fat in animal models, enhanced physical performance, organ protection (liver, heart), possible effects on bone and immunity. Safety: no adverse effects in animals; unknown in humans. Important: these effects are not confirmed in humans.",
         es: "La guia destaca sensibilidad a la insulina, oxidacion de grasa, soporte de capacidad de ejercicio y resiliencia metabolica asociada a la edad, recordando que los datos clinicos en humanos siguen siendo limitados."
       },
       protocolOverview: {
