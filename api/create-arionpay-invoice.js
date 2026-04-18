@@ -262,20 +262,37 @@ module.exports = async function handler(req, res) {
 
   try {
     saveOrder(order);
-    notifications = await sendOrderCreatedEmails(order);
 
-    // Persist notification delivery results on the stored order so webhook
-    // handlers or admins can inspect whether customer/admin emails were
-    // actually dispatched (useful when external email provider is missing
-    // or returning errors).
-    try {
-      const orderWithNotifications = {
-        ...order,
-        notifications
+    // Only attempt to send emails if the required env vars are present.
+    const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.EMAIL_FROM || process.env.RESEND_FROM));
+    if (emailConfigured) {
+      notifications = await sendOrderCreatedEmails(order);
+
+      try {
+        const orderWithNotifications = {
+          ...order,
+          notifications
+        };
+        saveOrder(orderWithNotifications);
+      } catch (e) {
+        console.warn("Failed to save order notifications:", e && e.message);
+      }
+    } else {
+      // Record that email sending is disabled so operators can inspect later.
+      notifications = {
+        customer: { ok: false, reason: "email_disabled" },
+        admin: { ok: false, reason: "email_disabled" }
       };
-      saveOrder(orderWithNotifications);
-    } catch (e) {
-      console.warn("Failed to save order notifications:", e && e.message);
+
+      try {
+        const orderWithNotifications = {
+          ...order,
+          notifications
+        };
+        saveOrder(orderWithNotifications);
+      } catch (e) {
+        console.warn("Failed to save order (email disabled):", e && e.message);
+      }
     }
   } catch (error) {
     console.warn("ArionPay invoice created, but local order post-processing failed.", error);

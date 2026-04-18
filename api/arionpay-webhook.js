@@ -112,10 +112,16 @@ module.exports = async function handler(req, res) {
   saveOrder(nextOrder);
 
   if (previousStatus !== nextOrder.status) {
-    try {
-      await sendOrderStatusEmails(nextOrder, previousStatus);
-    } catch (e) {
-      console.warn("Failed to send order status emails:", e && e.message);
+    // Only attempt to send status emails if email sending is configured.
+    const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.EMAIL_FROM || process.env.RESEND_FROM));
+    if (emailConfigured) {
+      try {
+        await sendOrderStatusEmails(nextOrder, previousStatus);
+      } catch (e) {
+        console.warn("Failed to send order status emails:", e && e.message);
+      }
+    } else {
+      console.log("Email sending disabled; skipping status notification.");
     }
   }
 
