@@ -53,10 +53,12 @@ module.exports = async function handler(req, res) {
     id: invoiceId,
     reference,
     status,
-    chain: payload.chain || payload.data?.chain
+    chain: payload.chain || payload.data?.chain,
+    fullPayload: JSON.stringify(payload, null, 2)
   });
 
   if (!order) {
+    console.log("No order found for webhook", { reference, invoiceId });
     return res.status(200).json({ received: true, matched: false });
   }
 
