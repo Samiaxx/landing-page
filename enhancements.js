@@ -14,6 +14,95 @@
     : "primus-cart-v2";
   const ARIONPAY_INVOICE_ENDPOINT = "/api/create-arionpay-invoice";
   const ORDER_STATUS_ENDPOINT = "/api/order-status";
+  let shopGoal = "all";
+  let shopSort = "featured";
+  let activeProductGalleryImage = 0;
+  let activeProductGallerySlug = "";
+
+  const GOAL_COLLECTIONS = [
+    {
+      id: "all",
+      label: { en: "All research lanes", es: "Todas las lineas de investigacion" },
+      summary: {
+        en: "Full catalogue view across metabolic, repair, cognitive, and specialist peptide lanes.",
+        es: "Vista completa del catalogo para lineas metabolicas, reparacion, cognitivas y especializadas."
+      }
+    },
+    {
+      id: "metabolic",
+      label: { en: "Metabolic", es: "Metabolico" },
+      summary: {
+        en: "Appetite-regulation, body-composition, nutrient-use, and energy-pathway products.",
+        es: "Productos orientados a regulacion del apetito, composicion corporal, uso de nutrientes y vias energeticas."
+      }
+    },
+    {
+      id: "recovery",
+      label: { en: "Recovery", es: "Recuperacion" },
+      summary: {
+        en: "Tissue-support, regenerative, and recovery-facing products with faster operational clarity.",
+        es: "Productos de soporte tisular, regeneracion y recuperacion con una lectura operativa mas clara."
+      }
+    },
+    {
+      id: "cognitive",
+      label: { en: "Cognitive", es: "Cognitivo" },
+      summary: {
+        en: "Focus, calm, sleep, and nervous-system oriented products grouped into one buyer lane.",
+        es: "Productos de foco, calma, sueno y sistema nervioso agrupados en una sola linea de compra."
+      }
+    },
+    {
+      id: "longevity",
+      label: { en: "Longevity", es: "Longevidad" },
+      summary: {
+        en: "Mitochondrial, healthy-ageing, and resilience-focused products for more specialist research intent.",
+        es: "Productos mitocondriales, de envejecimiento saludable y resiliencia para una intencion de compra mas especialista."
+      }
+    },
+    {
+      id: "specialty",
+      label: { en: "Specialty", es: "Especialidad" },
+      summary: {
+        en: "Appearance, pigmentation, and specialist category products that need clearer product separation.",
+        es: "Productos de apariencia, pigmentacion y categorias especialistas que necesitan una separacion mas clara."
+      }
+    }
+  ];
+
+  const SHOP_SORT_OPTIONS = [
+    { id: "featured", label: { en: "Featured first", es: "Destacados primero" } },
+    { id: "price-asc", label: { en: "Price: low to high", es: "Precio: de menor a mayor" } },
+    { id: "price-desc", label: { en: "Price: high to low", es: "Precio: de mayor a menor" } },
+    { id: "name", label: { en: "Name", es: "Nombre" } }
+  ];
+
+  const PRODUCT_GOAL_MAP = {
+    "tirzepatide-30mg": ["metabolic"],
+    "retatrutide-30mg": ["metabolic"],
+    "tb-500-20mg": ["recovery"],
+    "bpc-157-10mg": ["recovery"],
+    "ghk-cu-50mg": ["recovery", "specialty"],
+    "mots-c-40mg": ["metabolic", "longevity"],
+    "melanotan-mt2-10mg": ["specialty"],
+    "ss-31-50mg": ["longevity", "metabolic"],
+    "nad-1000mg": ["longevity", "metabolic"],
+    "semax-30mg": ["cognitive"],
+    "selank-10mg": ["cognitive"],
+    "dsip-10mg": ["cognitive"],
+    "epithalon-40mg": ["longevity"],
+    "ipamorelin-10mg": ["recovery"],
+    "kpv-10mg": ["recovery"],
+    "pt141-10mg": ["specialty"],
+    "oxytocin-10mg": ["specialty", "cognitive"]
+  };
+
+  const BEST_SELLER_SLUGS = [
+    "tirzepatide-30mg",
+    "retatrutide-30mg",
+    "tb-500-20mg",
+    "bpc-157-10mg"
+  ];
 
   const POLICY_LINKS = [
     { href: "privacy.html", key: "privacy", label: { en: "Privacy Policy", es: "Política de privacidad" } },
@@ -1441,6 +1530,261 @@
     return palette[seed % palette.length];
   }
 
+  function goalConfig(goalId) {
+    return GOAL_COLLECTIONS.find((item) => item.id === goalId) || GOAL_COLLECTIONS[0];
+  }
+
+  function validGoal(goalId) {
+    return goalConfig(goalId).id;
+  }
+
+  function validSort(sortId) {
+    return SHOP_SORT_OPTIONS.some((item) => item.id === sortId) ? sortId : "featured";
+  }
+
+  function productGoals(product) {
+    return PRODUCT_GOAL_MAP[product.slug] || ["specialty"];
+  }
+
+  function primaryGoal(product) {
+    return productGoals(product)[0] || "specialty";
+  }
+
+  function productMatchesGoal(product, goalId) {
+    return goalId === "all" || productGoals(product).includes(goalId);
+  }
+
+  function allGalleryImages(product) {
+    return Array.from(new Set([product.image].concat(Array.isArray(product.gallery) ? product.gallery : []).filter(Boolean)));
+  }
+
+  function availableProducts() {
+    return PRODUCTS.filter((product) => product.status === "available");
+  }
+
+  function comingSoonProducts() {
+    return PRODUCTS.filter((product) => product.status === "coming");
+  }
+
+  function bestSellerProducts() {
+    return BEST_SELLER_SLUGS
+      .map((slug) => PRODUCTS.find((product) => product.slug === slug))
+      .filter((product) => product && product.status === "available");
+  }
+
+  function laneProducts(goalId, status = "all") {
+    return PRODUCTS.filter((product) => {
+      if (!productMatchesGoal(product, goalId)) {
+        return false;
+      }
+
+      if (status === "all") {
+        return true;
+      }
+
+      return product.status === status;
+    });
+  }
+
+  function sortShopProducts(products) {
+    const list = [...products];
+
+    if (shopSort === "price-asc") {
+      return list.sort((a, b) => (a.price || 0) - (b.price || 0));
+    }
+
+    if (shopSort === "price-desc") {
+      return list.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+
+    if (shopSort === "name") {
+      return list.sort((a, b) => localize(a.name).localeCompare(localize(b.name), "en", { sensitivity: "base" }));
+    }
+
+    return list.sort((a, b) => {
+      const availabilityDelta = Number(b.status === "available") - Number(a.status === "available");
+      if (availabilityDelta !== 0) {
+        return availabilityDelta;
+      }
+
+      const featuredDelta = Number(b.featured === true) - Number(a.featured === true);
+      if (featuredDelta !== 0) {
+        return featuredDelta;
+      }
+
+      return (b.price || 0) - (a.price || 0);
+    });
+  }
+
+  function filteredShopProducts() {
+    const term = shopQuery.trim().toLowerCase();
+
+    return sortShopProducts(PRODUCTS.filter((product) => {
+      const matchesAvailability = shopFilter === "all"
+        || (shopFilter === "available" && product.status === "available")
+        || (shopFilter === "coming" && product.status === "coming");
+      const matchesGoal = productMatchesGoal(product, shopGoal);
+      const haystack = `${localize(product.name)} ${product.dosage} ${product.status} ${productGoals(product).join(" ")}`.toLowerCase();
+      return matchesAvailability && matchesGoal && (!term || haystack.includes(term));
+    }));
+  }
+
+  function syncShopStateFromLocation() {
+    if (getCurrentPage() !== "shop") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    shopGoal = validGoal(params.get("goal") || shopGoal);
+    shopSort = validSort(params.get("sort") || shopSort);
+    shopFilter = ["all", "available", "coming"].includes(params.get("availability"))
+      ? params.get("availability")
+      : shopFilter;
+
+    if (params.has("q")) {
+      shopQuery = params.get("q") || "";
+    }
+  }
+
+  function writeShopStateToLocation() {
+    if (getCurrentPage() !== "shop" || typeof history.replaceState !== "function") {
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    if (shopGoal !== "all") {
+      params.set("goal", shopGoal);
+    }
+
+    if (shopSort !== "featured") {
+      params.set("sort", shopSort);
+    }
+
+    if (shopFilter !== "all") {
+      params.set("availability", shopFilter);
+    }
+
+    if (shopQuery.trim()) {
+      params.set("q", shopQuery.trim());
+    }
+
+    const query = params.toString();
+    history.replaceState({}, "", `shop.html${query ? `?${query}` : ""}`);
+  }
+
+  function shopGoalHref(goalId) {
+    const goal = validGoal(goalId);
+    return goal === "all" ? "shop.html" : `shop.html?goal=${goal}`;
+  }
+
+  function relatedProductsFor(product) {
+    const goal = primaryGoal(product);
+    const sameLane = PRODUCTS.filter((item) => item.slug !== product.slug && productMatchesGoal(item, goal));
+    const remaining = PRODUCTS.filter((item) => item.slug !== product.slug && !productMatchesGoal(item, goal));
+
+    return sortShopProducts(sameLane)
+      .concat(sortShopProducts(remaining))
+      .slice(0, 3);
+  }
+
+  function renderGoalCards() {
+    return GOAL_COLLECTIONS
+      .filter((goal) => goal.id !== "all")
+      .map((goal, index) => {
+        const available = laneProducts(goal.id, "available").length;
+        const upcoming = laneProducts(goal.id, "coming").length;
+
+        return `
+          <a class="objective-card reveal${index % 2 ? " reveal-delay" : ""}" href="${shopGoalHref(goal.id)}">
+            <span class="detail-label">${tx("Research lane", "Linea de investigacion")}</span>
+            <strong>${localize(goal.label)}</strong>
+            <p>${localize(goal.summary)}</p>
+            <div class="objective-meta">
+              <span>${available} ${tx("available", "disponibles")}</span>
+              <span>${upcoming} ${tx("coming soon", "proximamente")}</span>
+            </div>
+          </a>
+        `;
+      })
+      .join("");
+  }
+
+  function renderCompactProductRows(products) {
+    return products.map((product) => `
+      <a class="merch-row" href="product.html?slug=${product.slug}">
+        <span class="merch-row-media">
+          <img src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
+        </span>
+        <span class="merch-row-copy">
+          <strong>${localize(product.name)} ${product.dosage}</strong>
+          <small>${localize(goalConfig(primaryGoal(product)).label)}</small>
+        </span>
+        <span class="merch-row-meta">
+          <strong>${productPriceLabel(product)}</strong>
+          <small>${product.status === "available" ? tx("Ready now", "Listo ahora") : tx("Coming soon", "Proximamente")}</small>
+        </span>
+      </a>
+    `).join("");
+  }
+
+  function renderShopGoalButtons() {
+    return GOAL_COLLECTIONS.map((goal) => `
+      <button
+        type="button"
+        class="goal-chip ${shopGoal === goal.id ? "is-active" : ""}"
+        data-goal-filter="${goal.id}"
+      >${localize(goal.label)}</button>
+    `).join("");
+  }
+
+  function renderShopSortOptions() {
+    return SHOP_SORT_OPTIONS.map((option) => `
+      <option value="${option.id}" ${shopSort === option.id ? "selected" : ""}>${localize(option.label)}</option>
+    `).join("");
+  }
+
+  function renderShopMeta(products) {
+    const goal = goalConfig(shopGoal);
+    const summary = shopGoal === "all"
+      ? tx("Catalogue view across every active research lane.", "Vista del catalogo en todas las lineas activas de investigacion.")
+      : localize(goal.summary);
+
+    return `
+      <div class="catalog-meta-copy">
+        <strong class="catalog-meta-title">${products.length} ${tx("results", "resultados")}</strong>
+        <span class="catalog-meta-subtitle">${summary}</span>
+      </div>
+      <div class="catalog-pills">
+        <span class="catalog-pill">${tx("Availability", "Disponibilidad")}: ${shopFilter === "all" ? tx("All", "Todo") : shopFilter === "available" ? tx("Available", "Disponible") : tx("Coming soon", "Proximamente")}</span>
+        <span class="catalog-pill">${tx("Lane", "Linea")}: ${localize(goal.label)}</span>
+      </div>
+    `;
+  }
+
+  function renderPurchaseFacts(product) {
+    return `
+      <div class="purchase-fact-grid">
+        <div class="purchase-fact">
+          <span>${tx("Batch", "Lote")}</span>
+          <strong>${product.batch}</strong>
+        </div>
+        <div class="purchase-fact">
+          <span>${tx("Last analysis", "Ultimo analisis")}</span>
+          <strong>${formatDate(product.coaDate)}</strong>
+        </div>
+        <div class="purchase-fact">
+          <span>${tx("Dispatch", "Salida")}</span>
+          <strong>${tx("24h target", "Objetivo 24h")}</strong>
+        </div>
+        <div class="purchase-fact">
+          <span>${tx("Payment", "Pago")}</span>
+          <strong>ArionPay / USDT</strong>
+        </div>
+      </div>
+    `;
+  }
+
   function renderProductVisual(product, variant = "card") {
     const tone = productTone(product);
     const note = product.status === "available"
@@ -2723,6 +3067,934 @@
     `;
   };
 
+  function renderEnhancedHomePage() {
+    const liveCount = availableProducts().length;
+    const launchCount = comingSoonProducts().length;
+    const featured = bestSellerProducts()
+      .map((product, index) => renderProductCard(product, { delay: index % 2 === 1 }))
+      .join("");
+    const readyNow = renderCompactProductRows(sortShopProducts(availableProducts()).slice(0, 5));
+    const launchQueue = renderCompactProductRows(sortShopProducts(comingSoonProducts()).slice(0, 5));
+
+    return `
+      <section class="hero-home">
+        <div class="container hero-grid">
+          <div class="hero-copy reveal">
+            <p class="kicker">${tx("Research-Grade Peptide Storefront", "Storefront de peptidos para investigacion")}</p>
+            <h1>${tx(
+              "A more complete catalogue flow from discovery to checkout.",
+              "Un flujo de catalogo mas completo desde el descubrimiento hasta el checkout."
+            )}</h1>
+            <p class="lead">${tx(
+              "Primus Peptides now presents the catalogue as a live store: clearer lanes, stronger product browsing, faster comparison, and a shorter route into ArionPay checkout.",
+              "Primus Peptides ahora presenta el catalogo como una tienda activa: lineas mas claras, mejor exploracion de productos, comparacion mas rapida y una ruta mas corta hacia el checkout con ArionPay."
+            )}</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="shop.html">${tx("Shop all products", "Comprar todos los productos")}</a>
+              <a class="btn btn-secondary" href="coa.html">${tx("COA Archive", "Archivo COA")}</a>
+            </div>
+            <div class="hero-trust">
+              <div class="trust-chip"><strong>${localize(COPY.labels.hplc)}</strong></div>
+              <div class="trust-chip"><strong>${localize(COPY.labels.shipped)}</strong></div>
+              <div class="trust-chip"><strong>${localize(COPY.labels.freeShipping)}</strong></div>
+            </div>
+          </div>
+          <div class="hero-stack reveal reveal-delay">
+            <article class="panel panel-dark">
+              <p class="panel-kicker">${tx("Store snapshot", "Resumen de la tienda")}</p>
+              <h2>${tx(
+                "Live catalogue depth, bilingual navigation, and trust signals kept close to the buying path.",
+                "Profundidad real de catalogo, navegacion bilingue y senales de confianza cerca del recorrido de compra."
+              )}</h2>
+              <div class="metric-grid">
+                <div class="metric-card"><strong>${liveCount}</strong><small>${tx("available now", "disponibles ahora")}</small></div>
+                <div class="metric-card"><strong>${launchCount}</strong><small>${tx("in launch queue", "en cola de lanzamiento")}</small></div>
+                <div class="metric-card"><strong>USDT</strong><small>${tx("ArionPay checkout", "checkout ArionPay")}</small></div>
+              </div>
+            </article>
+            <article class="hero-visual reveal">
+              <img src="${IMAGE_SET[0]}" alt="Primus Peptides product visual">
+              <div class="overlay-card">${tx(
+                "White-background product imagery, batch-linked presentation, and catalogue sections that feel closer to a working store.",
+                "Imagenes de producto sobre fondo blanco, presentacion vinculada a lote y secciones de catalogo mas cercanas a una tienda operativa."
+              )}</div>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container trust-grid">${renderTrustCards()}</div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Shop by lane", "Comprar por linea")}</p>
+            <h2 class="section-title">${tx(
+              "Move through the catalogue by product intent instead of browsing one long undifferentiated grid.",
+              "Recorre el catalogo por intencion de producto en lugar de una sola parrilla sin diferenciar."
+            )}</h2>
+          </div>
+          <div class="objective-grid">${renderGoalCards()}</div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Best sellers", "Mas vendidos")}</p>
+            <h2 class="section-title">${tx(
+              "Core catalogue products surfaced first, with cleaner comparison points and direct cart access.",
+              "Productos clave del catalogo visibles primero, con comparacion mas limpia y acceso directo al carrito."
+            )}</h2>
+          </div>
+          <div class="catalog-grid">${featured}</div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container launch-grid">
+          <article class="detail-card reveal">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Ready now", "Listo ahora")}</p>
+              <h2 class="section-title">${tx("Current catalogue", "Catalogo actual")}</h2>
+              <p class="section-copy">${tx(
+                "Available products ready for immediate browsing and checkout.",
+                "Productos disponibles listos para explorar y comprar de inmediato."
+              )}</p>
+            </div>
+            <div class="stack-sm">${readyNow}</div>
+          </article>
+          <article class="detail-card reveal reveal-delay">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Launch queue", "Cola de lanzamiento")}</p>
+              <h2 class="section-title">${tx("Coming soon", "Proximamente")}</h2>
+              <p class="section-copy">${tx(
+                "Products already positioned in the storefront before release pricing is opened.",
+                "Productos ya posicionados en la tienda antes de abrir el precio de lanzamiento."
+              )}</p>
+            </div>
+            <div class="stack-sm">${launchQueue}</div>
+          </article>
+        </div>
+      </section>
+      <section class="section section-dark">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Store operations", "Operativa de tienda")}</p>
+            <h2 class="section-title">${tx(
+              "Core support blocks now work as selling infrastructure, not just static brand sections.",
+              "Los bloques de soporte ahora funcionan como infraestructura de venta, no solo como secciones estaticas."
+            )}</h2>
+          </div>
+          <div class="service-grid">${renderServiceCards()}</div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container shipping-layout">
+          <article class="shipping-card reveal">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Shipping clarity", "Claridad de envios")}</p>
+              <h2 class="section-title">${tx(
+                "Dispatch and delivery information that answers objections before checkout.",
+                "Informacion de salida y entrega que resuelve objeciones antes del checkout."
+              )}</h2>
+            </div>
+            <table class="shipping-table">
+              <thead>
+                <tr>
+                  <th>${tx("Region", "Zona")}</th>
+                  <th>${tx("Timing", "Tiempo")}</th>
+                  <th>${tx("Price", "Precio")}</th>
+                </tr>
+              </thead>
+              <tbody>${renderShippingRows()}</tbody>
+            </table>
+          </article>
+          <article class="info-panel reveal reveal-delay">
+            <p class="panel-kicker">${tx("Checkout routing", "Ruta de checkout")}</p>
+            <h3>${tx(
+              "Cart, checkout, and payment steps now sit closer together so the store feels transactional instead of brochure-led.",
+              "Carrito, checkout y pago ahora quedan mas conectados para que la tienda se sienta transaccional y no solo informativa."
+            )}</h3>
+            <p class="section-copy">${tx(
+              "The storefront keeps COA, batch, shipping, and payment information visible earlier in the journey.",
+              "La tienda mantiene visible antes en el recorrido la informacion de COA, lote, envio y pago."
+            )}</p>
+          </article>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Why trust us", "Por que confiar en nosotros")}</p>
+            <h2 class="section-title">${tx(
+              "A certificate-led layer that feels closer to a specialist supplier than a generic supplement store.",
+              "Una capa de confianza orientada a certificados que se siente mas cercana a un proveedor especialista que a una tienda generica."
+            )}</h2>
+          </div>
+          <div class="proof-grid">${renderProofCards()}</div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Testimonials", "Testimonios")}</p>
+            <h2 class="section-title">${tx(
+              "Social proof placed where the catalogue now feels more operational and purchase-ready.",
+              "Prueba social colocada donde el catalogo ya se siente mas operativo y listo para compra."
+            )}</h2>
+          </div>
+          <div class="testimonial-grid">${renderTestimonialCards()}</div>
+        </div>
+      </section>
+    `;
+  }
+
+  renderShopGrid = function () {
+    const filtered = filteredShopProducts();
+    const meta = document.querySelector("[data-shop-meta]");
+    const grid = document.querySelector("[data-shop-grid]");
+
+    if (!grid || !meta) {
+      return;
+    }
+
+    meta.innerHTML = renderShopMeta(filtered);
+
+    if (!filtered.length) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <h3>${tx("No products matched this view.", "No hay productos para esta vista.")}</h3>
+          <p>${tx(
+            "Try another research lane, change availability, or clear the search term.",
+            "Prueba otra linea de investigacion, cambia la disponibilidad o limpia la busqueda."
+          )}</p>
+          <button class="btn btn-secondary" type="button" data-shop-reset>${tx("Reset catalogue view", "Reiniciar vista del catalogo")}</button>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered
+      .map((product, index) => renderProductCard(product, { reveal: false, delay: index % 2 === 1 }))
+      .join("");
+  };
+
+  renderShopPage = function () {
+    syncShopStateFromLocation();
+
+    const liveCount = availableProducts().length;
+    const launchCount = comingSoonProducts().length;
+    const selectedGoal = goalConfig(shopGoal);
+    const selectedLaneCount = shopGoal === "all" ? PRODUCTS.length : laneProducts(shopGoal).length;
+
+    return `
+      <section class="page-hero">
+        <div class="container page-hero-grid">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Catalogue", "Catalogo")}</p>
+            <h1>${tx("Browse the catalogue like a working store.", "Explora el catalogo como una tienda operativa.")}</h1>
+            <p class="lead">${tx(
+              "Search, narrow by research lane, and sort the catalogue without losing batch, trust, or checkout context.",
+              "Busca, filtra por linea de investigacion y ordena el catalogo sin perder el contexto de lote, confianza o checkout."
+            )}</p>
+          </div>
+          <aside class="page-stat-card reveal reveal-delay">
+            <p class="panel-kicker">${tx("Current view", "Vista actual")}</p>
+            <h3>${localize(selectedGoal.label)}</h3>
+            <p class="lead">${localize(selectedGoal.summary)}</p>
+            <div class="page-stat-list">
+              <div class="page-stat-item"><strong>${selectedLaneCount}</strong><span>${tx("products in this view", "productos en esta vista")}</span></div>
+              <div class="page-stat-item"><strong>${liveCount}</strong><span>${tx("available now", "disponibles ahora")}</span></div>
+              <div class="page-stat-item"><strong>${launchCount}</strong><span>${tx("coming soon", "proximamente")}</span></div>
+              <div class="page-stat-item"><strong>USDT</strong><span>${tx("ArionPay checkout", "checkout ArionPay")}</span></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <article class="detail-card reveal">
+            <div class="shop-toolbar">
+              <div class="shop-toolbar-row">
+                <label class="shop-search-field">
+                  <span class="detail-label">${tx("Search", "Buscar")}</span>
+                  <input class="search-input" type="search" value="${shopQuery}" placeholder="${localize(COPY.labels.searchPlaceholder)}" data-shop-search>
+                </label>
+                <label class="shop-sort-field">
+                  <span class="detail-label">${tx("Sort", "Ordenar")}</span>
+                  <select class="form-select" data-shop-sort>
+                    ${renderShopSortOptions()}
+                  </select>
+                </label>
+              </div>
+              <div class="shop-toolbar-row shop-toolbar-row-wrap">
+                <div class="goal-row">
+                  ${renderShopGoalButtons()}
+                </div>
+              </div>
+              <div class="shop-toolbar-row shop-toolbar-row-wrap">
+                <div class="filter-row">
+                  <button type="button" class="filter-chip ${shopFilter === "all" ? "is-active" : ""}" data-stock-filter="all">${tx("All products", "Todos los productos")}</button>
+                  <button type="button" class="filter-chip ${shopFilter === "available" ? "is-active" : ""}" data-stock-filter="available">${tx("Available", "Disponible")}</button>
+                  <button type="button" class="filter-chip ${shopFilter === "coming" ? "is-active" : ""}" data-stock-filter="coming">${tx("Coming soon", "Proximamente")}</button>
+                </div>
+                <button class="btn btn-secondary btn-small" type="button" data-shop-reset>${tx("Clear filters", "Limpiar filtros")}</button>
+              </div>
+            </div>
+          </article>
+          <div class="catalog-meta reveal" data-shop-meta></div>
+          <div class="catalog-grid" data-shop-grid></div>
+        </div>
+      </section>
+    `;
+  };
+
+  renderProductPage = function () {
+    const product = currentProduct();
+    const cart = readCart();
+    const total = subtotal(cart);
+    const progress = Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100);
+    const galleryImages = allGalleryImages(product);
+
+    if (activeProductGallerySlug !== product.slug) {
+      activeProductGallerySlug = product.slug;
+      activeProductGalleryImage = 0;
+    }
+
+    const activeImage = galleryImages[activeProductGalleryImage] || galleryImages[0] || product.image;
+    const visualProduct = activeImage === product.image ? product : { ...product, image: activeImage };
+    const gallery = galleryImages
+      .map((image, index) => `
+        <button class="gallery-thumb gallery-thumb-enhanced ${index === activeProductGalleryImage ? "is-active" : ""}" type="button" data-gallery-image="${index}">
+          <span class="gallery-thumb-label">${index === 0 ? tx("Primary", "Principal") : `${tx("View", "Vista")} ${index + 1}`}</span>
+          <img src="${image}" alt="${localize(product.name)} ${product.dosage}">
+        </button>
+      `)
+      .join("");
+    const laneTags = productGoals(product)
+      .map((goal) => `<span class="product-tag">${localize(goalConfig(goal).label)}</span>`)
+      .join("");
+    const related = relatedProductsFor(product)
+      .map((item, index) => renderProductCard(item, { delay: index % 2 === 1 }))
+      .join("");
+    const tabPanel = activeProductTab === "description"
+      ? renderProductDescriptionEnhanced(product)
+      : renderProductAdditionalEnhanced(product);
+
+    const actionBlock = product.status === "available"
+      ? `
+        <div class="quantity-row" data-quantity-root>
+          <span>${tx("Quantity", "Cantidad")}</span>
+          <div class="quantity-controls">
+            <button class="qty-btn" type="button" data-qty-action="decrease">-</button>
+            <strong data-quantity-value>1</strong>
+            <button class="qty-btn" type="button" data-qty-action="increase">+</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" type="button" data-add-to-cart="${product.slug}">${tx("Add to Cart", "Anadir al carrito")}</button>
+      `
+      : `
+        <div class="stock-pill coming">${tx("Coming May", "Llega en mayo")}</div>
+        <p class="product-subtext">${tx("Pricing and release details will appear once the launch batch is ready.", "Los detalles de precio y lanzamiento apareceran cuando el lote este listo.")}</p>
+        <button class="btn btn-muted btn-block" type="button" disabled>${tx("Coming Soon", "Proximamente")}</button>
+      `;
+
+    return `
+      <section class="page-hero">
+        <div class="container product-main">
+          <p class="breadcrumb">${tx("Home", "Inicio")} / ${tx("Shop", "Tienda")} / ${localize(product.name)} ${product.dosage}</p>
+          <div class="product-layout">
+            <div class="gallery-grid reveal">
+              <div class="product-main-image product-main-image-enhanced">
+                ${renderProductVisual(visualProduct, "detail")}
+                <div class="product-visual-meta-strip">
+                  <span>${tx("Batch-linked presentation", "Presentacion vinculada a lote")}</span>
+                  <span>${tx("COA-ready listing", "Listado listo para COA")}</span>
+                  <span>${tx("ArionPay checkout route", "Ruta de checkout ArionPay")}</span>
+                </div>
+              </div>
+              <div class="gallery-thumb-grid">${gallery}</div>
+            </div>
+            <aside class="panel product-panel reveal reveal-delay">
+              <div class="card-meta">
+                <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
+                <span class="badge">${localize(COPY.labels.hplc)}</span>
+              </div>
+              <p class="panel-kicker">${tx("Product detail", "Detalle de producto")}</p>
+              <h1>${localize(product.name)} ${product.dosage}</h1>
+              <div class="card-tag-row">
+                ${laneTags}
+                <span class="product-tag product-tag-muted">${product.batch}</span>
+              </div>
+              <p class="product-subtext">${localize(product.short)}</p>
+              <div class="price-row">
+                <strong class="price-value">${productPriceLabel(product)}</strong>
+                <span>${product.status === "available" ? "EUR" : tx("Release pending", "Lanzamiento pendiente")}</span>
+              </div>
+              ${renderPurchaseFacts(product)}
+              <div class="product-trust">
+                <div class="trust-icon">${localize(COPY.labels.shipped)}</div>
+                <div class="trust-icon">${localize(COPY.labels.freeShipping)}</div>
+                <div class="trust-icon">${localize(COPY.labels.hplc)}</div>
+              </div>
+              <div class="shipping-progress">
+                <div class="shipping-progress-bar" style="width:${progress}%"></div>
+                <p>${shippingProgressCopy(total)}</p>
+              </div>
+              <div class="support-list">
+                <strong>${tx("Operational detail", "Detalle operativo")}</strong>
+                <p>${tx("COA archive, shipping rates, and payment routing stay visible during the buying journey.", "Archivo COA, tarifas de envio y ruta de pago visibles durante el recorrido de compra.")}</p>
+              </div>
+              ${actionBlock}
+            </aside>
+          </div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container">
+          <article class="tabs-card reveal">
+            <div class="tab-row">
+              <button type="button" class="tab-button ${activeProductTab === "description" ? "is-active" : ""}" data-tab="description">${tx("Description", "Descripcion")}</button>
+              <button type="button" class="tab-button ${activeProductTab === "additional" ? "is-active" : ""}" data-tab="additional">${tx("Additional Info", "Informacion adicional")}</button>
+            </div>
+            <div data-tab-panel>${tabPanel}</div>
+          </article>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Related products", "Productos relacionados")}</p>
+            <h2 class="section-title">${tx("Continue through the same product lane.", "Continua por la misma linea de producto.")}</h2>
+          </div>
+          <div class="related-grid">${related}</div>
+        </div>
+      </section>
+    `;
+  };
+
+  renderProductCard = function (product, options = {}) {
+    const cardClass = options.reveal === false
+      ? "product-card product-card-enhanced"
+      : `product-card product-card-enhanced reveal${options.delay ? " reveal-delay" : ""}`;
+    const actionButton = product.status === "available"
+      ? `<button class="btn btn-secondary" type="button" data-add-to-cart="${product.slug}">${localize(COPY.labels.addToCart)}</button>`
+      : `<span class="badge badge-ready">${localize(COPY.labels.comingMay)}</span>`;
+    const tags = productGoals(product)
+      .slice(0, 2)
+      .map((goal) => `<span class="product-tag">${localize(goalConfig(goal).label)}</span>`)
+      .join("");
+
+    return `
+      <article class="${cardClass}">
+        ${renderProductVisual(product, "card")}
+        <div class="card-body">
+          <div class="card-meta">
+            <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
+            <strong class="card-price">${productPriceLabel(product)}</strong>
+          </div>
+          <div class="card-tag-row">
+            ${tags}
+          </div>
+          <h3>${localize(product.name)} ${product.dosage}</h3>
+          <p class="card-copy">${localize(product.short)}</p>
+          <div class="product-action-row">
+            <a class="text-link" href="product.html?slug=${product.slug}">${localize(COPY.labels.viewProduct)}</a>
+            ${actionButton}
+          </div>
+        </div>
+      </article>
+    `;
+  };
+
+  function renderCheckoutStage(activeStep) {
+    const steps = [
+      {
+        id: "cart",
+        number: "01",
+        label: tx("Cart review", "Revision del carrito"),
+        note: tx("Items and delivery", "Articulos y envio")
+      },
+      {
+        id: "checkout",
+        number: "02",
+        label: tx("Checkout details", "Detalles de checkout"),
+        note: tx("Billing and shipping", "Facturacion y envio")
+      },
+      {
+        id: "payment",
+        number: "03",
+        label: tx("Secure payment", "Pago seguro"),
+        note: tx("ArionPay invoice", "Factura ArionPay")
+      }
+    ];
+    const currentIndex = steps.findIndex((step) => step.id === activeStep);
+
+    return `
+      <div class="checkout-stage reveal">
+        ${steps.map((step, index) => `
+          <div class="checkout-stage-item ${index < currentIndex ? "is-complete" : ""} ${index === currentIndex ? "is-active" : ""}">
+            <span class="checkout-stage-step">${step.number}</span>
+            <div class="checkout-stage-copy">
+              <strong class="checkout-stage-label">${step.label}</strong>
+              <span class="checkout-stage-note">${step.note}</span>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderOrderReviewSteps(total) {
+    return `
+      <div class="step-list checkout-step-list">
+        <div class="detail-card">
+          <span class="detail-label">${tx("Step 1", "Paso 1")}</span>
+          <strong>${tx("Review the order", "Revisa el pedido")}</strong>
+          <p>${tx("Confirm quantities, product mix, and shipping selection before leaving the cart.", "Confirma cantidades, mezcla de productos y envio antes de salir del carrito.")}</p>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">${tx("Step 2", "Paso 2")}</span>
+          <strong>${tx("Complete billing details", "Completa los datos de facturacion")}</strong>
+          <p>${tx("Country, address, and contact details carry directly into the live payment handoff.", "Pais, direccion y contacto pasan directamente a la entrega del pago en vivo.")}</p>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">${tx("Step 3", "Paso 3")}</span>
+          <strong>${tx("Continue to ArionPay", "Continua a ArionPay")}</strong>
+          <p>${total >= FREE_SHIPPING_THRESHOLD
+            ? tx("Free EU shipping is already unlocked before payment opens.", "El envio UE gratuito ya esta activado antes de abrir el pago.")
+            : tx("The hosted invoice opens immediately after order confirmation.", "La factura alojada se abre justo despues de confirmar el pedido.")
+          }</p>
+        </div>
+      </div>
+    `;
+  }
+
+  renderOrderLineItems = function (items) {
+    return items.map((item) => {
+      const product = item.slug ? getProduct(item.slug) : item.product;
+
+      if (!product) {
+        return "";
+      }
+
+      const lineTotal = typeof item.lineTotal === "number"
+        ? item.lineTotal
+        : (product.price || 0) * item.quantity;
+
+      return `
+        <div class="order-review-item">
+          <span class="order-review-media">
+            <img src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
+          </span>
+          <div class="order-review-copy">
+            <strong>${localize(product.name)} ${product.dosage}</strong>
+            <p>${tx("Qty", "Cant.")}: ${item.quantity} · ${product.batch}</p>
+          </div>
+          <strong>${typeof lineTotal === "number" && lineTotal > 0 ? formatPrice(lineTotal) : tx("Pending", "Pendiente")}</strong>
+        </div>
+      `;
+    }).join("");
+  };
+
+  renderCartItems = function (cart) {
+    if (!cart.length) {
+      return `
+        <div class="cart-empty">
+          <h3>${tx("Your order review starts here.", "La revision del pedido empieza aqui.")}</h3>
+          <p>${tx("Add products to unlock delivery selection, live totals, and the secure ArionPay checkout route.", "Anade productos para activar la seleccion de envio, totales en vivo y la ruta segura de checkout con ArionPay.")}</p>
+          <a class="btn btn-primary" href="shop.html">${localize(COPY.labels.browseShop)}</a>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="cart-items">
+        ${cart.map((item) => {
+          const product = getProduct(item.slug);
+          const lane = localize(goalConfig(primaryGoal(product)).label);
+          const lineTotal = typeof product.price === "number"
+            ? product.price * item.quantity
+            : null;
+
+          return `
+            <article class="cart-line-card">
+              <a class="cart-line-media" href="product.html?slug=${product.slug}">
+                <img src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
+              </a>
+              <div class="cart-line-copy">
+                <div class="card-tag-row">
+                  <span class="product-tag">${lane}</span>
+                  <span class="product-tag product-tag-muted">${product.batch}</span>
+                </div>
+                <h3>${localize(product.name)} ${product.dosage}</h3>
+                <p class="card-copy">${localize(product.short)}</p>
+                <div class="cart-line-meta">
+                  <span>${tx("Unit price", "Precio unitario")}: ${product.price ? formatPrice(product.price) : localize(COPY.labels.priceOnRelease)}</span>
+                  <span>${tx("Dispatch", "Salida")}: ${tx("24h target", "Objetivo 24h")}</span>
+                </div>
+                <div class="cart-line-links">
+                  <a class="text-link" href="product.html?slug=${product.slug}">${localize(COPY.labels.viewProduct)}</a>
+                  <button class="remove-link" type="button" data-cart-action="remove" data-cart-slug="${product.slug}">${tx("Remove", "Eliminar")}</button>
+                </div>
+              </div>
+              <div class="cart-line-controls">
+                <div class="quantity-controls">
+                  <button class="cart-action" type="button" data-cart-action="decrease" data-cart-slug="${product.slug}">-</button>
+                  <strong>${item.quantity}</strong>
+                  <button class="cart-action" type="button" data-cart-action="increase" data-cart-slug="${product.slug}">+</button>
+                </div>
+                <div class="cart-line-total">
+                  <span class="summary-label">${tx("Line total", "Total linea")}</span>
+                  <strong class="summary-price">${lineTotal !== null ? formatPrice(lineTotal) : localize(COPY.labels.priceOnRelease)}</strong>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join("")}
+      </div>
+    `;
+  };
+
+  renderSidebarDeliveryChoice = function (option, currentId, total) {
+    const price = deliveryPrice(option, total);
+
+    return `
+      <label class="checkout-choice ${currentId === option.id ? "is-selected" : ""}" data-choice-card data-choice-name="shippingMethod" data-choice-value="${option.id}">
+        <input type="radio" name="shippingMethod" value="${option.id}" form="checkout-form" ${currentId === option.id ? "checked" : ""}>
+        <div class="checkout-choice-copy">
+          <div class="checkout-choice-headline">
+            <strong>${localize(option.label)}</strong>
+            <span class="checkout-choice-price">${price === 0 ? tx("Free", "Gratis") : formatPrice(price)}</span>
+          </div>
+          <span>${localize(option.note)}</span>
+          <small>${localize(option.eta)}</small>
+        </div>
+      </label>
+    `;
+  };
+
+  renderSidebarPaymentChoice = function (option, currentId) {
+    const activeCurrency = selectedCryptoCurrency();
+
+    return `
+      <article class="checkout-choice checkout-choice-payment ${currentId === option.id ? "is-selected" : ""}">
+        <div class="checkout-choice-copy">
+          <div class="checkout-choice-headline">
+            <strong>ArionPay</strong>
+            <span class="checkout-choice-price">${activeCurrency.shortLabel}</span>
+          </div>
+          <span>${tx("Secure hosted cryptocurrency checkout opens after the order details are confirmed.", "El checkout seguro alojado de criptomonedas se abre despues de confirmar los datos del pedido.")}</span>
+          <div class="checkout-payment-icons">
+            <span>${activeCurrency.shortLabel}</span>
+            <span>TRC20</span>
+            <span>${tx("Hosted", "Alojado")}</span>
+          </div>
+        </div>
+      </article>
+    `;
+  };
+
+  renderCartPage = function () {
+    const cart = readCart();
+    const total = subtotal(cart);
+    const delivery = selectedDelivery(total);
+    const payment = selectedPayment();
+    const shippingCost = cart.length ? deliveryPrice(delivery, total) : 0;
+    const grandTotal = total + shippingCost;
+    const progress = Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100);
+    const hasItems = cart.length > 0;
+
+    return `
+      <section class="page-hero">
+        <div class="container section-stack">
+          ${renderCheckoutStage("cart")}
+          <div class="cart-layout cart-layout-pro">
+            <section class="contact-card reveal">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Cart", "Carrito")}</p>
+                <h1>${tx("Review the order before secure payment.", "Revisa el pedido antes del pago seguro.")}</h1>
+                <p class="lead">${tx("This step is now structured like a live order review: adjust quantities, lock the delivery method, and continue directly into the hosted ArionPay payment route.", "Este paso ahora funciona como una revision de pedido real: ajusta cantidades, fija el metodo de envio y continua directamente hacia la ruta alojada de pago con ArionPay.")}</p>
+              </div>
+              <div class="cart-intro-metrics">
+                <div class="purchase-fact">
+                  <span>${tx("Items", "Articulos")}</span>
+                  <strong>${itemCount(cart)}</strong>
+                </div>
+                <div class="purchase-fact">
+                  <span>${tx("Delivery", "Entrega")}</span>
+                  <strong>${hasItems ? localize(delivery.label) : tx("Pending", "Pendiente")}</strong>
+                </div>
+                <div class="purchase-fact">
+                  <span>${tx("Payment", "Pago")}</span>
+                  <strong>ArionPay / USDT</strong>
+                </div>
+              </div>
+              ${renderCartItems(cart)}
+            </section>
+            <aside class="summary-card summary-card-sticky cart-summary-card reveal reveal-delay">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Order summary", "Resumen del pedido")}</p>
+                <h2 class="section-title">${tx("Ready for checkout", "Listo para checkout")}</h2>
+              </div>
+              <div class="order-line-items">${renderOrderLineItems(cart)}</div>
+              <div class="summary-divider"></div>
+              <div class="summary-list">
+                <div class="summary-row"><span class="summary-label">${tx("Subtotal", "Subtotal")}</span><strong>${formatPrice(total)}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>
+                <div class="summary-row summary-row-total"><span class="summary-label">${tx("Estimated total", "Total estimado")}</span><strong>${formatPrice(grandTotal)}</strong></div>
+              </div>
+              <div class="shipping-progress">
+                <div class="shipping-progress-bar" style="width:${progress}%"></div>
+                <p>${shippingProgressCopy(total)}</p>
+              </div>
+              <div class="stack-sm" data-cart-preferences>
+                <span class="checkout-eyebrow">${tx("Choose delivery before checkout", "Elige envio antes del checkout")}</span>
+                <div class="checkout-method-grid">
+                  ${DELIVERY_OPTIONS.map((item) => renderDeliveryOption(item, delivery.id, total)).join("")}
+                </div>
+              </div>
+              <div class="support-chip-row">
+                <div class="support-chip">${tx("Dispatch target")}: 24h</div>
+                <div class="support-chip">${tx("Payment route", "Ruta de pago")}: ArionPay / USDT (TRC20)</div>
+              </div>
+              ${renderOrderReviewSteps(total)}
+              <div class="summary-actions">
+                ${hasItems
+                  ? `<a class="btn btn-primary btn-block" href="checkout.html">${localize(COPY.labels.checkout)}</a>`
+                  : `<button class="btn btn-primary btn-block" type="button" disabled>${localize(COPY.labels.checkout)}</button>`
+                }
+                <a class="btn btn-secondary btn-block" href="shop.html">${tx("Keep browsing", "Seguir comprando")}</a>
+              </div>
+              <p class="helper-copy">${hasItems
+                ? tx("Your delivery choice carries into checkout and the live ArionPay invoice opens immediately after details are confirmed.", "Tu eleccion de envio pasa al checkout y la factura en vivo de ArionPay se abre justo despues de confirmar los datos.")
+                : tx("Add at least one product to activate checkout.", "Agrega al menos un producto para activar el checkout.")
+              }</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+    `;
+  };
+
+  renderCheckoutPage = function () {
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("status") === "success";
+    const order = readLastOrder();
+    const cart = readCart();
+    const total = subtotal(cart);
+    const draft = readCheckoutDraft();
+    const country = countryConfig(draft.country || "NG");
+    const region = normalizeRegion(country.code, draft.state || "");
+    const delivery = DELIVERY_OPTIONS.find((item) => item.id === (draft.shippingMethod || "eu-standard")) || DELIVERY_OPTIONS[0];
+    const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === (draft.paymentMethod || ACTIVE_PAYMENT_OPTIONS[0].id)) || ACTIVE_PAYMENT_OPTIONS[0];
+    const cryptoCurrency = selectedCryptoCurrency();
+    const shippingCost = deliveryPrice(delivery, total);
+    const grandTotal = total + shippingCost;
+    const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
+    const orderPaid = success && order && isPaidOrderStatus(order.status);
+
+    if (success && order) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            ${renderCheckoutStage("payment")}
+            <article class="success-card reveal">
+              <p class="section-kicker">${orderPaid ? tx("Payment confirmed", "Pago confirmado") : tx("Order received", "Pedido recibido")}</p>
+              <h1 class="success-title">${orderPaid ? tx("Your order is moving to fulfilment.", "Tu pedido ya pasa a preparacion.") : tx("Your payment page is ready.", "Tu pagina de pago ya esta lista.")}</h1>
+              <p class="success-copy">${orderPaid
+                ? tx("Payment has been confirmed and the order is now queued for dispatch review.", "El pago ha sido confirmado y el pedido ya queda en cola para revision de envio.")
+                : tx("Complete payment through the secure ArionPay page to finalize this order.", "Completa el pago en la pagina segura de ArionPay para finalizar este pedido.")
+              }</p>
+              <div class="order-meta-grid">
+                <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Payment", "Pago")}</span><strong>${paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${orderPaid ? tx("Payment confirmed by ArionPay.", "Pago confirmado por ArionPay.") : localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
+              <div class="cta-row-inline">
+                ${!orderPaid && order.invoiceUrl
+                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}" target="_blank" rel="noopener">${tx("Open payment page", "Abrir pagina de pago")}</a>`
+                  : `<a class="btn btn-primary" href="shop.html">${tx("Back to shop", "Volver a la tienda")}</a>`
+                }
+                <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
+              </div>
+              ${!orderPaid
+                ? `<p class="helper-copy" data-order-sync-status>${tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")}</p>`
+                : ""
+              }
+            </article>
+          </div>
+        </section>
+      `;
+    }
+
+    if (!cart.length) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            ${renderCheckoutStage("checkout")}
+            <div class="empty-state reveal">
+              <h1>${tx("Your cart is empty.", "Tu carrito esta vacio.")}</h1>
+              <p>${tx("Add products before opening the guest checkout flow.", "Anade productos antes de abrir el checkout invitado.")}</p>
+              <a class="btn btn-primary" href="shop.html">${tx("Browse products", "Ver productos")}</a>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="page-hero">
+        <div class="container checkout-shell">
+          ${renderCheckoutStage("checkout")}
+          <div class="checkout-banner reveal">${tx("Free tracked EU shipping on all orders over 200 EUR.", "Envio UE con seguimiento gratis en todos los pedidos superiores a 200 EUR.")}</div>
+          <div class="checkout-grid checkout-grid-pro">
+            <section class="checkout-main reveal">
+              <article class="checkout-card checkout-card-form">
+                <div class="section-header">
+                  <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
+                  <h1>${tx("Billing details and secure payment.", "Datos de facturacion y pago seguro.")}</h1>
+                  <p class="lead">${tx("The checkout now works as a live order handoff: confirm address details, review delivery, and continue directly to the secure hosted ArionPay invoice.", "El checkout ahora funciona como una entrega real de pedido: confirma direccion, revisa el envio y continua directamente hacia la factura segura alojada de ArionPay.")}</p>
+                </div>
+                <form class="form-grid checkout-form-pro" id="checkout-form" data-checkout-form>
+                  <section class="full-width checkout-form-section">
+                    <div class="checkout-form-section-head">
+                      <p class="checkout-eyebrow">${tx("Contact details", "Datos de contacto")}</p>
+                      <h3>${tx("Who should receive dispatch updates?", "Quien debe recibir actualizaciones de envio?")}</h3>
+                    </div>
+                    <div class="checkout-field-grid">
+                      <label>
+                        <span>${tx("First name *", "Nombre *")}</span>
+                        <input class="form-input" name="firstName" required value="${draft.firstName || ""}">
+                      </label>
+                      <label>
+                        <span>${tx("Last name *", "Apellidos *")}</span>
+                        <input class="form-input" name="lastName" required value="${draft.lastName || ""}">
+                      </label>
+                    </div>
+                    <div class="checkout-field-grid">
+                      <label>
+                        <span>${tx("Email *", "Correo *")}</span>
+                        <input class="form-input" name="email" type="email" required value="${draft.email || ""}">
+                      </label>
+                      <label>
+                        <span>${tx("Phone *", "Telefono *")}</span>
+                        <input class="form-input" name="phone" required value="${draft.phone || ""}">
+                      </label>
+                    </div>
+                    <label class="full-width">
+                      <span>${tx("Company name (optional)", "Nombre de empresa (opcional)")}</span>
+                      <input class="form-input" name="company" value="${draft.company || ""}">
+                    </label>
+                  </section>
+                  <section class="full-width checkout-form-section">
+                    <div class="checkout-form-section-head">
+                      <p class="checkout-eyebrow">${tx("Shipping address", "Direccion de envio")}</p>
+                      <h3>${tx("Where should the order be routed?", "A donde debe dirigirse el pedido?")}</h3>
+                    </div>
+                    <label class="full-width">
+                      <span>${tx("Country / Region *", "Pais / Region *")}</span>
+                      <select class="form-select" name="country" required>
+                        ${renderCountryOptions(country.code)}
+                      </select>
+                    </label>
+                    <div class="checkout-field-grid">
+                      <label>
+                        <span>${tx("Street address *", "Direccion *")}</span>
+                        <input class="form-input" name="address" required value="${draft.address || ""}">
+                      </label>
+                      <label>
+                        <span>${tx("Apartment, suite, unit, etc. (optional)", "Apartamento, suite, unidad, etc. (opcional)")}</span>
+                        <input class="form-input" name="addressLine2" value="${draft.addressLine2 || ""}">
+                      </label>
+                    </div>
+                    <label class="full-width">
+                      <span>${tx("Town / City *", "Ciudad *")}</span>
+                      <input class="form-input" name="city" required value="${draft.city || ""}">
+                    </label>
+                    <div class="checkout-field-grid">
+                      <label>
+                        <span>${tx("State *", "Estado *")}</span>
+                        <select class="form-select" name="state" required>
+                          ${renderStateOptions(country.code, region)}
+                        </select>
+                      </label>
+                      <label>
+                        <span>${tx("Postal code *", "Codigo postal *")}</span>
+                        <input class="form-input" name="postalCode" required value="${draft.postalCode || ""}">
+                      </label>
+                    </div>
+                  </section>
+                  <section class="full-width checkout-form-section">
+                    <div class="checkout-form-section-head">
+                      <p class="checkout-eyebrow">${tx("Order notes", "Notas del pedido")}</p>
+                      <h3>${tx("Optional handling notes", "Notas opcionales de manejo")}</h3>
+                    </div>
+                    <label class="full-width">
+                      <span>${tx("Order notes (optional)", "Notas del pedido (opcional)")}</span>
+                      <textarea class="form-textarea" name="notes" placeholder="${tx("Delivery notes, support context, or purchase instructions.", "Notas de entrega, contexto de soporte o instrucciones de compra.")}">${draft.notes || ""}</textarea>
+                    </label>
+                    <div class="checkout-note-panel">
+                      <strong>${tx("Before payment opens", "Antes de abrir el pago")}</strong>
+                      <p>${tx("Review the delivery method and agreement on the right-hand order summary before continuing to ArionPay.", "Revisa el metodo de envio y el acuerdo en el resumen del pedido antes de continuar a ArionPay.")}</p>
+                    </div>
+                  </section>
+                  <input type="hidden" name="paymentMethod" value="${payment.id}">
+                  <input type="hidden" name="paymentCurrency" value="${cryptoCurrency.id}">
+                </form>
+              </article>
+            </section>
+            <aside class="summary-card summary-card-sticky checkout-side reveal reveal-delay">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Summary", "Resumen")}</p>
+                <h2 class="section-title">${tx("Final order review", "Revision final del pedido")}</h2>
+              </div>
+              <div class="order-line-items">${renderOrderLineItems(cart)}</div>
+              <div class="summary-divider"></div>
+              <div class="checkout-side-section">
+                <p class="checkout-eyebrow">${tx("Delivery method", "Metodo de envio")}</p>
+                <div class="checkout-choice-list">
+                  ${DELIVERY_OPTIONS.map((item) => renderSidebarDeliveryChoice(item, delivery.id, total)).join("")}
+                </div>
+              </div>
+              <div class="summary-list">
+                <div class="summary-row"><span class="summary-label">${tx("Subtotal", "Subtotal")}</span><strong>${formatPrice(total)}</strong></div>
+                <div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>
+                <div class="summary-row summary-row-total"><span class="summary-label">${tx("Estimated total", "Total estimado")}</span><strong>${formatPrice(grandTotal)}</strong></div>
+              </div>
+              <div class="shipping-progress">
+                <div class="shipping-progress-bar" style="width:${Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100)}%"></div>
+                <p>${shippingProgressCopy(total)}</p>
+              </div>
+              <div class="checkout-side-section">
+                <p class="checkout-eyebrow">${tx("Payment route", "Ruta de pago")}</p>
+                <div class="checkout-choice-list">
+                  ${ACTIVE_PAYMENT_OPTIONS.map((item) => renderSidebarPaymentChoice(item, payment.id)).join("")}
+                </div>
+                <p class="checkout-side-note">${tx("The live checkout asset for this store is USDT (TRC20). After order confirmation, the payment page opens directly through ArionPay.", "El activo activo para este checkout es USDT (TRC20). Tras confirmar el pedido, la pagina de pago se abre directamente mediante ArionPay.")}</p>
+              </div>
+              <div class="support-chip-row">
+                <div class="support-chip">${tx("Selected delivery", "Envio elegido")}: ${localize(delivery.label)}</div>
+                <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
+              </div>
+              <label class="checkout-agreement">
+                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${draft.ageConfirmed ? "checked" : ""} required>
+                <span>${tx("I confirm that I am purchasing for laboratory research use only, that I am of legal age, and that I have read the terms and privacy policy.", "Confirmo que compro solo para investigacion de laboratorio, que soy mayor de edad y que he leido los terminos y la politica de privacidad.")}</span>
+              </label>
+              ${renderOrderReviewSteps(total)}
+              <div class="checkout-action-stack">
+                <button class="btn btn-primary btn-block" type="submit" form="checkout-form" data-checkout-submit>${checkoutSubmitLabel(payment)}</button>
+                <a class="btn btn-secondary btn-block" href="cart.html">${tx("Back to cart", "Volver al carrito")}</a>
+              </div>
+              <p class="helper-copy" data-checkout-status>${checkoutHelperCopy(payment)}</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+    `;
+  };
+
   renderPage = function () {
     const host = document.querySelector("[data-page-content]");
 
@@ -3013,6 +4285,63 @@
       });
     });
 
+  };
+
+  const bindBaseEnhancedInteractions = bindPageInteractions;
+
+  bindPageInteractions = function () {
+    bindBaseEnhancedInteractions();
+
+    const search = document.querySelector("[data-shop-search]");
+    if (search) {
+      search.addEventListener("input", (event) => {
+        shopQuery = event.target.value;
+        writeShopStateToLocation();
+      });
+    }
+
+    const sort = document.querySelector("[data-shop-sort]");
+    if (sort) {
+      sort.addEventListener("change", (event) => {
+        shopSort = validSort(event.target.value);
+        writeShopStateToLocation();
+        renderPage();
+      });
+    }
+
+    document.querySelectorAll("[data-stock-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        shopFilter = button.getAttribute("data-stock-filter") || "all";
+        writeShopStateToLocation();
+        renderPage();
+      });
+    });
+
+    document.querySelectorAll("[data-goal-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        shopGoal = validGoal(button.getAttribute("data-goal-filter") || "all");
+        writeShopStateToLocation();
+        renderPage();
+      });
+    });
+
+    document.querySelectorAll("[data-shop-reset]").forEach((button) => {
+      button.addEventListener("click", () => {
+        shopQuery = "";
+        shopFilter = "all";
+        shopGoal = "all";
+        shopSort = "featured";
+        writeShopStateToLocation();
+        renderPage();
+      });
+    });
+
+    document.querySelectorAll("[data-gallery-image]").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeProductGalleryImage = Number(button.getAttribute("data-gallery-image") || 0);
+        renderPage();
+      });
+    });
   };
 
   patchSharedCopy();
