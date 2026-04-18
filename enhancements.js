@@ -4246,7 +4246,15 @@
               );
             }
 
-            window.location.href = result.invoiceUrl;
+            // Open the ArionPay invoice in a new tab so the customer stays on
+            // the storefront and can be redirected back if the gateway uses
+            // the provided return URL. This avoids losing the storefront
+            // state if the gateway doesn't redirect automatically.
+            try {
+              window.open(result.invoiceUrl, "_blank", "noopener");
+            } catch (e) {
+              window.location.href = result.invoiceUrl;
+            }
           })
           .catch((error) => {
             const message = error instanceof Error && error.message

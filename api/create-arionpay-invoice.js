@@ -173,6 +173,29 @@ module.exports = async function handler(req, res) {
     chain: paymentAsset.chain
   };
 
+  // Attempt to provide ArionPay with return/redirect URLs so the hosted
+  // payment page can send customers back to the storefront after payment.
+  // Prefer an explicit env var, then fall back to request origin or host.
+  try {
+    const base = (process.env.SITE_BASE_URL || process.env.PUBLIC_SITE_URL || req.headers?.origin || (req.headers && `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}`) || "").replace(/\/$/, "");
+    if (base) {
+      const successUrl = `${base}/?reference=${encodeURIComponent(reference)}`;
+      const cancelUrl = `${base}/checkout.html?reference=${encodeURIComponent(reference)}`;
+
+      // Include multiple common key names to increase compatibility with
+      // different gateway expectations (snake_case and camelCase).
+      payload.success_url = successUrl;
+      payload.return_url = successUrl;
+      payload.successUrl = successUrl;
+      payload.returnUrl = successUrl;
+      payload.cancel_url = cancelUrl;
+      payload.cancelUrl = cancelUrl;
+    }
+  } catch (e) {
+    // Non-fatal — proceed without return URLs if anything goes wrong here.
+    console.warn("Could not compute return URL for ArionPay invoice:", e && e.message);
+  }
+
   const payloadJson = JSON.stringify(payload);
   const signature = crypto
     .createHmac("sha256", apiSecret)

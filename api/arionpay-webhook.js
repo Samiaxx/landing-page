@@ -89,19 +89,34 @@ module.exports = async function handler(req, res) {
     payloadKeys: Object.keys(payload)
   });
 
-  const previousStatus = order.status;
-  const nextOrder = {
-    ...order,
-    status,
-    invoiceId: order.invoiceId || invoiceId,
-    gatewayPayload: payload,
-    lastWebhookAt: new Date().toISOString()
-  };
+  const previousStatus = order ? order.status : null;
+  const nextOrder = order
+    ? {
+        ...order,
+        status,
+        invoiceId: order.invoiceId || invoiceId,
+        gatewayPayload: payload,
+        lastWebhookAt: new Date().toISOString()
+      }
+    : {
+        reference: reference || `arion-${invoiceId}`,
+        createdAt: new Date().toISOString(),
+        status,
+        customer: {},
+        items: [],
+        invoiceId: invoiceId || "",
+        gatewayPayload: payload,
+        lastWebhookAt: new Date().toISOString()
+      };
 
   saveOrder(nextOrder);
 
   if (previousStatus !== nextOrder.status) {
-    await sendOrderStatusEmails(nextOrder, previousStatus);
+    try {
+      await sendOrderStatusEmails(nextOrder, previousStatus);
+    } catch (e) {
+      console.warn("Failed to send order status emails:", e && e.message);
+    }
   }
 
   return res.status(200).json({
