@@ -38,8 +38,13 @@ function extractInvoiceId(payload) {
 }
 
 module.exports = async function handler(req, res) {
+  if (req.method === "HEAD" || req.method === "OPTIONS") {
+    res.setHeader("Allow", "HEAD, OPTIONS, POST");
+    return res.status(200).json({ received: true, verified: true });
+  }
+
   if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
+    res.setHeader("Allow", "HEAD, OPTIONS, POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -50,6 +55,7 @@ module.exports = async function handler(req, res) {
   const order = (reference && readOrder(reference)) || findOrderByInvoiceId(invoiceId);
 
   console.log("ArionPay webhook received", {
+    method: req.method,
     id: invoiceId,
     reference,
     status,
