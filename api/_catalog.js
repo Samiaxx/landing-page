@@ -40,11 +40,6 @@ const SHIPPING_OPTIONS = {
 };
 
 const PAYMENT_OPTIONS = {
-  BANK_TRANSFER: {
-    id: "BANK_TRANSFER",
-    label: "Direct bank transfer",
-    note: "Order reserved first, then payment instructions follow by email."
-  },
   USDT_TRC20: {
     id: "USDT_TRC20",
     label: "USDT (TRC20)",

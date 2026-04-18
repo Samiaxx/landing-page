@@ -4,8 +4,8 @@ const path = require("path");
 const { URL } = require("url");
 const createArionPayInvoice = require("./api/create-arionpay-invoice");
 const arionPayWebhook = require("./api/arionpay-webhook");
-const createBankTransferOrder = require("./api/create-bank-transfer-order");
 const contactHandler = require("./api/contact");
+const orderStatusHandler = require("./api/order-status");
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
@@ -128,7 +128,7 @@ function readRequestBody(req) {
   });
 }
 
-async function handleApiRoute(handler, req, res) {
+async function handleApiRoute(handler, req, res, currentUrl) {
   const rawBody = await readRequestBody(req);
   let parsedBody = {};
 
@@ -144,7 +144,10 @@ async function handleApiRoute(handler, req, res) {
     method: req.method,
     headers: req.headers,
     body: parsedBody,
-    rawBody
+    rawBody,
+    query: currentUrl
+      ? Object.fromEntries(currentUrl.searchParams.entries())
+      : {}
   };
 
   const response = createResponseAdapter(res);
@@ -201,22 +204,22 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (pathname === "/api/create-arionpay-invoice") {
-      await handleApiRoute(createArionPayInvoice, req, res);
+      await handleApiRoute(createArionPayInvoice, req, res, currentUrl);
       return;
     }
 
     if (pathname === "/api/arionpay-webhook") {
-      await handleApiRoute(arionPayWebhook, req, res);
-      return;
-    }
-
-    if (pathname === "/api/create-bank-transfer-order") {
-      await handleApiRoute(createBankTransferOrder, req, res);
+      await handleApiRoute(arionPayWebhook, req, res, currentUrl);
       return;
     }
 
     if (pathname === "/api/contact") {
-      await handleApiRoute(contactHandler, req, res);
+      await handleApiRoute(contactHandler, req, res, currentUrl);
+      return;
+    }
+
+    if (pathname === "/api/order-status") {
+      await handleApiRoute(orderStatusHandler, req, res, currentUrl);
       return;
     }
 

@@ -313,8 +313,8 @@ const COPY = {
       es: "Tienda científica, confiable y moderna para compradores de péptidos de alta intención."
     },
     footerLegal: {
-      en: "For laboratory research use only. Final legal, medical, and compliance copy should be reviewed before launch.",
-      es: "Solo para uso de investigación de laboratorio. El copy legal, médico y de cumplimiento debe revisarse antes del lanzamiento."
+      en: "For laboratory research use only.",
+      es: "Solo para uso de investigacion de laboratorio."
     },
     linkColumn: { en: "Links", es: "Enlaces" },
     contactColumn: { en: "Contact", es: "Contacto" },
@@ -392,7 +392,7 @@ const COPY = {
     servicesBody: { en: "The four content blocks mirror the required Team / Health / GMP / Quality narrative with a cleaner research-store tone.", es: "Los cuatro bloques replican la narrativa Team / Health / GMP / Quality con un tono más limpio de tienda de investigación." },
     shippingKicker: { en: "Shipping Info", es: "Información de envío" },
     shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
-    shippingBody: { en: "Estimated carrier pricing is shown here and should be replaced with final live rates before launch.", es: "Aquí se muestran tarifas estimadas del operador y deben sustituirse por tarifas finales antes del lanzamiento." },
+    shippingBody: { en: "Shipping options and delivery costs are presented clearly before payment.", es: "Las opciones de envio y los costes de entrega se muestran con claridad antes del pago." },
     benefitsKicker: { en: "Why Choose Us", es: "Por qué elegirnos" },
     benefitsTitle: { en: "Short icon-led proof points reinforce trust mid-page and near the footer.", es: "Puntos de prueba con iconos refuerzan la confianza a mitad de página y cerca del footer." },
     benefitsBody: { en: "This section is deliberately compact so it reads quickly on mobile traffic.", es: "Esta sección es compacta a propósito para una lectura rápida en tráfico móvil." },
@@ -482,7 +482,7 @@ const COPY = {
       },
       {
         question: { en: "Can shoppers pay with crypto?", es: "¿Se puede pagar con crypto?" },
-        answer: { en: "Shoppers can pay with hosted ArionPay payment links for supported single-product USDT orders.", es: "Los compradores pueden pagar con enlaces de pago alojados de ArionPay para pedidos USDT compatibles." }
+        answer: { en: "Shoppers can complete checkout through ArionPay using the live USDT (TRC20) payment flow.", es: "Los compradores pueden completar el checkout mediante ArionPay usando el flujo activo de pago con USDT (TRC20)." }
       },
       {
         question: { en: "Why are some products marked Coming May?", es: "¿Por qué algunos productos aparecen como Llega en mayo?" },
@@ -504,7 +504,7 @@ const COPY = {
     paymentTitle: { en: "Payment", es: "Pago" },
     paymentBody: { en: "USDT is available through secure cryptocurrency checkout.", es: "USDT está disponible mediante checkout seguro con criptomonedas." },
     formTitle: { en: "Send a message", es: "Enviar un mensaje" },
-    formBody: { en: "In a live build this form would route to your inbox or CRM while keeping the same visual treatment.", es: "En una versión real este formulario enviaría los datos a tu correo o CRM manteniendo el mismo tratamiento visual." },
+    formBody: { en: "Use this form for shipping, COA, and order support requests.", es: "Usa este formulario para solicitudes de envio, COA y soporte de pedidos." },
     nameLabel: { en: "Name", es: "Nombre" },
     emailLabel: { en: "Email", es: "Email" },
     subjectLabel: { en: "Subject", es: "Asunto" },
@@ -1291,7 +1291,7 @@ function renderUpdatedHomePage() {
             </thead>
             <tbody>${renderShippingRows()}</tbody>
           </table>
-            <p class="table-note">${currentLanguage === "es" ? "Tarifas estimadas: sustitúyelas por las condiciones finales del operador antes del lanzamiento." : "Estimated carrier pricing shown here should be replaced with final live rates before launch."}</p>
+        <p class="table-note">${currentLanguage === "es" ? "Las tarifas y tiempos de entrega se muestran antes del pago para ofrecer una referencia clara del pedido." : "Shipping rates and delivery timings are shown before payment so customers can review the order clearly."}</p>
         </article>
       </div>
     </section>

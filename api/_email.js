@@ -34,49 +34,6 @@ function getEmailConfig() {
   };
 }
 
-function getBankTransferDetails() {
-  const details = {
-    beneficiary: trimValue(process.env.BANK_BENEFICIARY),
-    bankName: trimValue(process.env.BANK_NAME),
-    iban: trimValue(process.env.BANK_IBAN),
-    swift: trimValue(process.env.BANK_SWIFT),
-    accountNumber: trimValue(process.env.BANK_ACCOUNT_NUMBER),
-    sortCode: trimValue(process.env.BANK_SORT_CODE)
-  };
-
-  return Object.values(details).some(Boolean) ? details : null;
-}
-
-function bankDetailsRows(details) {
-  if (!details) {
-    return "";
-  }
-
-  const rows = [
-    ["Beneficiary", details.beneficiary],
-    ["Bank", details.bankName],
-    ["IBAN", details.iban],
-    ["SWIFT", details.swift],
-    ["Account number", details.accountNumber],
-    ["Sort code", details.sortCode]
-  ].filter(([, value]) => value);
-
-  if (!rows.length) {
-    return "";
-  }
-
-  return `
-    <table style="width:100%;border-collapse:collapse;margin-top:14px;">
-      ${rows.map(([label, value]) => `
-        <tr>
-          <td style="padding:8px 0;color:#61708a;font-size:13px;">${escapeHtml(label)}</td>
-          <td style="padding:8px 0;color:#0d172f;font-size:14px;font-weight:700;text-align:right;">${escapeHtml(value)}</td>
-        </tr>
-      `).join("")}
-    </table>
-  `;
-}
-
 function orderItemsMarkup(order) {
   return (order.items || []).map((item) => `
     <tr>
@@ -137,7 +94,7 @@ function emailLayout({ eyebrow, title, intro, body, ctaLabel, ctaHref, footer })
 
 function orderContext(order) {
   const shipping = SHIPPING_OPTIONS[order.shippingMethod] || SHIPPING_OPTIONS["eu-standard"];
-  const payment = PAYMENT_OPTIONS[order.paymentMethod] || PAYMENT_OPTIONS.BANK_TRANSFER;
+  const payment = PAYMENT_OPTIONS[order.paymentMethod] || PAYMENT_OPTIONS.USDT_TRC20;
   const customer = customerName(order.customer) || order.customer.email || "Customer";
 
   return { customer, payment, shipping };
@@ -203,11 +160,7 @@ async function sendEmail({ to, subject, html, text, replyTo, tag }) {
 async function sendOrderCreatedEmails(order) {
   const config = getEmailConfig();
   const { customer, payment, shipping } = orderContext(order);
-  const bankDetails = getBankTransferDetails();
-  const isBankTransfer = order.paymentMethod === "BANK_TRANSFER";
-  const customerIntro = isBankTransfer
-    ? `Hi ${customer}, we have reserved your order ${order.reference} and prepared the payment instructions.`
-    : `Hi ${customer}, your order ${order.reference} has been received and your secure payment link is ready.`;
+  const customerIntro = `Hi ${customer}, your order ${order.reference} has been received and your secure payment page is ready.`;
   const customerBody = `
     <div style="padding:18px;border-radius:18px;background:#f7fbff;border:1px solid rgba(20,99,211,0.12);margin-top:16px;">
       <p style="margin:0;color:#42526b;line-height:1.7;">Payment method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
@@ -215,39 +168,26 @@ async function sendOrderCreatedEmails(order) {
       <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Order reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
     </div>
     ${orderSummaryMarkup(order)}
-    ${isBankTransfer
-      ? `
-        <div style="padding:18px;border-radius:18px;background:#f7fbff;border:1px solid rgba(20,99,211,0.12);margin-top:18px;">
-          <p style="margin:0;color:#0d172f;font-weight:700;">Bank transfer instructions</p>
-          <p style="margin:10px 0 0;color:#42526b;line-height:1.7;">Include your order reference in the transfer note so the payment can be matched quickly.</p>
-          ${bankDetailsRows(bankDetails) || `<p style="margin:10px 0 0;color:#42526b;line-height:1.7;">A support agent will reply with the currently active receiving account details.</p>`}
-        </div>
-      `
-      : `
-        <div style="padding:18px;border-radius:18px;background:#f7fbff;border:1px solid rgba(20,99,211,0.12);margin-top:18px;">
-          <p style="margin:0;color:#0d172f;font-weight:700;">Complete payment</p>
-          <p style="margin:10px 0 0;color:#42526b;line-height:1.7;">Use the secure ArionPay invoice below to complete payment. We will email you again as soon as the payment status changes.</p>
-        </div>
-      `
-    }
+    <div style="padding:18px;border-radius:18px;background:#f7fbff;border:1px solid rgba(20,99,211,0.12);margin-top:18px;">
+      <p style="margin:0;color:#0d172f;font-weight:700;">Complete payment</p>
+      <p style="margin:10px 0 0;color:#42526b;line-height:1.7;">Use the secure ArionPay payment page below to complete checkout. We will email you again as soon as the payment status changes.</p>
+    </div>
   `;
 
   const customerResult = await sendEmail({
     to: order.customer.email,
-    subject: isBankTransfer
-      ? `Primus Peptides order ${order.reference}: bank transfer instructions`
-      : `Primus Peptides order ${order.reference}: payment link ready`,
+    subject: `Primus Peptides order ${order.reference}: payment page ready`,
     html: emailLayout({
-      eyebrow: isBankTransfer ? "Bank transfer order" : "Order received",
-      title: isBankTransfer ? "Your order is reserved" : "Your payment link is ready",
+      eyebrow: "Order received",
+      title: "Your payment page is ready",
       intro: customerIntro,
       body: customerBody,
-      ctaLabel: isBankTransfer ? "" : "Open secure payment link",
-      ctaHref: isBankTransfer ? "" : order.invoiceUrl,
+      ctaLabel: "Open secure payment page",
+      ctaHref: order.invoiceUrl,
       footer: "Primus Peptides order updates are sent automatically after status changes."
     }),
     text: `${customerIntro}\nOrder reference: ${order.reference}\nOrder total: EUR ${Number(order.total || 0).toFixed(2)}`,
-    tag: isBankTransfer ? "bank-transfer-customer" : "crypto-invoice-customer"
+    tag: "crypto-invoice-customer"
   });
 
   const adminBody = `
@@ -266,7 +206,7 @@ async function sendOrderCreatedEmails(order) {
     html: emailLayout({
       eyebrow: "Admin notification",
       title: "New order received",
-      intro: `A new ${payment.label.toLowerCase()} order has been created and stored by the storefront backend.`,
+      intro: `A new ArionPay order has been created and stored by the storefront backend.`,
       body: adminBody,
       footer: "Use the stored order reference to coordinate fulfilment, payment review, and support follow-up."
     }),
@@ -387,7 +327,6 @@ async function sendContactEmails(message) {
 }
 
 module.exports = {
-  getBankTransferDetails,
   isPaidStatus,
   sendContactEmails,
   sendOrderCreatedEmails,

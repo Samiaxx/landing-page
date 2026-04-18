@@ -1,13 +1,47 @@
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 
-const DATA_ROOT = path.join(__dirname, "..", ".primus-data");
-const ORDERS_DIR = path.join(DATA_ROOT, "orders");
-const EMAIL_LOG_PATH = path.join(DATA_ROOT, "email-outbox.ndjson");
-const CONTACT_LOG_PATH = path.join(DATA_ROOT, "contact.ndjson");
+let dataRootCache = "";
+
+function resolveDataRoot() {
+  if (dataRootCache) {
+    return dataRootCache;
+  }
+
+  const candidates = [
+    process.env.PRIMUS_DATA_DIR,
+    path.join(os.tmpdir(), "primus-peptides-data"),
+    path.join(__dirname, "..", ".primus-data")
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      fs.mkdirSync(candidate, { recursive: true });
+      dataRootCache = candidate;
+      return dataRootCache;
+    } catch {
+      // Try the next writable location.
+    }
+  }
+
+  throw new Error("Unable to initialize a writable data directory for Primus orders.");
+}
+
+function ordersDir() {
+  return path.join(resolveDataRoot(), "orders");
+}
+
+function emailLogPath() {
+  return path.join(resolveDataRoot(), "email-outbox.ndjson");
+}
+
+function contactLogPath() {
+  return path.join(resolveDataRoot(), "contact.ndjson");
+}
 
 function ensureDataRoot() {
-  fs.mkdirSync(ORDERS_DIR, { recursive: true });
+  fs.mkdirSync(ordersDir(), { recursive: true });
 }
 
 function safeReference(reference) {
@@ -17,7 +51,7 @@ function safeReference(reference) {
 }
 
 function orderFile(reference) {
-  return path.join(ORDERS_DIR, `${safeReference(reference) || "order"}.json`);
+  return path.join(ordersDir(), `${safeReference(reference) || "order"}.json`);
 }
 
 function saveOrder(order) {
@@ -59,10 +93,10 @@ function findOrderByInvoiceId(invoiceId) {
   }
 
   ensureDataRoot();
-  const files = fs.readdirSync(ORDERS_DIR);
+  const files = fs.readdirSync(ordersDir());
 
   for (const file of files) {
-    const fullPath = path.join(ORDERS_DIR, file);
+    const fullPath = path.join(ordersDir(), file);
 
     try {
       const order = JSON.parse(fs.readFileSync(fullPath, "utf8"));
@@ -83,11 +117,11 @@ function appendNdjson(filepath, payload) {
 }
 
 function appendEmailLog(payload) {
-  appendNdjson(EMAIL_LOG_PATH, payload);
+  appendNdjson(emailLogPath(), payload);
 }
 
 function appendContactLog(payload) {
-  appendNdjson(CONTACT_LOG_PATH, payload);
+  appendNdjson(contactLogPath(), payload);
 }
 
 module.exports = {
