@@ -18,6 +18,11 @@
   let shopSort = "featured";
   let activeProductGalleryImage = 0;
   let activeProductGallerySlug = "";
+  let arionPayStatusPollTimer = 0;
+  let arionPayStatusPollCount = 0;
+
+  const ARIONPAY_STATUS_POLL_DELAY_MS = 2500;
+  const ARIONPAY_STATUS_POLL_LIMIT = 8;
 
   const GOAL_COLLECTIONS = [
     {
@@ -1373,18 +1378,118 @@
     return /paid|completed|confirmed|success/i.test(String(status || ""));
   }
 
+  function clearArionPayStatusPoll() {
+    if (arionPayStatusPollTimer) {
+      window.clearTimeout(arionPayStatusPollTimer);
+      arionPayStatusPollTimer = 0;
+    }
+  }
+
+  function resetArionPayStatusPoll() {
+    clearArionPayStatusPoll();
+    arionPayStatusPollCount = 0;
+  }
+
+  function scheduleArionPayStatusPoll() {
+    if (arionPayStatusPollCount >= ARIONPAY_STATUS_POLL_LIMIT) {
+      return;
+    }
+
+    clearArionPayStatusPoll();
+    arionPayStatusPollCount += 1;
+    arionPayStatusPollTimer = window.setTimeout(() => {
+      arionPayStatusPollTimer = 0;
+      refreshArionPayOrderStatus();
+    }, ARIONPAY_STATUS_POLL_DELAY_MS);
+  }
+
+  function deliveryOptionById(id, fallbackId) {
+    return DELIVERY_OPTIONS.find((item) => item.id === id)
+      || DELIVERY_OPTIONS.find((item) => item.id === fallbackId)
+      || DELIVERY_OPTIONS[0];
+  }
+
+  function paymentOptionById(id, fallbackId) {
+    return ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === id)
+      || ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === fallbackId)
+      || ACTIVE_PAYMENT_OPTIONS[0];
+  }
+
+  function cryptoCurrencyById(id, fallbackId) {
+    return CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === id)
+      || CRYPTO_CURRENCY_OPTIONS.find((item) => item.id === fallbackId)
+      || selectedCryptoCurrency();
+  }
+
+  function mergeSyncedOrder(orderPayload, fallbackOrder) {
+    if (!orderPayload || typeof orderPayload !== "object") {
+      return fallbackOrder || null;
+    }
+
+    const fallback = fallbackOrder && typeof fallbackOrder === "object" ? fallbackOrder : {};
+    const fallbackShippingId = fallback.shippingMethod || (fallback.shipping && fallback.shipping.id) || "eu-standard";
+    const fallbackPaymentId = fallback.paymentMethod || (fallback.payment && fallback.payment.id) || ACTIVE_PAYMENT_OPTIONS[0].id;
+    const shippingMethod = orderPayload.shippingMethod || fallbackShippingId;
+    const paymentMethod = orderPayload.paymentMethod || fallbackPaymentId;
+    const shipping = deliveryOptionById(shippingMethod, fallbackShippingId);
+    const payment = paymentOptionById(paymentMethod, fallbackPaymentId);
+    const paymentCurrency = cryptoCurrencyById(paymentMethod, fallback.paymentCurrency && fallback.paymentCurrency.id);
+    const subtotal = typeof orderPayload.subtotal === "number"
+      ? orderPayload.subtotal
+      : (typeof fallback.subtotal === "number" ? fallback.subtotal : 0);
+    const shippingCost = typeof orderPayload.shippingCost === "number"
+      ? orderPayload.shippingCost
+      : (typeof fallback.shippingCost === "number" ? fallback.shippingCost : deliveryPrice(shipping, subtotal));
+    const total = typeof orderPayload.total === "number"
+      ? orderPayload.total
+      : (typeof fallback.total === "number" ? fallback.total : subtotal + shippingCost);
+
+    return {
+      ...fallback,
+      reference: orderPayload.reference || fallback.reference || "",
+      createdAt: orderPayload.createdAt || fallback.createdAt || new Date().toISOString(),
+      status: orderPayload.status || fallback.status || "received",
+      gatewayStatus: orderPayload.gatewayStatus || fallback.gatewayStatus || "",
+      invoiceId: orderPayload.invoiceId || fallback.invoiceId || "",
+      invoiceUrl: orderPayload.invoiceUrl || fallback.invoiceUrl || "",
+      lastWebhookAt: orderPayload.lastWebhookAt || fallback.lastWebhookAt || "",
+      shippingMethod,
+      paymentMethod,
+      shipping,
+      payment,
+      paymentCurrency,
+      subtotal,
+      shippingCost,
+      total,
+      items: Array.isArray(orderPayload.items) && orderPayload.items.length
+        ? orderPayload.items
+        : (Array.isArray(fallback.items) ? fallback.items : [])
+    };
+  }
+
   async function refreshArionPayOrderStatus() {
     if (getCurrentPage() !== "checkout") {
+      resetArionPayStatusPoll();
       return;
     }
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get("status") !== "success") {
+    const success = params.get("status") === "success";
+    const reference = params.get("reference") || "";
+
+    if (!success && !reference) {
+      resetArionPayStatusPoll();
       return;
     }
 
     const lastOrder = readLastOrder();
-    if (!lastOrder || !lastOrder.reference) {
+    const cachedOrder = lastOrder && (!reference || lastOrder.reference === reference)
+      ? lastOrder
+      : null;
+    const orderReference = reference || (cachedOrder && cachedOrder.reference) || "";
+
+    if (!orderReference) {
+      resetArionPayStatusPoll();
       return;
     }
 
@@ -1396,9 +1501,9 @@
       );
     }
 
-    const query = new URLSearchParams({ reference: lastOrder.reference });
-    if (lastOrder.invoiceId) {
-      query.set("invoiceId", lastOrder.invoiceId);
+    const query = new URLSearchParams({ reference: orderReference });
+    if (cachedOrder && cachedOrder.invoiceId) {
+      query.set("invoiceId", cachedOrder.invoiceId);
     }
 
     try {
@@ -1415,22 +1520,28 @@
             "El estado del pago todavia se esta sincronizando. Puedes reabrir la pagina de pago de ArionPay si hace falta."
           );
         }
+        if (success) {
+          scheduleArionPayStatusPoll();
+        }
         return;
       }
 
-      const nextOrder = {
-        ...lastOrder,
-        status: payload.order.status || lastOrder.status,
-        invoiceId: payload.order.invoiceId || lastOrder.invoiceId,
-        invoiceUrl: payload.order.invoiceUrl || lastOrder.invoiceUrl,
-        lastWebhookAt: payload.order.lastWebhookAt || lastOrder.lastWebhookAt
-      };
+      const nextOrder = mergeSyncedOrder(payload.order, cachedOrder);
+      if (!nextOrder || !nextOrder.reference) {
+        if (success) {
+          scheduleArionPayStatusPoll();
+        }
+        return;
+      }
 
       const changed =
-        nextOrder.status !== lastOrder.status
-        || nextOrder.invoiceId !== lastOrder.invoiceId
-        || nextOrder.invoiceUrl !== lastOrder.invoiceUrl
-        || nextOrder.lastWebhookAt !== lastOrder.lastWebhookAt;
+        !cachedOrder
+        || nextOrder.status !== cachedOrder.status
+        || nextOrder.invoiceId !== cachedOrder.invoiceId
+        || nextOrder.invoiceUrl !== cachedOrder.invoiceUrl
+        || nextOrder.lastWebhookAt !== cachedOrder.lastWebhookAt;
+
+      saveLastOrder(nextOrder);
 
       if (!changed) {
         if (statusNode) {
@@ -1441,14 +1552,20 @@
               "El pago sigue pendiente de confirmacion por ArionPay."
             );
         }
+        if (isPaidOrderStatus(nextOrder.status)) {
+          resetArionPayStatusPoll();
+        } else if (success) {
+          scheduleArionPayStatusPoll();
+        }
         return;
       }
-
-      saveLastOrder(nextOrder);
 
       if (isPaidOrderStatus(nextOrder.status)) {
         clearStoredCart();
         saveCheckoutDraft({});
+        resetArionPayStatusPoll();
+      } else if (success) {
+        scheduleArionPayStatusPoll();
       }
 
       renderPage();
@@ -1458,6 +1575,9 @@
           "We could not refresh the payment status right now. Please reopen the payment page or check again shortly.",
           "No hemos podido actualizar el estado del pago ahora mismo. Reabre la pagina de pago o vuelve a comprobarlo en breve."
         );
+      }
+      if (success) {
+        scheduleArionPayStatusPoll();
       }
     }
   }
@@ -3779,7 +3899,11 @@
   renderCheckoutPage = function () {
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
-    const order = readLastOrder();
+    const returnReference = params.get("reference") || "";
+    const cachedOrder = readLastOrder();
+    const order = cachedOrder && (!returnReference || cachedOrder.reference === returnReference)
+      ? cachedOrder
+      : null;
     const cart = readCart();
     const total = subtotal(cart);
     const draft = readCheckoutDraft();
@@ -3792,6 +3916,25 @@
     const grandTotal = total + shippingCost;
     const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
     const orderPaid = success && order && isPaidOrderStatus(order.status);
+
+    if (success && returnReference && !order) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            ${renderCheckoutStage("payment")}
+            <article class="success-card reveal">
+              <p class="section-kicker">${tx("Order received", "Pedido recibido")}</p>
+              <h1 class="success-title">${tx("We are verifying your payment.", "Estamos verificando tu pago.")}</h1>
+              <p class="success-copy">${tx("The store is loading the latest order record so this return page reflects the real payment result.", "La tienda esta cargando el registro mas reciente del pedido para que esta pagina refleje el resultado real del pago.")}</p>
+              <div class="order-meta-grid">
+                <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${returnReference}</strong><p>${tx("ArionPay return detected", "Retorno de ArionPay detectado")}</p></article>
+              </div>
+              <p class="helper-copy" data-order-sync-status>${tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")}</p>
+            </article>
+          </div>
+        </section>
+      `;
+    }
 
     if (success && order) {
       return `
@@ -4222,7 +4365,9 @@
               createdAt: new Date().toISOString(),
               customer: draft,
               shipping,
+              shippingMethod: shipping.id,
               payment,
+              paymentMethod: paymentCurrency.id,
               subtotal: Number(result.subtotal || total || 0),
               shippingCost: Number(result.shipping || shippingCost || 0),
               total: Number(result.total || (total + shippingCost) || 0),

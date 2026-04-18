@@ -28,6 +28,28 @@ function extractStatus(payload) {
     || "received";
 }
 
+function normalizeStatus(status) {
+  const value = String(status || "").trim();
+
+  if (!value) {
+    return "received";
+  }
+
+  if (/paid|completed|complete|confirmed|success/i.test(value)) {
+    return "paid";
+  }
+
+  if (/pending|awaiting|processing|created|received/i.test(value)) {
+    return "pending";
+  }
+
+  if (/cancel|canceled|cancelled|failed|expired|void|invalid/i.test(value)) {
+    return "failed";
+  }
+
+  return value;
+}
+
 function extractReference(payload) {
   return payload.orderId
     || payload.order_id
@@ -58,12 +80,14 @@ module.exports = async function handler(req, res) {
   const payload = extractPayload(req);
   const reference = extractReference(payload);
   const invoiceId = extractInvoiceId(payload);
-  const status = extractStatus(payload);
+  const gatewayStatus = extractStatus(payload);
+  const status = normalizeStatus(gatewayStatus);
 
   console.log("=== ArionPay Webhook Extraction ===");
   console.log("Extracted reference:", reference);
   console.log("Extracted invoiceId:", invoiceId);
   console.log("Extracted status:", status);
+  console.log("Extracted gatewayStatus:", gatewayStatus);
 
   console.log("=== Attempting Order Lookup ===");
   let order = null;
@@ -86,6 +110,7 @@ module.exports = async function handler(req, res) {
     reference,
     invoiceId,
     status,
+    gatewayStatus,
     payloadKeys: Object.keys(payload)
   });
 
@@ -94,6 +119,7 @@ module.exports = async function handler(req, res) {
     ? {
         ...order,
         status,
+        gatewayStatus,
         invoiceId: order.invoiceId || invoiceId,
         gatewayPayload: payload,
         lastWebhookAt: new Date().toISOString()
@@ -102,6 +128,7 @@ module.exports = async function handler(req, res) {
         reference: reference || `arion-${invoiceId}`,
         createdAt: new Date().toISOString(),
         status,
+        gatewayStatus,
         customer: {},
         items: [],
         invoiceId: invoiceId || "",

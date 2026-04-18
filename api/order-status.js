@@ -28,10 +28,18 @@ module.exports = async function handler(req, res) {
   return res.status(200).json({
     order: {
       reference: order.reference,
+      createdAt: order.createdAt || "",
       status: order.status || "received",
+      gatewayStatus: order.gatewayStatus || "",
       invoiceId: order.invoiceId || "",
       invoiceUrl: order.invoiceUrl || "",
-      lastWebhookAt: order.lastWebhookAt || ""
+      lastWebhookAt: order.lastWebhookAt || "",
+      shippingMethod: order.shippingMethod || "",
+      paymentMethod: order.paymentMethod || "",
+      subtotal: Number(order.subtotal || 0),
+      shippingCost: Number(order.shippingCost || 0),
+      total: Number(order.total || 0),
+      items: Array.isArray(order.items) ? order.items : []
     }
   });
 };
