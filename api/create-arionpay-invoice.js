@@ -263,6 +263,20 @@ module.exports = async function handler(req, res) {
   try {
     saveOrder(order);
     notifications = await sendOrderCreatedEmails(order);
+
+    // Persist notification delivery results on the stored order so webhook
+    // handlers or admins can inspect whether customer/admin emails were
+    // actually dispatched (useful when external email provider is missing
+    // or returning errors).
+    try {
+      const orderWithNotifications = {
+        ...order,
+        notifications
+      };
+      saveOrder(orderWithNotifications);
+    } catch (e) {
+      console.warn("Failed to save order notifications:", e && e.message);
+    }
   } catch (error) {
     console.warn("ArionPay invoice created, but local order post-processing failed.", error);
   }
