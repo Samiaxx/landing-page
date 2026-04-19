@@ -20,9 +20,12 @@
   let activeProductGallerySlug = "";
   let arionPayStatusPollTimer = 0;
   let arionPayStatusPollCount = 0;
+  let paidOrderRedirectTimer = 0;
 
   const ARIONPAY_STATUS_POLL_DELAY_MS = 2500;
   const ARIONPAY_STATUS_POLL_LIMIT = 8;
+  const PAID_ORDER_REDIRECT_DELAY_MS = 3500;
+  const HOMEPAGE_URL = "index.html";
 
   const GOAL_COLLECTIONS = [
     {
@@ -1385,6 +1388,13 @@
     }
   }
 
+  function clearPaidOrderRedirect() {
+    if (paidOrderRedirectTimer) {
+      window.clearTimeout(paidOrderRedirectTimer);
+      paidOrderRedirectTimer = 0;
+    }
+  }
+
   function resetArionPayStatusPoll() {
     clearArionPayStatusPoll();
     arionPayStatusPollCount = 0;
@@ -1401,6 +1411,17 @@
       arionPayStatusPollTimer = 0;
       refreshArionPayOrderStatus();
     }, ARIONPAY_STATUS_POLL_DELAY_MS);
+  }
+
+  function schedulePaidOrderRedirect() {
+    if (paidOrderRedirectTimer || getCurrentPage() !== "checkout") {
+      return;
+    }
+
+    paidOrderRedirectTimer = window.setTimeout(() => {
+      paidOrderRedirectTimer = 0;
+      window.location.replace(HOMEPAGE_URL);
+    }, PAID_ORDER_REDIRECT_DELAY_MS);
   }
 
   function deliveryOptionById(id, fallbackId) {
@@ -1467,9 +1488,62 @@
     };
   }
 
+  function finalizePaidCheckoutUi(order, statusNode) {
+    if (!order || !isPaidOrderStatus(order.status)) {
+      clearPaidOrderRedirect();
+      return;
+    }
+
+    clearStoredCart();
+    saveCheckoutDraft({});
+
+    if (typeof updateCartBadges === "function") {
+      updateCartBadges();
+    }
+
+    if (statusNode) {
+      statusNode.textContent = tx(
+        "Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.",
+        "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve."
+      );
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (getCurrentPage() === "checkout" && params.get("status") === "success") {
+      schedulePaidOrderRedirect();
+    } else {
+      clearPaidOrderRedirect();
+    }
+  }
+
+  function syncPaidCheckoutUi() {
+    if (getCurrentPage() !== "checkout") {
+      clearPaidOrderRedirect();
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const success = params.get("status") === "success";
+    const reference = params.get("reference") || "";
+
+    if (!success) {
+      clearPaidOrderRedirect();
+      return;
+    }
+
+    const order = readLastOrder();
+    if (!order || (reference && order.reference !== reference)) {
+      clearPaidOrderRedirect();
+      return;
+    }
+
+    finalizePaidCheckoutUi(order, document.querySelector("[data-order-sync-status]"));
+  }
+
   async function refreshArionPayOrderStatus() {
     if (getCurrentPage() !== "checkout") {
       resetArionPayStatusPoll();
+      clearPaidOrderRedirect();
       return;
     }
 
@@ -1479,6 +1553,7 @@
 
     if (!success && !reference) {
       resetArionPayStatusPoll();
+      clearPaidOrderRedirect();
       return;
     }
 
@@ -1490,6 +1565,7 @@
 
     if (!orderReference) {
       resetArionPayStatusPoll();
+      clearPaidOrderRedirect();
       return;
     }
 
@@ -1543,10 +1619,19 @@
 
       saveLastOrder(nextOrder);
 
+      if (isPaidOrderStatus(nextOrder.status)) {
+        finalizePaidCheckoutUi(nextOrder, statusNode);
+      } else {
+        clearPaidOrderRedirect();
+      }
+
       if (!changed) {
         if (statusNode) {
           statusNode.textContent = isPaidOrderStatus(nextOrder.status)
-            ? tx("Payment confirmed by ArionPay.", "Pago confirmado por ArionPay.")
+            ? tx(
+              "Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.",
+              "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve."
+            )
             : tx(
               "Payment is still awaiting confirmation from ArionPay.",
               "El pago sigue pendiente de confirmacion por ArionPay."
@@ -1561,8 +1646,6 @@
       }
 
       if (isPaidOrderStatus(nextOrder.status)) {
-        clearStoredCart();
-        saveCheckoutDraft({});
         resetArionPayStatusPoll();
       } else if (success) {
         scheduleArionPayStatusPoll();
@@ -3945,7 +4028,7 @@
               <p class="section-kicker">${orderPaid ? tx("Payment confirmed", "Pago confirmado") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${orderPaid ? tx("Your order is moving to fulfilment.", "Tu pedido ya pasa a preparacion.") : tx("Your payment page is ready.", "Tu pagina de pago ya esta lista.")}</h1>
               <p class="success-copy">${orderPaid
-                ? tx("Payment has been confirmed and the order is now queued for dispatch review.", "El pago ha sido confirmado y el pedido ya queda en cola para revision de envio.")
+                ? tx("Payment has been confirmed, the cart is now cleared, and you will be returned to the homepage shortly.", "El pago ha sido confirmado, el carrito ya esta vacio y volveras pronto a la pagina principal.")
                 : tx("Complete payment through the secure ArionPay page to finalize this order.", "Completa el pago en la pagina segura de ArionPay para finalizar este pedido.")
               }</p>
               <div class="order-meta-grid">
@@ -3958,14 +4041,14 @@
               <div class="cta-row-inline">
                 ${!orderPaid && order.invoiceUrl
                   ? `<a class="btn btn-primary" href="${order.invoiceUrl}" target="_blank" rel="noopener">${tx("Open payment page", "Abrir pagina de pago")}</a>`
-                  : `<a class="btn btn-primary" href="shop.html">${tx("Back to shop", "Volver a la tienda")}</a>`
+                  : `<a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>`
                 }
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
               </div>
-              ${!orderPaid
-                ? `<p class="helper-copy" data-order-sync-status>${tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")}</p>`
-                : ""
-              }
+              <p class="helper-copy" data-order-sync-status>${orderPaid
+                ? tx("Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.", "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve.")
+                : tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")
+              }</p>
             </article>
           </div>
         </section>
@@ -4173,6 +4256,7 @@
     initReveal();
     updateTitle();
     syncCheckoutUi();
+    syncPaidCheckoutUi();
     refreshArionPayOrderStatus();
   };
 
