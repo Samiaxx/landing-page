@@ -244,9 +244,10 @@ module.exports = async function handler(req, res) {
   try {
     const base = (process.env.SITE_BASE_URL || process.env.PUBLIC_SITE_URL || req.headers?.origin || (req.headers && `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}`) || "").replace(/\/$/, "");
     if (base) {
-      const successUrl = `${base}/checkout.html?reference=${encodeURIComponent(reference)}&status=success`;
-      const cancelUrl = `${base}/checkout.html?reference=${encodeURIComponent(reference)}&status=cancel`;
-      const callbackUrl = `${base}/api/arionpay-webhook`;
+      const callbackBase = `${base}/api/arionpay-webhook?reference=${encodeURIComponent(reference)}`;
+      const successUrl = `${callbackBase}&status=success`;
+      const cancelUrl = `${callbackBase}&status=cancel`;
+      const callbackUrl = callbackBase;
 
       // Include multiple common key names to increase compatibility with
       // different gateway expectations (snake_case and camelCase).
