@@ -10,6 +10,7 @@ const {
   validateCustomer
 } = require("./_catalog");
 const { sendOrderCreatedEmails } = require("./_email");
+const { convertAmount } = require("./_fx");
 const { getOrderStoreStatus, readOrder, saveOrder } = require("./_orders");
 
 const PAYMENT_ASSETS = {
@@ -137,7 +138,8 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ARIONPAY_API_KEY;
   const apiSecret = process.env.ARIONPAY_API_SECRET;
   const storeId = process.env.ARIONPAY_STORE_ID;
-  const fiatCurrency = String(process.env.ARIONPAY_FIAT_CURRENCY || "EUR").trim().toUpperCase();
+  const storeCurrency = String(process.env.ARIONPAY_FIAT_CURRENCY || "EUR").trim().toUpperCase();
+  const gatewayFiatCurrency = String(process.env.ARIONPAY_GATEWAY_FIAT_CURRENCY || "USD").trim().toUpperCase();
 
   if (!apiKey || !apiSecret || !storeId) {
     return res.status(500).json({
@@ -199,12 +201,38 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "The order total must be greater than zero." });
   }
 
+  let gatewayAmount = Number(totals.total.toFixed(2));
+  let conversion = {
+    amount: gatewayAmount,
+    rate: 1,
+    source: "identity",
+    effectiveDate: "",
+    fetchedAt: "",
+    fromCurrency: storeCurrency,
+    toCurrency: gatewayFiatCurrency
+  };
+
+  if (storeCurrency !== gatewayFiatCurrency) {
+    try {
+      conversion = await convertAmount(totals.total, storeCurrency, gatewayFiatCurrency);
+      gatewayAmount = conversion.amount;
+    } catch (error) {
+      return res.status(502).json({
+        error: `Unable to convert the ${storeCurrency} checkout total into ${gatewayFiatCurrency} for ArionPay.`,
+        hint: "The hosted invoice now requires a live FX quote before it is created. Retry shortly, and if this keeps failing verify outbound access to the ECB exchange-rate feed.",
+        detail: error instanceof Error ? error.message : "Unknown FX conversion error"
+      });
+    }
+  }
+
   const payload = {
     storeId,
-    amount: Number(totals.total.toFixed(2)),
-    // ArionPay expects amount/currency as the source fiat amount while
+    amount: gatewayAmount,
+    // ArionPay expects amount/currency as the gateway fiat amount while
     // `chain` preselects the crypto asset shown on the hosted checkout.
-    currency: fiatCurrency,
+    // Convert store totals first so EUR storefront pricing does not become
+    // a 1:1 USD/USDT request inside the hosted payment page.
+    currency: gatewayFiatCurrency,
     orderId: reference,
     chain: paymentAsset.chain
   };
@@ -294,8 +322,14 @@ module.exports = async function handler(req, res) {
     total: Number(totals.total.toFixed(2)),
     invoiceId: invoice.invoiceId,
     invoiceUrl: invoice.invoiceUrl,
-    storeCurrency: fiatCurrency,
-    gatewayCurrency: invoice.currency || fiatCurrency
+    storeCurrency,
+    gatewayCurrency: invoice.currency || gatewayFiatCurrency,
+    gatewayFiatAmount: gatewayAmount,
+    gatewayFiatCurrency,
+    fxRate: Number(conversion.rate.toFixed(6)),
+    fxSource: conversion.source,
+    fxEffectiveDate: conversion.effectiveDate || "",
+    fxFetchedAt: conversion.fetchedAt || ""
   };
 
   let notifications = null;
@@ -342,8 +376,14 @@ module.exports = async function handler(req, res) {
     reference,
     invoiceId: invoice.invoiceId,
     invoiceUrl: invoice.invoiceUrl,
-    currency: invoice.currency || fiatCurrency,
-    storeCurrency: fiatCurrency,
+    currency: invoice.currency || gatewayFiatCurrency,
+    storeCurrency,
+    gatewayCurrency: invoice.currency || gatewayFiatCurrency,
+    gatewayFiatAmount: gatewayAmount,
+    gatewayFiatCurrency,
+    fxRate: Number(conversion.rate.toFixed(6)),
+    fxSource: conversion.source,
+    fxEffectiveDate: conversion.effectiveDate || "",
     subtotal: Number(totals.subtotal.toFixed(2)),
     shipping: Number(totals.shipping.toFixed(2)),
     total: Number(totals.total.toFixed(2)),
