@@ -24,7 +24,7 @@
   let paidOrderRedirectTimer = 0;
 
   const ARIONPAY_STATUS_POLL_DELAY_MS = 2500;
-  const ARIONPAY_STATUS_POLL_LIMIT = 8;
+  const ARIONPAY_STATUS_POLL_LIMIT = 48;
   const PAID_ORDER_REDIRECT_DELAY_MS = 3500;
   const HOMEPAGE_URL = "index.html";
 
@@ -1625,11 +1625,13 @@
     if (cachedOrder && cachedOrder.invoiceId) {
       query.set("invoiceId", cachedOrder.invoiceId);
     }
+    query.set("_sync", `${Date.now()}`);
 
     try {
       const response = await fetch(`${ORDER_STATUS_ENDPOINT}?${query.toString()}`, {
         method: "GET",
-        headers: { Accept: "application/json" }
+        headers: { Accept: "application/json" },
+        cache: "no-store"
       });
       const payload = await response.json().catch(() => ({}));
 
