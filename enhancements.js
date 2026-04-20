@@ -3047,7 +3047,7 @@
               <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
               <div class="cta-row-inline">
                 ${!orderPaid && order.invoiceUrl
-                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}" target="_blank" rel="noopener">${tx("Open payment page", "Abrir pagina de pago")}</a>`
+                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}">${tx("Open payment page", "Abrir pagina de pago")}</a>`
                   : `<a class="btn btn-primary" href="shop.html">${tx("Back to shop", "Volver a la tienda")}</a>`
                 }
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
@@ -4040,7 +4040,7 @@
               <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
               <div class="cta-row-inline">
                 ${!orderPaid && order.invoiceUrl
-                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}" target="_blank" rel="noopener">${tx("Open payment page", "Abrir pagina de pago")}</a>`
+                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}">${tx("Open payment page", "Abrir pagina de pago")}</a>`
                   : `<a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>`
                 }
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
@@ -4475,15 +4475,9 @@
               );
             }
 
-            // Open the ArionPay invoice in a new tab so the customer stays on
-            // the storefront and can be redirected back if the gateway uses
-            // the provided return URL. This avoids losing the storefront
-            // state if the gateway doesn't redirect automatically.
-            try {
-              window.open(result.invoiceUrl, "_blank", "noopener");
-            } catch (e) {
-              window.location.href = result.invoiceUrl;
-            }
+            // Keep checkout, payment, and the gateway return in the same tab
+            // so the customer only has one storefront context to finalize.
+            window.location.href = result.invoiceUrl;
           })
           .catch((error) => {
             const message = error instanceof Error && error.message
