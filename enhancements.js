@@ -1374,11 +1374,42 @@
   }
 
   function clearStoredCart() {
+    if (typeof saveCart === "function") {
+      saveCart([]);
+      return;
+    }
+
     writeStoredValue(CART_STORE, JSON.stringify([]));
   }
 
   function isPaidOrderStatus(status) {
     return /paid|completed|confirmed|success/i.test(String(status || ""));
+  }
+
+  function lineItemSignature(items) {
+    return (Array.isArray(items) ? items : [])
+      .map((item) => {
+        const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
+        const quantity = Math.max(1, Number(item?.quantity) || 1);
+        return slug ? `${slug}:${quantity}` : "";
+      })
+      .filter(Boolean)
+      .sort()
+      .join("|");
+  }
+
+  function paidOrderMatchesCart(order, cart) {
+    if (!order || !isPaidOrderStatus(order.status)) {
+      return false;
+    }
+
+    const orderSignature = lineItemSignature(order.items);
+    const cartSignature = lineItemSignature(cart);
+    return Boolean(orderSignature && cartSignature && orderSignature === cartSignature);
+  }
+
+  function buildOrderSuccessUrl(reference) {
+    return `checkout.html?reference=${encodeURIComponent(reference)}&status=success`;
   }
 
   function clearArionPayStatusPoll() {
@@ -1488,11 +1519,13 @@
     };
   }
 
-  function finalizePaidCheckoutUi(order, statusNode) {
+  function finalizePaidCheckoutUi(order, statusNode, options = {}) {
     if (!order || !isPaidOrderStatus(order.status)) {
       clearPaidOrderRedirect();
       return;
     }
+
+    const allowRedirect = options.allowRedirect !== false;
 
     clearStoredCart();
     saveCheckoutDraft({});
@@ -1508,8 +1541,7 @@
       );
     }
 
-    const params = new URLSearchParams(window.location.search);
-    if (getCurrentPage() === "checkout" && params.get("status") === "success") {
+    if (allowRedirect && getCurrentPage() === "checkout") {
       schedulePaidOrderRedirect();
     } else {
       clearPaidOrderRedirect();
@@ -1525,19 +1557,21 @@
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
     const reference = params.get("reference") || "";
-
-    if (!success) {
-      clearPaidOrderRedirect();
-      return;
-    }
-
     const order = readLastOrder();
-    if (!order || (reference && order.reference !== reference)) {
+    const paidSessionOrder = paidOrderMatchesCart(order, readCart()) ? order : null;
+    const successOrder = success && order && (!reference || order.reference === reference) ? order : null;
+    const completedOrder = successOrder && isPaidOrderStatus(successOrder.status)
+      ? successOrder
+      : paidSessionOrder;
+
+    if (!completedOrder) {
       clearPaidOrderRedirect();
       return;
     }
 
-    finalizePaidCheckoutUi(order, document.querySelector("[data-order-sync-status]"));
+    finalizePaidCheckoutUi(completedOrder, document.querySelector("[data-order-sync-status]"), {
+      allowRedirect: success || Boolean(paidSessionOrder)
+    });
   }
 
   async function refreshArionPayOrderStatus() {
@@ -1572,8 +1606,8 @@
     const statusNode = document.querySelector("[data-order-sync-status]");
     if (statusNode) {
       statusNode.textContent = tx(
-        "Checking the latest ArionPay payment status...",
-        "Comprobando el estado mas reciente del pago en ArionPay..."
+        "Payment received. Confirming your order with ArionPay now...",
+        "Pago recibido. Confirmando tu pedido con ArionPay ahora..."
       );
     }
 
@@ -1592,8 +1626,8 @@
       if (!response.ok || !payload.order) {
         if (statusNode) {
           statusNode.textContent = tx(
-            "Payment status is still syncing. You can reopen the ArionPay payment page if needed.",
-            "El estado del pago todavia se esta sincronizando. Puedes reabrir la pagina de pago de ArionPay si hace falta."
+            "Payment received. We are still waiting for ArionPay confirmation. Please do not pay again.",
+            "Pago recibido. Seguimos esperando la confirmacion de ArionPay. Por favor, no pagues de nuevo."
           );
         }
         if (success) {
@@ -1620,7 +1654,7 @@
       saveLastOrder(nextOrder);
 
       if (isPaidOrderStatus(nextOrder.status)) {
-        finalizePaidCheckoutUi(nextOrder, statusNode);
+        finalizePaidCheckoutUi(nextOrder, statusNode, { allowRedirect: true });
       } else {
         clearPaidOrderRedirect();
       }
@@ -1633,8 +1667,8 @@
               "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve."
             )
             : tx(
-              "Payment is still awaiting confirmation from ArionPay.",
-              "El pago sigue pendiente de confirmacion por ArionPay."
+              "Payment received. We are still confirming your order with ArionPay. Please do not pay again.",
+              "Pago recibido. Seguimos confirmando tu pedido con ArionPay. Por favor, no pagues de nuevo."
             );
         }
         if (isPaidOrderStatus(nextOrder.status)) {
@@ -1655,8 +1689,8 @@
     } catch {
       if (statusNode) {
         statusNode.textContent = tx(
-          "We could not refresh the payment status right now. Please reopen the payment page or check again shortly.",
-          "No hemos podido actualizar el estado del pago ahora mismo. Reabre la pagina de pago o vuelve a comprobarlo en breve."
+          "Payment received. We could not confirm the status just yet, but we are still checking it automatically.",
+          "Pago recibido. Aun no hemos podido confirmar el estado, pero seguimos comprobando automaticamente."
         );
       }
       if (success) {
@@ -2136,13 +2170,13 @@
   }
 
   function checkoutPendingStatus(payment) {
-    return tx("Creating your secure ArionPay invoice...", "Creando tu factura segura de ArionPay...");
+    return tx("Creating your secure ArionPay invoice in this tab...", "Creando tu factura segura de ArionPay en esta pestana...");
   }
 
   function checkoutHelperCopy(payment) {
     return tx(
-      "You will continue to the secure ArionPay payment page after your billing details are confirmed.",
-      "Continuaras a la pagina de pago segura de ArionPay una vez confirmados tus datos de facturacion."
+      "You will continue to the secure ArionPay payment page in this tab and return here automatically after payment.",
+      "Continuaras a la pagina de pago segura de ArionPay en esta pestana y volveras aqui automaticamente despues del pago."
     );
   }
 
@@ -3998,7 +4032,13 @@
     const shippingCost = deliveryPrice(delivery, total);
     const grandTotal = total + shippingCost;
     const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
-    const orderPaid = success && order && isPaidOrderStatus(order.status);
+    const sessionCompletedOrder = !success && paidOrderMatchesCart(cachedOrder, cart)
+      ? cachedOrder
+      : null;
+    const completedOrder = success && order && isPaidOrderStatus(order.status)
+      ? order
+      : sessionCompletedOrder;
+    const orderPaid = Boolean(completedOrder);
 
     if (success && returnReference && !order) {
       return `
@@ -4006,13 +4046,50 @@
           <div class="container section-stack">
             ${renderCheckoutStage("payment")}
             <article class="success-card reveal">
-              <p class="section-kicker">${tx("Order received", "Pedido recibido")}</p>
-              <h1 class="success-title">${tx("We are verifying your payment.", "Estamos verificando tu pago.")}</h1>
-              <p class="success-copy">${tx("The store is loading the latest order record so this return page reflects the real payment result.", "La tienda esta cargando el registro mas reciente del pedido para que esta pagina refleje el resultado real del pago.")}</p>
+              <p class="section-kicker">${tx("Payment received", "Pago recibido")}</p>
+              <h1 class="success-title">${tx("We are confirming your order.", "Estamos confirmando tu pedido.")}</h1>
+              <p class="success-copy">${tx("We received your return from ArionPay and are now confirming the payment status. This page updates automatically, so please do not pay again.", "Hemos recibido tu retorno desde ArionPay y ahora estamos confirmando el estado del pago. Esta pagina se actualiza automaticamente, por favor no pagues de nuevo.")}</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${returnReference}</strong><p>${tx("ArionPay return detected", "Retorno de ArionPay detectado")}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Payment status", "Estado del pago")}</span><strong>${tx("Confirming", "Confirmando")}</strong><p>${tx("We are waiting for the final ArionPay confirmation.", "Estamos esperando la confirmacion final de ArionPay.")}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Next step", "Siguiente paso")}</span><strong>${tx("Automatic verification", "Verificacion automatica")}</strong><p>${tx("As soon as ArionPay confirms payment, this order moves to fulfilment review.", "En cuanto ArionPay confirme el pago, este pedido pasa a revision de preparacion.")}</p></article>
               </div>
-              <p class="helper-copy" data-order-sync-status>${tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")}</p>
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>
+                <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
+              </div>
+              <p class="helper-copy" data-order-sync-status>${tx("Payment received. Confirming your order with ArionPay now...", "Pago recibido. Confirmando tu pedido con ArionPay ahora...")}</p>
+            </article>
+          </div>
+        </section>
+      `;
+    }
+
+    if (orderPaid && completedOrder) {
+      return `
+        <section class="page-hero">
+          <div class="container section-stack">
+            ${renderCheckoutStage("payment")}
+            <article class="success-card reveal">
+              <p class="section-kicker">${tx("Order completed", "Pedido completado")}</p>
+              <h1 class="success-title">${success ? tx("Your order is complete.", "Tu pedido esta completo.") : tx("This order is already completed.", "Este pedido ya esta completado.")}</h1>
+              <p class="success-copy">${success
+                ? tx("Payment has been confirmed, the cart is now cleared, and your order is moving to fulfilment review. You will be returned to the homepage shortly.", "El pago ha sido confirmado, el carrito ya esta vacio y tu pedido ya pasa a revision de preparacion. Volveras pronto a la pagina principal.")
+                : tx("This checkout session already has a paid order. The cart is being cleared and the completed order is loading instead of reopening payment.", "Esta sesion de checkout ya tiene un pedido pagado. El carrito se esta vaciando y se muestra el pedido completado en lugar de reabrir el pago.")
+              }</p>
+              <div class="order-meta-grid">
+                <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${completedOrder.reference}</strong><p>${formatDate(completedOrder.createdAt)}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Payment status", "Estado del pago")}</span><strong>${tx("Paid", "Pagado")}</strong><p>${tx("Confirmed by ArionPay.", "Confirmado por ArionPay.")}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Next step", "Siguiente paso")}</span><strong>${tx("Fulfilment review", "Revision de preparacion")}</strong><p>${tx("Dispatch updates will be sent by email if anything changes.", "Las actualizaciones de envio se enviaran por correo si algo cambia.")}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(completedOrder.shipping.label)}</strong><p>${localize(completedOrder.shipping.eta)}</p></article>
+              </div>
+              <div class="summary-divider"></div>
+              <div class="order-line-items">${renderOrderLineItems(completedOrder.items)}</div>
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>
+                <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
+              </div>
+              <p class="helper-copy" data-order-sync-status>${tx("Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.", "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve.")}</p>
             </article>
           </div>
         </section>
@@ -4025,30 +4102,22 @@
           <div class="container section-stack">
             ${renderCheckoutStage("payment")}
             <article class="success-card reveal">
-              <p class="section-kicker">${orderPaid ? tx("Payment confirmed", "Pago confirmado") : tx("Order received", "Pedido recibido")}</p>
-              <h1 class="success-title">${orderPaid ? tx("Your order is moving to fulfilment.", "Tu pedido ya pasa a preparacion.") : tx("Your payment page is ready.", "Tu pagina de pago ya esta lista.")}</h1>
-              <p class="success-copy">${orderPaid
-                ? tx("Payment has been confirmed, the cart is now cleared, and you will be returned to the homepage shortly.", "El pago ha sido confirmado, el carrito ya esta vacio y volveras pronto a la pagina principal.")
-                : tx("Complete payment through the secure ArionPay page to finalize this order.", "Completa el pago en la pagina segura de ArionPay para finalizar este pedido.")
-              }</p>
+              <p class="section-kicker">${tx("Payment received", "Pago recibido")}</p>
+              <h1 class="success-title">${tx("We are confirming your order.", "Estamos confirmando tu pedido.")}</h1>
+              <p class="success-copy">${tx("We received your return from ArionPay and are now confirming the payment status. This page updates automatically, so please do not pay again.", "Hemos recibido tu retorno desde ArionPay y ahora estamos confirmando el estado del pago. Esta pagina se actualiza automaticamente, por favor no pagues de nuevo.")}</p>
               <div class="order-meta-grid">
                 <article class="detail-card"><span class="detail-label">${tx("Order reference", "Referencia")}</span><strong>${order.reference}</strong><p>${formatDate(order.createdAt)}</p></article>
-                <article class="detail-card"><span class="detail-label">${tx("Payment", "Pago")}</span><strong>${paymentDisplayLabel(order.payment, order.paymentCurrency)}</strong><p>${orderPaid ? tx("Payment confirmed by ArionPay.", "Pago confirmado por ArionPay.") : localize(order.payment.note)}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Payment status", "Estado del pago")}</span><strong>${tx("Confirming", "Confirmando")}</strong><p>${tx("We are waiting for the final ArionPay confirmation.", "Estamos esperando la confirmacion final de ArionPay.")}</p></article>
+                <article class="detail-card"><span class="detail-label">${tx("Next step", "Siguiente paso")}</span><strong>${tx("Automatic verification", "Verificacion automatica")}</strong><p>${tx("As soon as ArionPay confirms payment, this order moves to fulfilment review.", "En cuanto ArionPay confirme el pago, este pedido pasa a revision de preparacion.")}</p></article>
                 <article class="detail-card"><span class="detail-label">${tx("Delivery", "Entrega")}</span><strong>${localize(order.shipping.label)}</strong><p>${localize(order.shipping.eta)}</p></article>
               </div>
               <div class="summary-divider"></div>
               <div class="order-line-items">${renderOrderLineItems(order.items)}</div>
               <div class="cta-row-inline">
-                ${!orderPaid && order.invoiceUrl
-                  ? `<a class="btn btn-primary" href="${order.invoiceUrl}">${tx("Open payment page", "Abrir pagina de pago")}</a>`
-                  : `<a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>`
-                }
+                <a class="btn btn-primary" href="${HOMEPAGE_URL}">${tx("Return home now", "Volver al inicio ahora")}</a>
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
               </div>
-              <p class="helper-copy" data-order-sync-status>${orderPaid
-                ? tx("Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.", "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve.")
-                : tx("Checking the latest ArionPay payment status...", "Comprobando el estado mas reciente del pago en ArionPay...")
-              }</p>
+              <p class="helper-copy" data-order-sync-status>${tx("Payment received. Confirming your order with ArionPay now...", "Pago recibido. Confirmando tu pedido con ArionPay ahora...")}</p>
             </article>
           </div>
         </section>
@@ -4105,8 +4174,8 @@
                         <input class="form-input" name="email" type="email" required value="${draft.email || ""}">
                       </label>
                       <label>
-                        <span>${tx("Phone *", "Telefono *")}</span>
-                        <input class="form-input" name="phone" required value="${draft.phone || ""}">
+                        <span>${tx("Phone (optional)", "Telefono (opcional)")}</span>
+                        <input class="form-input" name="phone" value="${draft.phone || ""}">
                       </label>
                     </div>
                     <label class="full-width">
@@ -4374,6 +4443,8 @@
         const statusNode = document.querySelector("[data-checkout-status]");
         const draft = checkoutDraftFromForm(checkoutForm);
         const cart = readCart();
+        const lastOrder = readLastOrder();
+        const duplicatePaidOrder = paidOrderMatchesCart(lastOrder, cart) ? lastOrder : null;
         const total = subtotal(cart);
         const shipping = DELIVERY_OPTIONS.find((item) => item.id === draft.shippingMethod) || DELIVERY_OPTIONS[0];
         const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === draft.paymentMethod) || ACTIVE_PAYMENT_OPTIONS[0];
@@ -4391,6 +4462,18 @@
         }
 
         saveCheckoutDraft(draft);
+
+        if (duplicatePaidOrder) {
+          saveLastOrder(duplicatePaidOrder);
+          if (statusNode) {
+            statusNode.textContent = tx(
+              "This checkout session already has a paid order. Loading the completed order now...",
+              "Esta sesion de checkout ya tiene un pedido pagado. Cargando ahora el pedido completado..."
+            );
+          }
+          window.location.replace(buildOrderSuccessUrl(duplicatePaidOrder.reference));
+          return;
+        }
 
         const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, paymentCurrency.id);
 
@@ -4422,6 +4505,7 @@
             reference,
             shippingMethod: shipping.id,
             paymentMethod: paymentCurrency.id,
+            sessionOrderReference: lastOrder && lastOrder.reference ? lastOrder.reference : "",
             customer: draft,
             items: cart.map((item) => ({
               slug: item.slug,
@@ -4431,6 +4515,11 @@
         })
           .then(async (response) => {
             const result = await response.json().catch(() => ({}));
+
+            if (result.alreadyPaid && result.reference) {
+              window.location.replace(buildOrderSuccessUrl(result.reference));
+              return;
+            }
 
             if (!response.ok || !result.invoiceUrl) {
               const detail = result.error && result.hint
@@ -4477,7 +4566,7 @@
 
             // Keep checkout, payment, and the gateway return in the same tab
             // so the customer only has one storefront context to finalize.
-            window.location.href = result.invoiceUrl;
+            window.location.replace(result.invoiceUrl);
           })
           .catch((error) => {
             const message = error instanceof Error && error.message

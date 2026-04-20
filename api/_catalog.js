@@ -159,9 +159,6 @@ function validateCustomer(customer) {
   if (!customer.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) {
     missing.push("email");
   }
-  if (!customer.phone) {
-    missing.push("phone");
-  }
   if (!customer.country) {
     missing.push("country");
   }

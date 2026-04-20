@@ -10,7 +10,7 @@ const {
   validateCustomer
 } = require("./_catalog");
 const { sendOrderCreatedEmails } = require("./_email");
-const { saveOrder } = require("./_orders");
+const { readOrder, saveOrder } = require("./_orders");
 
 const PAYMENT_ASSETS = {
   USDT: { currency: "USDT", chain: "USDT_TRC20" },
@@ -116,6 +116,30 @@ function parseBody(req) {
   return req.body;
 }
 
+function optionalReference(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value.trim().replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
+}
+
+function isPaidStatus(status) {
+  return /paid|completed|confirmed|success/i.test(String(status || ""));
+}
+
+function itemsFingerprint(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item) => {
+      const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
+      const quantity = Math.max(1, Number(item?.quantity) || 1);
+      return slug ? `${slug}:${quantity}` : "";
+    })
+    .filter(Boolean)
+    .sort()
+    .join("|");
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -145,6 +169,7 @@ module.exports = async function handler(req, res) {
   const missingCustomerFields = validateCustomer(customer);
   const paymentAsset = PAYMENT_ASSETS[body.paymentMethod] || PAYMENT_ASSETS.USDT_TRC20;
   const shippingMethod = typeof body.shippingMethod === "string" ? body.shippingMethod : "eu-standard";
+  const sessionOrderReference = optionalReference(body.sessionOrderReference);
 
   if (!items.length) {
     return res.status(400).json({ error: "Your cart is empty or contains unavailable products." });
@@ -158,6 +183,20 @@ module.exports = async function handler(req, res) {
   }
 
   const totals = calculateTotals(items, shippingMethod);
+  const serializedItems = serializeItems(items);
+
+  if (sessionOrderReference) {
+    const existingOrder = readOrder(sessionOrderReference);
+    if (existingOrder && isPaidStatus(existingOrder.status) && itemsFingerprint(existingOrder.items) === itemsFingerprint(serializedItems)) {
+      return res.status(409).json({
+        error: "This checkout session already has a paid order.",
+        hint: "The storefront will reopen the completed order instead of creating another payment invoice.",
+        alreadyPaid: true,
+        reference: existingOrder.reference,
+        status: existingOrder.status
+      });
+    }
+  }
 
   if (!(totals.total > 0)) {
     return res.status(400).json({ error: "The order total must be greater than zero." });
@@ -250,7 +289,7 @@ module.exports = async function handler(req, res) {
     createdAt: new Date().toISOString(),
     status: "invoice_created",
     customer,
-    items: serializeItems(items),
+    items: serializedItems,
     shippingMethod,
     paymentMethod: paymentAsset.chain,
     subtotal: Number(totals.subtotal.toFixed(2)),
