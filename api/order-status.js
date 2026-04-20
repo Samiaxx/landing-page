@@ -88,7 +88,7 @@ function serializeOrder(order) {
 }
 
 async function resolveOrder(reference, invoiceId) {
-  let order = (reference && readOrder(reference)) || (invoiceId && findOrderByInvoiceId(invoiceId));
+  let order = (reference && await readOrder(reference)) || (invoiceId && await findOrderByInvoiceId(invoiceId));
   const effectiveInvoiceId = invoiceId || (order && order.invoiceId) || "";
 
   if (!effectiveInvoiceId || (order && isPaidStatus(order.status))) {
@@ -106,7 +106,7 @@ async function resolveOrder(reference, invoiceId) {
   }
 
   if (hasOrderChanged(order, syncedOrder)) {
-    saveOrder(syncedOrder);
+    await saveOrder(syncedOrder);
   }
 
   return syncedOrder;

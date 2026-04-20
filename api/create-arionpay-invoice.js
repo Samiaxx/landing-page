@@ -10,7 +10,7 @@ const {
   validateCustomer
 } = require("./_catalog");
 const { sendOrderCreatedEmails } = require("./_email");
-const { readOrder, saveOrder } = require("./_orders");
+const { getOrderStoreStatus, readOrder, saveOrder } = require("./_orders");
 
 const PAYMENT_ASSETS = {
   USDT: { currency: "USDT", chain: "USDT_TRC20" },
@@ -150,6 +150,15 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  const orderStore = getOrderStoreStatus();
+  if (orderStore.requiresDurableStorage && !orderStore.durable) {
+    return res.status(500).json({
+      error: "Durable order storage is not configured for this deployment.",
+      hint: "Connect an Upstash Redis database to the Vercel project and set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN before accepting live payments.",
+      missing: orderStore.missing
+    });
+  }
+
   const body = parseBody(req);
   const items = normalizeItems(body.items);
   const reference = sanitizeReference(body.reference);
@@ -174,7 +183,7 @@ module.exports = async function handler(req, res) {
   const serializedItems = serializeItems(items);
 
   if (sessionOrderReference) {
-    const existingOrder = readOrder(sessionOrderReference);
+    const existingOrder = await readOrder(sessionOrderReference);
     if (existingOrder && isPaidStatus(existingOrder.status)) {
       return res.status(409).json({
         error: "This checkout session already has a paid order.",
@@ -202,7 +211,7 @@ module.exports = async function handler(req, res) {
 
   // Attempt to provide ArionPay with return/redirect URLs so the hosted
   // payment page can send customers back to the storefront after payment,
-  // and a callback URL so the local order record can be marked paid.
+  // and a callback URL so the stored order record can be marked paid.
   // Prefer an explicit env var, then fall back to request origin or host.
   try {
     const base = (process.env.SITE_BASE_URL || process.env.PUBLIC_SITE_URL || req.headers?.origin || (req.headers && `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}`) || "").replace(/\/$/, "");
@@ -292,7 +301,7 @@ module.exports = async function handler(req, res) {
   let notifications = null;
 
   try {
-    saveOrder(order);
+    await saveOrder(order);
 
     // Only attempt to send emails if the required env vars are present.
     const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.EMAIL_FROM || process.env.RESEND_FROM));
@@ -304,7 +313,7 @@ module.exports = async function handler(req, res) {
           ...order,
           notifications
         };
-        saveOrder(orderWithNotifications);
+        await saveOrder(orderWithNotifications);
       } catch (e) {
         console.warn("Failed to save order notifications:", e && e.message);
       }
@@ -320,13 +329,13 @@ module.exports = async function handler(req, res) {
           ...order,
           notifications
         };
-        saveOrder(orderWithNotifications);
+        await saveOrder(orderWithNotifications);
       } catch (e) {
         console.warn("Failed to save order (email disabled):", e && e.message);
       }
     }
   } catch (error) {
-    console.warn("ArionPay invoice created, but local order post-processing failed.", error);
+    console.warn("ArionPay invoice created, but order post-processing failed.", error);
   }
 
   return res.status(200).json({

@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: "reference or invoiceId is required" });
   }
 
-  const order = (reference && readOrder(reference)) || (invoiceId && findOrderByInvoiceId(invoiceId));
+  const order = (reference && await readOrder(reference)) || (invoiceId && await findOrderByInvoiceId(invoiceId));
 
   if (!order) {
     return res.status(404).json({ error: "Order not found" });
@@ -42,7 +42,7 @@ module.exports = async function handler(req, res) {
     }
 
     const next = { ...order, notifications: notifications || order.notifications };
-    saveOrder(next);
+    await saveOrder(next);
 
     return res.status(200).json({ ok: true, notifications });
   } catch (error) {

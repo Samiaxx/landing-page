@@ -36,11 +36,11 @@ module.exports = async function handler(req, res) {
   let order = null;
 
   if (reference) {
-    order = readOrder(reference);
+    order = await readOrder(reference);
   }
 
   if (!order && invoiceId) {
-    order = findOrderByInvoiceId(invoiceId);
+    order = await findOrderByInvoiceId(invoiceId);
   }
 
   const previousStatus = order ? normalizeStatus(order.status) : "";
@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
         lastWebhookAt: new Date().toISOString()
       };
 
-  saveOrder(nextOrder);
+  await saveOrder(nextOrder);
 
   if (previousStatus !== nextOrder.status) {
     // Only attempt to send status emails if email sending is configured.
