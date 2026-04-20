@@ -137,7 +137,7 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ARIONPAY_API_KEY;
   const apiSecret = process.env.ARIONPAY_API_SECRET;
   const storeId = process.env.ARIONPAY_STORE_ID;
-  const fiatCurrency = process.env.ARIONPAY_FIAT_CURRENCY || "EUR";
+  const fiatCurrency = String(process.env.ARIONPAY_FIAT_CURRENCY || "EUR").trim().toUpperCase();
 
   if (!apiKey || !apiSecret || !storeId) {
     return res.status(500).json({
@@ -202,9 +202,9 @@ module.exports = async function handler(req, res) {
   const payload = {
     storeId,
     amount: Number(totals.total.toFixed(2)),
-    // ArionPay support confirmed the invoice payload must pair the asset code
-    // with the exact receiving network string expected by their API.
-    currency: paymentAsset.currency,
+    // ArionPay expects amount/currency as the source fiat amount while
+    // `chain` preselects the crypto asset shown on the hosted checkout.
+    currency: fiatCurrency,
     orderId: reference,
     chain: paymentAsset.chain
   };
@@ -295,7 +295,7 @@ module.exports = async function handler(req, res) {
     invoiceId: invoice.invoiceId,
     invoiceUrl: invoice.invoiceUrl,
     storeCurrency: fiatCurrency,
-    gatewayCurrency: invoice.currency || paymentAsset.currency
+    gatewayCurrency: invoice.currency || fiatCurrency
   };
 
   let notifications = null;
@@ -342,7 +342,7 @@ module.exports = async function handler(req, res) {
     reference,
     invoiceId: invoice.invoiceId,
     invoiceUrl: invoice.invoiceUrl,
-    currency: invoice.currency || paymentAsset.currency,
+    currency: invoice.currency || fiatCurrency,
     storeCurrency: fiatCurrency,
     subtotal: Number(totals.subtotal.toFixed(2)),
     shipping: Number(totals.shipping.toFixed(2)),
