@@ -9,6 +9,7 @@
   const LAST_ORDER_STORE = typeof LAST_ORDER_KEY === "string"
     ? LAST_ORDER_KEY
     : "primus-last-order-v1";
+  const CHECKOUT_SESSION_ORDER_STORE = "primus-checkout-session-order-v1";
   const CART_STORE = typeof CART_KEY === "string"
     ? CART_KEY
     : "primus-cart-v2";
@@ -1373,6 +1374,25 @@
     writeStoredValue(LAST_ORDER_STORE, JSON.stringify(order));
   }
 
+  function readCheckoutSessionOrderReference() {
+    const stored = readStoredValue(CHECKOUT_SESSION_ORDER_STORE);
+    return typeof stored === "string"
+      ? stored.trim().replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80)
+      : "";
+  }
+
+  function saveCheckoutSessionOrderReference(reference) {
+    const nextReference = typeof reference === "string"
+      ? reference.trim().replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80)
+      : "";
+
+    writeStoredValue(CHECKOUT_SESSION_ORDER_STORE, nextReference);
+  }
+
+  function clearCheckoutSessionOrderReference() {
+    writeStoredValue(CHECKOUT_SESSION_ORDER_STORE, "");
+  }
+
   function clearStoredCart() {
     if (typeof saveCart === "function") {
       saveCart([]);
@@ -1386,26 +1406,13 @@
     return /paid|completed|confirmed|success/i.test(String(status || ""));
   }
 
-  function lineItemSignature(items) {
-    return (Array.isArray(items) ? items : [])
-      .map((item) => {
-        const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
-        const quantity = Math.max(1, Number(item?.quantity) || 1);
-        return slug ? `${slug}:${quantity}` : "";
-      })
-      .filter(Boolean)
-      .sort()
-      .join("|");
-  }
-
-  function paidOrderMatchesCart(order, cart) {
-    if (!order || !isPaidOrderStatus(order.status)) {
-      return false;
+  function activeSessionOrder(order) {
+    const sessionOrderReference = readCheckoutSessionOrderReference();
+    if (!sessionOrderReference || !order || order.reference !== sessionOrderReference) {
+      return null;
     }
 
-    const orderSignature = lineItemSignature(order.items);
-    const cartSignature = lineItemSignature(cart);
-    return Boolean(orderSignature && cartSignature && orderSignature === cartSignature);
+    return order;
   }
 
   function buildOrderSuccessUrl(reference) {
@@ -1529,6 +1536,7 @@
 
     clearStoredCart();
     saveCheckoutDraft({});
+    clearCheckoutSessionOrderReference();
 
     if (typeof updateCartBadges === "function") {
       updateCartBadges();
@@ -1558,7 +1566,9 @@
     const success = params.get("status") === "success";
     const reference = params.get("reference") || "";
     const order = readLastOrder();
-    const paidSessionOrder = paidOrderMatchesCart(order, readCart()) ? order : null;
+    const paidSessionOrder = activeSessionOrder(order) && isPaidOrderStatus(order.status)
+      ? order
+      : null;
     const successOrder = success && order && (!reference || order.reference === reference) ? order : null;
     const completedOrder = successOrder && isPaidOrderStatus(successOrder.status)
       ? successOrder
@@ -4032,7 +4042,7 @@
     const shippingCost = deliveryPrice(delivery, total);
     const grandTotal = total + shippingCost;
     const paymentLabel = paymentDisplayLabel(payment, cryptoCurrency);
-    const sessionCompletedOrder = !success && paidOrderMatchesCart(cachedOrder, cart)
+    const sessionCompletedOrder = !success && activeSessionOrder(cachedOrder) && isPaidOrderStatus(cachedOrder.status)
       ? cachedOrder
       : null;
     const completedOrder = success && order && isPaidOrderStatus(order.status)
@@ -4444,7 +4454,10 @@
         const draft = checkoutDraftFromForm(checkoutForm);
         const cart = readCart();
         const lastOrder = readLastOrder();
-        const duplicatePaidOrder = paidOrderMatchesCart(lastOrder, cart) ? lastOrder : null;
+        const sessionOrderReference = readCheckoutSessionOrderReference();
+        const duplicatePaidOrder = activeSessionOrder(lastOrder) && isPaidOrderStatus(lastOrder.status)
+          ? lastOrder
+          : null;
         const total = subtotal(cart);
         const shipping = DELIVERY_OPTIONS.find((item) => item.id === draft.shippingMethod) || DELIVERY_OPTIONS[0];
         const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === draft.paymentMethod) || ACTIVE_PAYMENT_OPTIONS[0];
@@ -4505,7 +4518,7 @@
             reference,
             shippingMethod: shipping.id,
             paymentMethod: paymentCurrency.id,
-            sessionOrderReference: lastOrder && lastOrder.reference ? lastOrder.reference : "",
+            sessionOrderReference,
             customer: draft,
             items: cart.map((item) => ({
               slug: item.slug,
@@ -4556,6 +4569,7 @@
             };
 
             saveLastOrder(order);
+            saveCheckoutSessionOrderReference(order.reference);
 
             if (statusNode) {
               statusNode.textContent = tx(

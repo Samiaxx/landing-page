@@ -128,18 +128,6 @@ function isPaidStatus(status) {
   return /paid|completed|confirmed|success/i.test(String(status || ""));
 }
 
-function itemsFingerprint(items) {
-  return (Array.isArray(items) ? items : [])
-    .map((item) => {
-      const slug = typeof item?.slug === "string" ? item.slug.trim() : "";
-      const quantity = Math.max(1, Number(item?.quantity) || 1);
-      return slug ? `${slug}:${quantity}` : "";
-    })
-    .filter(Boolean)
-    .sort()
-    .join("|");
-}
-
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -187,7 +175,7 @@ module.exports = async function handler(req, res) {
 
   if (sessionOrderReference) {
     const existingOrder = readOrder(sessionOrderReference);
-    if (existingOrder && isPaidStatus(existingOrder.status) && itemsFingerprint(existingOrder.items) === itemsFingerprint(serializedItems)) {
+    if (existingOrder && isPaidStatus(existingOrder.status)) {
       return res.status(409).json({
         error: "This checkout session already has a paid order.",
         hint: "The storefront will reopen the completed order instead of creating another payment invoice.",
