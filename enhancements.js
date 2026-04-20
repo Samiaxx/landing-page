@@ -1389,55 +1389,6 @@
     writeStoredValue(CHECKOUT_SESSION_ORDER_STORE, nextReference);
   }
 
-  function normalizeHostedCheckoutUrl(value) {
-    if (typeof value !== "string" || !value.trim()) {
-      return "";
-    }
-
-    try {
-      const parsed = new URL(value, window.location.href);
-      if (!/^https?:$/i.test(parsed.protocol)) {
-        return "";
-      }
-      return parsed.href;
-    } catch {
-      return "";
-    }
-  }
-
-  function redirectToHostedInvoice(invoiceUrl, statusNode) {
-    const safeInvoiceUrl = normalizeHostedCheckoutUrl(invoiceUrl);
-
-    if (!safeInvoiceUrl) {
-      throw new Error(tx(
-        "ArionPay returned an invalid payment link.",
-        "ArionPay devolvio un enlace de pago no valido."
-      ));
-    }
-
-    if (statusNode) {
-      statusNode.innerHTML = `${tx(
-        "Secure invoice created. Redirecting to ArionPay now.",
-        "Factura segura creada. Redirigiendo a ArionPay ahora."
-      )} <a href="${safeInvoiceUrl}" rel="noopener">${tx(
-        "Open the secure payment page manually if the redirect does not start.",
-        "Abre manualmente la pagina segura de pago si la redireccion no comienza."
-      )}</a>`;
-    }
-
-    const navigate = () => {
-      window.location.assign(safeInvoiceUrl);
-    };
-
-    navigate();
-
-    window.setTimeout(() => {
-      if (document.visibilityState === "visible") {
-        navigate();
-      }
-    }, 900);
-  }
-
   function clearCheckoutSessionOrderReference() {
     writeStoredValue(CHECKOUT_SESSION_ORDER_STORE, "");
   }
@@ -4624,14 +4575,14 @@
 
             if (statusNode) {
               statusNode.textContent = tx(
-                "Secure invoice created. Redirecting to ArionPay now...",
-                "Factura segura creada. Redirigiendo a ArionPay ahora..."
+                "Secure invoice created. Redirecting to ArionPay...",
+                "Factura segura creada. Redirigiendo a ArionPay..."
               );
             }
 
             // Keep checkout, payment, and the gateway return in the same tab
             // so the customer only has one storefront context to finalize.
-            redirectToHostedInvoice(result.invoiceUrl, statusNode);
+            window.location.replace(result.invoiceUrl);
           })
           .catch((error) => {
             const message = error instanceof Error && error.message
