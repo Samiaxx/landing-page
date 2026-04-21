@@ -5,6 +5,7 @@ const path = require("path");
 const fsp = fs.promises;
 
 const ORDER_KEY_PREFIX = "primus:order";
+const ORDER_PENDING_KEY = `${ORDER_KEY_PREFIX}:pending`;
 const DURABLE_URL_KEYS = ["UPSTASH_REDIS_REST_URL", "KV_REST_API_URL"];
 const DURABLE_TOKEN_KEYS = ["UPSTASH_REDIS_REST_TOKEN", "KV_REST_API_TOKEN"];
 
@@ -127,6 +128,29 @@ function safeInvoiceId(invoiceId) {
     .slice(0, 160);
 }
 
+function normalizeTrackedStatus(status) {
+  const value = text(status).toLowerCase();
+
+  if (/paid|completed|confirmed|success/.test(value)) {
+    return "paid";
+  }
+
+  if (/cancel|cancelled|canceled|failed|expired|void|invalid|refunded|refund/.test(value)) {
+    return "closed";
+  }
+
+  return "pending";
+}
+
+function isTrackedPendingOrder(order) {
+  return Boolean(
+    order
+    && safeReference(order.reference)
+    && safeInvoiceId(order.invoiceId)
+    && normalizeTrackedStatus(order.status) === "pending"
+  );
+}
+
 function orderFile(reference) {
   return path.join(ordersDir(), `${safeReference(reference) || "order"}.json`);
 }
@@ -207,6 +231,29 @@ async function findOrderByInvoiceIdFromFile(invoiceId) {
   return null;
 }
 
+async function listPendingOrdersFromFile(limit = 20) {
+  ensureDataRoot();
+  const files = await fsp.readdir(ordersDir());
+  const orders = [];
+
+  for (const file of files) {
+    const fullPath = path.join(ordersDir(), file);
+
+    try {
+      const order = JSON.parse(await fsp.readFile(fullPath, "utf8"));
+      if (isTrackedPendingOrder(order)) {
+        orders.push(order);
+      }
+    } catch {
+      // Ignore unreadable files and keep scanning.
+    }
+  }
+
+  return orders
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
+    .slice(0, Math.max(1, Number(limit) || 20));
+}
+
 function appendFileLog(filepath, payload) {
   ensureDataRoot();
   fs.appendFileSync(filepath, `${JSON.stringify(payload)}\n`);
@@ -217,6 +264,12 @@ async function saveOrderToRedis(redis, order) {
 
   if (order.invoiceId) {
     tasks.push(redis.set(orderInvoiceKey(order.invoiceId), order.reference));
+  }
+
+  if (isTrackedPendingOrder(order)) {
+    tasks.push(redis.sadd(ORDER_PENDING_KEY, order.reference));
+  } else {
+    tasks.push(redis.srem(ORDER_PENDING_KEY, order.reference));
   }
 
   await Promise.all(tasks);
@@ -238,6 +291,25 @@ async function findOrderByInvoiceIdFromRedis(redis, invoiceId) {
   }
 
   return readOrderFromRedis(redis, reference);
+}
+
+async function listPendingOrdersFromRedis(redis, limit = 20) {
+  const references = await redis.smembers(ORDER_PENDING_KEY);
+  if (!Array.isArray(references) || !references.length) {
+    return [];
+  }
+
+  const orders = await Promise.all(
+    references
+      .map((reference) => safeReference(reference))
+      .filter(Boolean)
+      .map((reference) => readOrderFromRedis(redis, reference))
+  );
+
+  return orders
+    .filter((order) => isTrackedPendingOrder(order))
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
+    .slice(0, Math.max(1, Number(limit) || 20));
 }
 
 async function saveOrder(order) {
@@ -301,6 +373,15 @@ async function findOrderByInvoiceId(invoiceId) {
   return findOrderByInvoiceIdFromFile(normalizedInvoiceId);
 }
 
+async function listPendingOrders(limit = 20) {
+  const redis = getRedisClient();
+  if (redis) {
+    return listPendingOrdersFromRedis(redis, limit);
+  }
+
+  return listPendingOrdersFromFile(limit);
+}
+
 function appendEmailLog(payload) {
   appendFileLog(emailLogPath(), payload);
 }
@@ -314,6 +395,7 @@ module.exports = {
   appendEmailLog,
   findOrderByInvoiceId,
   getOrderStoreStatus,
+  listPendingOrders,
   readOrder,
   saveOrder,
   updateOrder

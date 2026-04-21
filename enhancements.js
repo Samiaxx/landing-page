@@ -1594,18 +1594,20 @@
     const params = new URLSearchParams(window.location.search);
     const success = params.get("status") === "success";
     const reference = params.get("reference") || "";
+    const lastOrder = readLastOrder();
+    const sessionOrderReference = readCheckoutSessionOrderReference();
+    const sessionOrder = activeSessionOrder(lastOrder);
+    const cachedOrder = reference
+      ? (lastOrder && lastOrder.reference === reference ? lastOrder : null)
+      : sessionOrder;
+    const shouldMonitorSession = Boolean(sessionOrder && sessionOrder.invoiceId);
 
-    if (!success && !reference) {
+    if (!success && !reference && !shouldMonitorSession) {
       resetArionPayStatusPoll();
       clearPaidOrderRedirect();
       return;
     }
-
-    const lastOrder = readLastOrder();
-    const cachedOrder = lastOrder && (!reference || lastOrder.reference === reference)
-      ? lastOrder
-      : null;
-    const orderReference = reference || (cachedOrder && cachedOrder.reference) || "";
+    const orderReference = reference || sessionOrderReference || (cachedOrder && cachedOrder.reference) || "";
 
     if (!orderReference) {
       resetArionPayStatusPoll();
@@ -1642,7 +1644,7 @@
             "Pago recibido. Seguimos esperando la confirmacion de ArionPay. Por favor, no pagues de nuevo."
           );
         }
-        if (success) {
+        if (success || shouldMonitorSession) {
           scheduleArionPayStatusPoll();
         }
         return;
@@ -1650,7 +1652,7 @@
 
       const nextOrder = mergeSyncedOrder(payload.order, cachedOrder);
       if (!nextOrder || !nextOrder.reference) {
-        if (success) {
+        if (success || shouldMonitorSession) {
           scheduleArionPayStatusPoll();
         }
         return;
@@ -1685,7 +1687,7 @@
         }
         if (isPaidOrderStatus(nextOrder.status)) {
           resetArionPayStatusPoll();
-        } else if (success) {
+        } else if (success || shouldMonitorSession) {
           scheduleArionPayStatusPoll();
         }
         return;
@@ -1693,7 +1695,7 @@
 
       if (isPaidOrderStatus(nextOrder.status)) {
         resetArionPayStatusPoll();
-      } else if (success) {
+      } else if (success || shouldMonitorSession) {
         scheduleArionPayStatusPoll();
       }
 
@@ -1705,7 +1707,7 @@
           "Pago recibido. Aun no hemos podido confirmar el estado, pero seguimos comprobando automaticamente."
         );
       }
-      if (success) {
+      if (success || shouldMonitorSession) {
         scheduleArionPayStatusPoll();
       }
     }

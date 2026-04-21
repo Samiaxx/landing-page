@@ -1,72 +1,10 @@
-const { findOrderByInvoiceId, readOrder, saveOrder } = require("./_orders");
-const {
-  fetchArionPayInvoice,
-  isPaidStatus,
-  normalizeStatus,
-  text
-} = require("./_arionpay");
+const { text } = require("./_arionpay");
+const { reconcileOrder } = require("./_reconcile-orders");
 
 function applyNoStore(res) {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-}
-
-function hasOrderChanged(currentOrder, nextOrder) {
-  if (!currentOrder) {
-    return true;
-  }
-
-  return [
-    "reference",
-    "createdAt",
-    "status",
-    "gatewayStatus",
-    "invoiceId",
-    "lastWebhookAt",
-    "shippingMethod",
-    "paymentMethod",
-    "subtotal",
-    "shippingCost",
-    "total"
-  ].some((key) => currentOrder[key] !== nextOrder[key]);
-}
-
-function buildSyncedOrder(currentOrder, remoteInvoice, requestedReference, requestedInvoiceId) {
-  if (!remoteInvoice || !remoteInvoice.ok) {
-    return currentOrder || null;
-  }
-
-  const baseOrder = currentOrder && typeof currentOrder === "object"
-    ? currentOrder
-    : {};
-  const reference = text(baseOrder.reference) || text(remoteInvoice.reference) || text(requestedReference);
-  const invoiceId = text(baseOrder.invoiceId) || text(remoteInvoice.invoiceId) || text(requestedInvoiceId);
-
-  if (!reference && !invoiceId) {
-    return currentOrder || null;
-  }
-
-  const gatewayStatus = text(remoteInvoice.gatewayStatus) || text(baseOrder.gatewayStatus);
-  const remoteStatus = text(remoteInvoice.gatewayStatus) ? remoteInvoice.status : "";
-  const status = normalizeStatus(remoteStatus || baseOrder.status || gatewayStatus);
-
-  return {
-    ...baseOrder,
-    reference: reference || `arion-${invoiceId}`,
-    createdAt: text(baseOrder.createdAt) || text(remoteInvoice.createdAt) || new Date().toISOString(),
-    status,
-    gatewayStatus,
-    invoiceId,
-    lastWebhookAt: text(baseOrder.lastWebhookAt) || "",
-    customer: baseOrder.customer || {},
-    items: Array.isArray(baseOrder.items) ? baseOrder.items : [],
-    shippingMethod: text(baseOrder.shippingMethod),
-    paymentMethod: text(baseOrder.paymentMethod),
-    subtotal: Number(baseOrder.subtotal || 0),
-    shippingCost: Number(baseOrder.shippingCost || 0),
-    total: Number(baseOrder.total || 0)
-  };
 }
 
 function serializeOrder(order) {
@@ -87,31 +25,6 @@ function serializeOrder(order) {
   };
 }
 
-async function resolveOrder(reference, invoiceId) {
-  let order = (reference && await readOrder(reference)) || (invoiceId && await findOrderByInvoiceId(invoiceId));
-  const effectiveInvoiceId = invoiceId || (order && order.invoiceId) || "";
-
-  if (!effectiveInvoiceId || (order && isPaidStatus(order.status))) {
-    return order;
-  }
-
-  const remoteInvoice = await fetchArionPayInvoice(effectiveInvoiceId);
-  if (!remoteInvoice || !remoteInvoice.ok) {
-    return order;
-  }
-
-  const syncedOrder = buildSyncedOrder(order, remoteInvoice, reference, effectiveInvoiceId);
-  if (!syncedOrder) {
-    return order;
-  }
-
-  if (hasOrderChanged(order, syncedOrder)) {
-    await saveOrder(syncedOrder);
-  }
-
-  return syncedOrder;
-}
-
 module.exports = async function handler(req, res) {
   applyNoStore(res);
 
@@ -129,7 +42,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const order = await resolveOrder(reference, invoiceId);
+  const order = await reconcileOrder(reference, invoiceId);
 
   if (!order) {
     return res.status(404).json({ error: "Order not found." });

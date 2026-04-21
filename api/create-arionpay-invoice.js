@@ -237,27 +237,29 @@ module.exports = async function handler(req, res) {
     chain: paymentAsset.chain
   };
 
-  // Attempt to provide ArionPay with return/redirect URLs so the hosted
-  // payment page can send customers back to the storefront after payment,
-  // and a callback URL so the stored order record can be marked paid.
+  // Provide ArionPay with frontend redirect URLs for the hosted checkout
+  // and keep the webhook callback separate for server-side payment updates.
   // Prefer an explicit env var, then fall back to request origin or host.
   try {
     const base = (process.env.SITE_BASE_URL || process.env.PUBLIC_SITE_URL || req.headers?.origin || (req.headers && `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}`) || "").replace(/\/$/, "");
     if (base) {
-      const callbackBase = `${base}/api/arionpay-webhook?reference=${encodeURIComponent(reference)}`;
-      const successUrl = `${callbackBase}&status=success`;
-      const cancelUrl = `${callbackBase}&status=cancel`;
-      const callbackUrl = callbackBase;
+      const successQuery = new URLSearchParams({
+        reference,
+        status: "success"
+      }).toString();
+      const callbackQuery = new URLSearchParams({
+        reference
+      }).toString();
+      const successUrl = `${base}/checkout.html?${successQuery}`;
+      const cancelUrl = `${base}/cart.html`;
+      const callbackUrl = `${base}/api/arionpay-webhook?${callbackQuery}`;
 
-      // Include multiple common key names to increase compatibility with
-      // different gateway expectations (snake_case and camelCase).
-      payload.success_url = successUrl;
-      payload.return_url = successUrl;
+      // ArionPay support confirmed the hosted checkout now expects
+      // camelCase redirect fields only. Keep the browser return pointed
+      // at the storefront confirmation page, not the webhook route.
       payload.successUrl = successUrl;
       payload.returnUrl = successUrl;
-      payload.cancel_url = cancelUrl;
       payload.cancelUrl = cancelUrl;
-      payload.callback_url = callbackUrl;
       payload.callbackUrl = callbackUrl;
     }
   } catch (e) {
