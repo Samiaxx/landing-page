@@ -42,37 +42,6 @@ function hasGatewayEvidence(payload, invoiceId) {
   );
 }
 
-function resolveBaseUrl(req) {
-  return (
-    process.env.SITE_BASE_URL
-    || process.env.PUBLIC_SITE_URL
-    || req.headers?.origin
-    || (req.headers && `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}`)
-    || ""
-  ).replace(/\/$/, "");
-}
-
-function buildCheckoutRedirectUrl(req, reference, requestedStatus, orderStatus) {
-  const base = resolveBaseUrl(req);
-  const params = new URLSearchParams();
-  const normalizedReference = text(reference);
-  const normalizedRequestedStatus = text(requestedStatus).toLowerCase();
-  const normalizedOrderStatus = normalizeStatus(orderStatus);
-
-  if (normalizedReference) {
-    params.set("reference", normalizedReference);
-  }
-
-  if (/cancel|failed|expired/i.test(normalizedRequestedStatus || normalizedOrderStatus)) {
-    params.set("status", "cancel");
-  } else {
-    params.set("status", "success");
-  }
-
-  const query = params.toString();
-  return `${base || ""}/checkout.html${query ? `?${query}` : ""}`;
-}
-
 module.exports = async function handler(req, res) {
   applyNoStore(res);
 
@@ -89,7 +58,6 @@ module.exports = async function handler(req, res) {
   const payload = mergeCallbackPayload(req);
   const reference = extractReference(payload);
   const invoiceId = extractInvoiceId(payload);
-  const requestedStatus = text(req.query?.status);
   const shouldPersistGatewayUpdate = req.method === "POST" || hasGatewayEvidence(payload, invoiceId);
   const gatewayStatus = shouldPersistGatewayUpdate
     ? (extractGatewayStatus(payload) || "received")
@@ -152,20 +120,12 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  if (req.method === "GET") {
-    const redirectUrl = buildCheckoutRedirectUrl(
-      req,
-      reference || (nextOrder && nextOrder.reference) || "",
-      requestedStatus,
-      (nextOrder && nextOrder.status) || previousStatus
-    );
-    return res.redirect(302, redirectUrl);
-  }
-
   return res.status(200).json({
+    success: true,
     received: true,
     matched: Boolean(order),
     reference: (nextOrder && nextOrder.reference) || reference || "",
-    status: (nextOrder && nextOrder.status) || previousStatus || "received"
+    status: (nextOrder && nextOrder.status) || previousStatus || "received",
+    webhookOnly: true
   });
 };
