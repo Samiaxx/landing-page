@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const {
   PAYMENT_OPTIONS,
   SHIPPING_OPTIONS,
+  cartRequiresShipping,
   calculateTotals,
   normalizeCustomer,
   normalizeItems,
@@ -163,9 +164,10 @@ module.exports = async function handler(req, res) {
 
   const body = parseBody(req);
   const items = normalizeItems(body.items);
+  const requiresShipping = cartRequiresShipping(items);
   const reference = sanitizeReference(body.reference);
   const customer = normalizeCustomer(body.customer);
-  const missingCustomerFields = validateCustomer(customer);
+  const missingCustomerFields = validateCustomer(customer, { requiresShipping });
   const paymentAsset = PAYMENT_ASSETS[body.paymentMethod] || PAYMENT_ASSETS.USDT_TRC20;
   const shippingMethod = typeof body.shippingMethod === "string" ? body.shippingMethod : "eu-standard";
   const sessionOrderReference = optionalReference(body.sessionOrderReference);

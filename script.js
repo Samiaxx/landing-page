@@ -207,6 +207,23 @@ const PRODUCTS = [
     coaDate: "2026-03-10"
   },
   {
+    slug: "checkout-test-1eur",
+    name: { en: "Checkout Test Product", es: "Producto de prueba checkout" },
+    dosage: "1 unit",
+    price: 1,
+    requiresShipping: false,
+    status: "available",
+    featured: false,
+    image: IMAGE_SET[1],
+    gallery: [IMAGE_SET[1], IMAGE_SET[2], IMAGE_SET[3]],
+    short: {
+      en: "Low-value product created for end-to-end checkout and redirect testing.",
+      es: "Producto de bajo valor creado para pruebas integrales de checkout y redireccion."
+    },
+    batch: "PP-TST-0426",
+    coaDate: "2026-04-21"
+  },
+  {
     slug: "dsip-10mg",
     name: { en: "DSIP", es: "DSIP" },
     dosage: "10mg",

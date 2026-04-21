@@ -9,7 +9,8 @@ const PRODUCT_CATALOG = {
   "ss-31-50mg": { name: "SS-31", dosage: "50mg", price: 50 },
   "nad-1000mg": { name: "NAD+", dosage: "1000mg", price: 30 },
   "semax-30mg": { name: "Semax", dosage: "30mg", price: 20 },
-  "selank-10mg": { name: "Selank", dosage: "10mg", price: 18 }
+  "selank-10mg": { name: "Selank", dosage: "10mg", price: 18 },
+  "checkout-test-1eur": { name: "Checkout Test Product", dosage: "1 unit", price: 1, requiresShipping: false }
 };
 
 const SHIPPING_OPTIONS = {
@@ -36,6 +37,14 @@ const SHIPPING_OPTIONS = {
     note: "Transit time depends on destination and customs.",
     price: 24,
     freeEligible: false
+  },
+  "test-checkout": {
+    id: "test-checkout",
+    label: "No shipping",
+    eta: "Instant",
+    note: "Checkout-only test product with no delivery charge.",
+    price: 0,
+    freeEligible: true
   }
 };
 
@@ -95,10 +104,21 @@ function normalizeItems(items) {
     .filter(Boolean);
 }
 
+function cartRequiresShipping(items) {
+  if (!Array.isArray(items) || !items.length) {
+    return false;
+  }
+
+  return items.some((item) => item && item.product && item.product.requiresShipping !== false);
+}
+
 function calculateTotals(items, shippingMethod) {
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shipping = SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"];
-  const shippingCost = shipping.freeEligible && subtotal >= FREE_SHIPPING_THRESHOLD
+  const requiresShipping = cartRequiresShipping(items);
+  const shipping = requiresShipping
+    ? (SHIPPING_OPTIONS[shippingMethod] || SHIPPING_OPTIONS["eu-standard"])
+    : SHIPPING_OPTIONS["test-checkout"];
+  const shippingCost = !requiresShipping || (shipping.freeEligible && subtotal >= FREE_SHIPPING_THRESHOLD)
     ? 0
     : shipping.price;
 
@@ -147,7 +167,8 @@ function customerName(customer) {
   return [customer.firstName, customer.lastName].filter(Boolean).join(" ").trim();
 }
 
-function validateCustomer(customer) {
+function validateCustomer(customer, options = {}) {
+  const requiresShipping = options.requiresShipping !== false;
   const missing = [];
 
   if (!customer.firstName) {
@@ -159,19 +180,19 @@ function validateCustomer(customer) {
   if (!customer.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) {
     missing.push("email");
   }
-  if (!customer.country) {
+  if (requiresShipping && !customer.country) {
     missing.push("country");
   }
-  if (!customer.state) {
+  if (requiresShipping && !customer.state) {
     missing.push("state");
   }
-  if (!customer.city) {
+  if (requiresShipping && !customer.city) {
     missing.push("city");
   }
-  if (!customer.postalCode) {
+  if (requiresShipping && !customer.postalCode) {
     missing.push("postalCode");
   }
-  if (!customer.address) {
+  if (requiresShipping && !customer.address) {
     missing.push("address");
   }
   if (!customer.ageConfirmed) {
@@ -182,6 +203,7 @@ function validateCustomer(customer) {
 }
 
 module.exports = {
+  cartRequiresShipping,
   FREE_SHIPPING_THRESHOLD,
   PAYMENT_OPTIONS,
   PRODUCT_CATALOG,
