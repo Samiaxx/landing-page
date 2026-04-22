@@ -1452,6 +1452,88 @@
     return `checkout.html?reference=${encodeURIComponent(reference)}&status=success`;
   }
 
+  function logPaidCheckoutFlow(event, detail = {}) {
+    if (typeof console === "undefined" || typeof console.info !== "function") {
+      return;
+    }
+
+    try {
+      console.info("[paid-checkout-flow]", event, detail);
+    } catch {
+      // Ignore console serialization failures.
+    }
+  }
+
+  function matchingOrderReference(order, reference) {
+    const normalizedReference = typeof reference === "string"
+      ? reference.trim().replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80)
+      : "";
+
+    return Boolean(order && order.reference && normalizedReference && order.reference === normalizedReference)
+      ? order
+      : null;
+  }
+
+  function resolveReturnedOrder(success, reference, cachedOrder) {
+    if (reference) {
+      return matchingOrderReference(cachedOrder, reference);
+    }
+
+    if (success) {
+      return activeSessionOrder(cachedOrder);
+    }
+
+    return null;
+  }
+
+  function ensurePaidCheckoutSuccessUrl(order) {
+    if (!order || !order.reference || getCurrentPage() !== "checkout" || typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const currentStatus = params.get("status") || "";
+    const currentReference = params.get("reference") || "";
+    const nextUrl = buildOrderSuccessUrl(order.reference);
+
+    if (currentStatus === "success" && currentReference === order.reference) {
+      return;
+    }
+
+    try {
+      window.history.replaceState({}, document.title, nextUrl);
+      logPaidCheckoutFlow("normalize-success-url", {
+        reference: order.reference,
+        previousStatus: currentStatus,
+        previousReference: currentReference
+      });
+    } catch {
+      // Ignore history update failures.
+    }
+  }
+
+  function currentCheckoutSuccessState() {
+    const node = document.querySelector("[data-checkout-state]");
+    return node ? String(node.getAttribute("data-checkout-state") || "").trim() : "";
+  }
+
+  function ensureCompletedCheckoutScreen(order) {
+    if (!order || !isPaidOrderStatus(order.status) || getCurrentPage() !== "checkout") {
+      return;
+    }
+
+    const currentState = currentCheckoutSuccessState();
+    if (currentState === "completed") {
+      return;
+    }
+
+    logPaidCheckoutFlow("rerender-completed-screen", {
+      reference: order.reference,
+      currentState
+    });
+    renderPage();
+  }
+
   function clearArionPayStatusPoll() {
     if (arionPayStatusPollTimer) {
       window.clearTimeout(arionPayStatusPollTimer);
@@ -1570,6 +1652,12 @@
     }
 
     const allowRedirect = options.allowRedirect !== false;
+    ensurePaidCheckoutSuccessUrl(order);
+    logPaidCheckoutFlow("finalize-paid-ui", {
+      reference: order.reference,
+      status: order.status,
+      allowRedirect
+    });
 
     clearStoredCart();
     saveCheckoutDraft({});
@@ -1585,6 +1673,8 @@
         "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve."
       );
     }
+
+    ensureCompletedCheckoutScreen(order);
 
     if (allowRedirect && getCurrentPage() === "checkout") {
       schedulePaidOrderRedirect();
@@ -1603,10 +1693,13 @@
     const success = params.get("status") === "success";
     const reference = params.get("reference") || "";
     const order = readLastOrder();
-    const paidSessionOrder = activeSessionOrder(order) && isPaidOrderStatus(order.status)
+    const returnedOrder = resolveReturnedOrder(success, reference, order);
+    const paidSessionOrder = !success && activeSessionOrder(order) && isPaidOrderStatus(order.status)
       ? order
       : null;
-    const successOrder = success && order && (!reference || order.reference === reference) ? order : null;
+    const successOrder = success && returnedOrder && isPaidOrderStatus(returnedOrder.status)
+      ? returnedOrder
+      : null;
     const completedOrder = successOrder && isPaidOrderStatus(successOrder.status)
       ? successOrder
       : paidSessionOrder;
@@ -1616,6 +1709,12 @@
       return;
     }
 
+    logPaidCheckoutFlow("sync-paid-order", {
+      success,
+      reference,
+      completedReference: completedOrder.reference,
+      completedStatus: completedOrder.status
+    });
     finalizePaidCheckoutUi(completedOrder, document.querySelector("[data-order-sync-status]"), {
       allowRedirect: success || Boolean(paidSessionOrder)
     });
@@ -1634,9 +1733,8 @@
     const lastOrder = readLastOrder();
     const sessionOrderReference = readCheckoutSessionOrderReference();
     const sessionOrder = activeSessionOrder(lastOrder);
-    const cachedOrder = reference
-      ? (lastOrder && lastOrder.reference === reference ? lastOrder : null)
-      : sessionOrder;
+    const returnedOrder = resolveReturnedOrder(success, reference, lastOrder);
+    const cachedOrder = returnedOrder || sessionOrder;
     const shouldMonitorSession = Boolean(sessionOrder && sessionOrder.invoiceId);
 
     if (!success && !reference && !shouldMonitorSession) {
@@ -1647,6 +1745,12 @@
     const orderReference = reference || sessionOrderReference || (cachedOrder && cachedOrder.reference) || "";
 
     if (!orderReference) {
+      logPaidCheckoutFlow("missing-order-reference", {
+        success,
+        reference,
+        sessionOrderReference,
+        cachedReference: cachedOrder && cachedOrder.reference
+      });
       resetArionPayStatusPoll();
       clearPaidOrderRedirect();
       return;
@@ -1675,6 +1779,11 @@
       const payload = await response.json().catch(() => ({}));
 
       if (!response.ok || !payload.order) {
+        logPaidCheckoutFlow("status-check-pending", {
+          orderReference,
+          httpStatus: response.status,
+          hasOrder: Boolean(payload && payload.order)
+        });
         if (statusNode) {
           statusNode.textContent = tx(
             "Payment received. We are still waiting for ArionPay confirmation. Please do not pay again.",
@@ -1705,6 +1814,13 @@
       saveLastOrder(nextOrder);
 
       if (isPaidOrderStatus(nextOrder.status)) {
+        logPaidCheckoutFlow("status-check-paid", {
+          orderReference,
+          resolvedReference: nextOrder.reference,
+          cachedStatus: cachedOrder && cachedOrder.status,
+          changed
+        });
+        ensurePaidCheckoutSuccessUrl(nextOrder);
         finalizePaidCheckoutUi(nextOrder, statusNode, { allowRedirect: true });
       } else {
         clearPaidOrderRedirect();
@@ -3005,7 +3121,7 @@
       return `
         <section class="page-hero">
           <div class="container section-stack">
-            <article class="success-card reveal">
+            <article class="success-card reveal" data-checkout-state="confirming">
               <p class="section-kicker">${bankTransferOrder ? tx("Manual payment selected", "Pago manual seleccionado") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${tx("Your order summary is ready.", "El resumen de tu pedido esta listo.")}</h1>
               <p class="success-copy">${tx("Crypto checkout now uses hosted ArionPay payment links for USDT orders.", "El checkout crypto ahora usa enlaces de pago alojados de ArionPay para pedidos USDT.")}</p>
@@ -3121,7 +3237,7 @@
       return `
         <section class="page-hero">
           <div class="container section-stack">
-            <article class="success-card reveal">
+            <article class="success-card reveal" data-checkout-state="completed">
               <p class="section-kicker">${orderPaid ? tx("Payment confirmed", "Pago confirmado") : tx("Order received", "Pedido recibido")}</p>
               <h1 class="success-title">${orderPaid ? tx("Your order is moving to fulfilment.", "Tu pedido ya pasa a preparacion.") : tx("Your payment page is ready.", "Tu pagina de pago ya esta lista.")}</h1>
               <p class="success-copy">${orderPaid
@@ -4097,9 +4213,7 @@
     const success = params.get("status") === "success";
     const returnReference = params.get("reference") || "";
     const cachedOrder = readLastOrder();
-    const order = cachedOrder && (!returnReference || cachedOrder.reference === returnReference)
-      ? cachedOrder
-      : null;
+    const order = resolveReturnedOrder(success, returnReference, cachedOrder);
     const cart = readCart();
     const total = subtotal(cart);
     const draft = readCheckoutDraft();
@@ -4125,7 +4239,7 @@
         <section class="page-hero">
           <div class="container section-stack">
             ${renderCheckoutStage("payment")}
-            <article class="success-card reveal">
+            <article class="success-card reveal" data-checkout-state="confirming">
               <p class="section-kicker">${tx("Payment received", "Pago recibido")}</p>
               <h1 class="success-title">${tx("We are confirming your order.", "Estamos confirmando tu pedido.")}</h1>
               <p class="success-copy">${tx("We received your return from ArionPay and are now confirming the payment status. This page updates automatically, so please do not pay again.", "Hemos recibido tu retorno desde ArionPay y ahora estamos confirmando el estado del pago. Esta pagina se actualiza automaticamente, por favor no pagues de nuevo.")}</p>
