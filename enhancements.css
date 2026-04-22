@@ -838,6 +838,53 @@
   background: rgba(26, 111, 214, 0.06);
 }
 
+.checkout-note-panel-precision {
+  margin-top: 0.4rem;
+}
+
+.checkout-precision-card,
+.checkout-tip-card {
+  display: grid;
+  gap: 10px;
+  padding: 1rem 1.05rem;
+  border-radius: 18px;
+  border: 1px solid rgba(10, 23, 48, 0.08);
+  background: linear-gradient(135deg, rgba(247, 250, 255, 0.96), rgba(255, 255, 255, 0.96));
+}
+
+.checkout-precision-card {
+  border-color: rgba(26, 111, 214, 0.16);
+  background: linear-gradient(135deg, rgba(234, 243, 255, 0.92), rgba(248, 251, 255, 0.98));
+}
+
+.checkout-precision-card strong,
+.checkout-tip-title {
+  color: var(--text);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.checkout-precision-card p,
+.checkout-tip-card p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.checkout-tip-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-soft);
+}
+
+.checkout-tip-list li {
+  line-height: 1.55;
+}
+
 .summary-row-total {
   background: linear-gradient(135deg, rgba(26, 111, 214, 0.08), rgba(219, 235, 255, 0.92));
 }
@@ -1052,6 +1099,11 @@
   border-radius: 18px;
   border: 1px solid rgba(10, 23, 48, 0.08);
   background: rgba(9, 22, 48, 0.04);
+}
+
+.checkout-agreement-emphasis {
+  border-color: rgba(26, 111, 214, 0.2);
+  background: linear-gradient(135deg, rgba(234, 243, 255, 0.92), rgba(248, 251, 255, 0.98));
 }
 
 .crypto-payment-card {

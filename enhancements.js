@@ -1378,6 +1378,7 @@
     next.paymentCurrency = "USDT_TRC20";
     next.createAccount = false;
     next.alternateShipping = false;
+    next.exactAmountConfirmed = next.exactAmountConfirmed === true;
     return next;
   }
 
@@ -2248,7 +2249,8 @@
       marketingOptIn: data.get("marketingOptIn") === "on",
       createAccount: data.get("createAccount") === "on",
       alternateShipping: data.get("alternateShipping") === "on",
-      ageConfirmed: data.get("ageConfirmed") === "on"
+      ageConfirmed: data.get("ageConfirmed") === "on",
+      exactAmountConfirmed: data.get("exactAmountConfirmed") === "on"
     };
   }
 
@@ -2336,7 +2338,7 @@
   }
 
   function checkoutSubmitLabel(payment) {
-    return tx("Pay now", "Pagar ahora");
+    return tx("Continue to Secure Crypto Payment", "Continuar al pago seguro con criptomonedas");
   }
 
   function checkoutPendingStatus(payment) {
@@ -2346,13 +2348,50 @@
   function checkoutHelperCopy(payment, cart = []) {
     return cartRequiresShipping(cart)
       ? tx(
-        "You will continue to the secure ArionPay payment page in this tab and return here automatically after payment.",
-        "Continuaras a la pagina de pago segura de ArionPay en esta pestana y volveras aqui automaticamente despues del pago."
+        "You will continue to the secure ArionPay page in this tab. The order stays in EUR here, and the next page will show the exact USDT amount to send for automatic confirmation.",
+        "Continuaras a la pagina segura de ArionPay en esta pestana. El pedido se mantiene en EUR aqui y la siguiente pagina mostrara la cantidad exacta de USDT que debes enviar para la confirmacion automatica."
       )
       : tx(
-        "This checkout test item has no shipping charge. You can continue directly to the secure ArionPay payment page in this tab.",
-        "Este articulo de prueba no tiene coste de envio. Puedes continuar directamente a la pagina segura de pago de ArionPay en esta pestana."
+        "This checkout test item has no shipping charge. The next page will show the exact USDT amount to send for automatic confirmation.",
+        "Este articulo de prueba no tiene coste de envio. La siguiente pagina mostrara la cantidad exacta de USDT que debes enviar para la confirmacion automatica."
       );
+  }
+
+  function exactAmountConfirmationPrompt() {
+    return tx(
+      "Please confirm that you will pay the exact USDT amount shown on the next page before continuing.",
+      "Confirma que pagaras la cantidad exacta de USDT mostrada en la pagina siguiente antes de continuar."
+    );
+  }
+
+  function renderExactAmountGuidance() {
+    return `
+      <div class="checkout-side-section">
+        <p class="checkout-eyebrow">${tx("Before secure payment", "Antes del pago seguro")}</p>
+        <div class="checkout-precision-card">
+          <strong>${tx("Please send the exact USDT amount shown on the next page. Do not round the number.", "Por favor, envia la cantidad exacta de USDT mostrada en la pagina siguiente. No redondees el numero.")}</strong>
+          <p>${tx("Your order review stays in EUR on the store for clarity. ArionPay will display the precise USDT amount and network to use before you pay.", "El resumen del pedido se mantiene en EUR dentro de la tienda para mayor claridad. ArionPay mostrara la cantidad exacta de USDT y la red que debes usar antes de pagar.")}</p>
+        </div>
+        <div class="checkout-tip-card">
+          <span class="checkout-tip-title">${tx("Payment tip", "Consejo de pago")}</span>
+          <ul class="checkout-tip-list">
+            <li>${tx("Copy the exact amount from the ArionPay page.", "Copia la cantidad exacta desde la pagina de ArionPay.")}</li>
+            <li>${tx("Include the decimals exactly as shown.", "Incluye los decimales exactamente como se muestran.")}</li>
+            <li>${tx("Use the correct network: USDT on TRC20.", "Usa la red correcta: USDT en TRC20.")}</li>
+            <li>${tx("Underpayment can delay automatic confirmation.", "Un pago incompleto puede retrasar la confirmacion automatica.")}</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderExactAmountReturnNotice() {
+    return `
+      <div class="checkout-note-panel checkout-note-panel-precision">
+        <strong>${tx("Automatic confirmation", "Confirmacion automatica")}</strong>
+        <p>${tx("Payments are confirmed automatically when the exact amount shown by ArionPay is received.", "Los pagos se confirman automaticamente cuando se recibe la cantidad exacta mostrada por ArionPay.")}</p>
+      </div>
+    `;
   }
 
   function singleItemCartEntry(cart) {
@@ -2405,16 +2444,18 @@
     const payment = selectedPayment();
     const cryptoCurrency = selectedCryptoCurrency();
     const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, cryptoCurrency.id);
+    const exactAmountCheckbox = document.querySelector('[data-exact-amount-confirmation]');
+    const exactAmountConfirmed = !exactAmountCheckbox || exactAmountCheckbox.checked;
 
     if (submitButton) {
       submitButton.textContent = checkoutSubmitLabel(payment);
-      submitButton.disabled = !cryptoState.ready;
+      submitButton.disabled = !cryptoState.ready || !exactAmountConfirmed;
     }
 
     if (statusNode) {
-      statusNode.textContent = cryptoState.ready
-        ? checkoutHelperCopy(payment, cart)
-        : cryptoState.reason;
+      statusNode.textContent = !cryptoState.ready
+        ? cryptoState.reason
+        : (exactAmountConfirmed ? checkoutHelperCopy(payment, cart) : exactAmountConfirmationPrompt());
     }
   }
 
@@ -3979,12 +4020,12 @@
         </div>
         <div class="detail-card">
           <span class="detail-label">${tx("Step 3", "Paso 3")}</span>
-          <strong>${tx("Continue to ArionPay", "Continua a ArionPay")}</strong>
+          <strong>${tx("Continue to Secure Crypto Payment", "Continua al pago seguro con criptomonedas")}</strong>
           <p>${!requiresShipping
-            ? tx("The hosted invoice opens immediately after confirmation, with no shipping charge added.", "La factura alojada se abre inmediatamente tras la confirmacion, sin coste de envio adicional.")
+            ? tx("The hosted invoice opens immediately after confirmation and shows the exact USDT amount to send.", "La factura alojada se abre inmediatamente tras la confirmacion y muestra la cantidad exacta de USDT a enviar.")
             : total >= FREE_SHIPPING_THRESHOLD
-            ? tx("Free EU shipping is already unlocked before payment opens.", "El envio UE gratuito ya esta activado antes de abrir el pago.")
-            : tx("The hosted invoice opens immediately after order confirmation.", "La factura alojada se abre justo despues de confirmar el pedido.")
+            ? tx("Free EU shipping is already unlocked before payment opens, and ArionPay shows the exact USDT amount next.", "El envio UE gratuito ya esta activado antes de abrir el pago y ArionPay mostrara despues la cantidad exacta de USDT.")
+            : tx("The hosted invoice opens immediately after order confirmation and shows the exact USDT amount next.", "La factura alojada se abre justo despues de confirmar el pedido y muestra despues la cantidad exacta de USDT.")
           }</p>
         </div>
       </div>
@@ -4253,6 +4294,7 @@
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
               </div>
               <p class="helper-copy" data-order-sync-status>${tx("Payment received. Confirming your order with ArionPay now...", "Pago recibido. Confirmando tu pedido con ArionPay ahora...")}</p>
+              ${renderExactAmountReturnNotice()}
             </article>
           </div>
         </section>
@@ -4284,6 +4326,7 @@
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
               </div>
               <p class="helper-copy" data-order-sync-status>${tx("Payment confirmed. Your cart has been cleared and you will be redirected to the homepage shortly.", "Pago confirmado. Tu carrito ya se ha vaciado y seras redirigido a la pagina principal en breve.")}</p>
+              ${renderExactAmountReturnNotice()}
             </article>
           </div>
         </section>
@@ -4312,6 +4355,7 @@
                 <a class="btn btn-secondary" href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
               </div>
               <p class="helper-copy" data-order-sync-status>${tx("Payment received. Confirming your order with ArionPay now...", "Pago recibido. Confirmando tu pedido con ArionPay ahora...")}</p>
+              ${renderExactAmountReturnNotice()}
             </article>
           </div>
         </section>
@@ -4480,8 +4524,9 @@
                 <div class="checkout-choice-list">
                   ${ACTIVE_PAYMENT_OPTIONS.map((item) => renderSidebarPaymentChoice(item, payment.id)).join("")}
                 </div>
-                <p class="checkout-side-note">${tx("The live checkout asset for this store is USDT (TRC20). After order confirmation, the payment page opens directly through ArionPay.", "El activo activo para este checkout es USDT (TRC20). Tras confirmar el pedido, la pagina de pago se abre directamente mediante ArionPay.")}</p>
+                <p class="checkout-side-note">${tx("The store review remains in EUR here. After order confirmation, ArionPay opens and shows the exact payable USDT amount on TRC20.", "El resumen de la tienda se mantiene en EUR aqui. Tras confirmar el pedido, ArionPay se abre y muestra la cantidad exacta de USDT a pagar en TRC20.")}</p>
               </div>
+              ${renderExactAmountGuidance()}
               <div class="support-chip-row">
                 ${requiresShipping
                   ? `<div class="support-chip">${tx("Selected delivery", "Envio elegido")}: ${localize(delivery.label)}</div>`
@@ -4489,6 +4534,10 @@
                 }
                 <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
               </div>
+              <label class="checkout-agreement checkout-agreement-emphasis">
+                <input type="checkbox" name="exactAmountConfirmed" form="checkout-form" data-exact-amount-confirmation ${draft.exactAmountConfirmed ? "checked" : ""} required>
+                <span>${tx("I understand that I must pay the exact USDT amount shown on the secure ArionPay page for automatic confirmation.", "Entiendo que debo pagar la cantidad exacta de USDT mostrada en la pagina segura de ArionPay para la confirmacion automatica.")}</span>
+              </label>
               <label class="checkout-agreement">
                 <input type="checkbox" name="ageConfirmed" form="checkout-form" ${draft.ageConfirmed ? "checked" : ""} required>
                 <span>${tx("I confirm that I am purchasing for laboratory research use only, that I am of legal age, and that I have read the terms and privacy policy.", "Confirmo que compro solo para investigacion de laboratorio, que soy mayor de edad y que he leido los terminos y la politica de privacidad.")}</span>
@@ -4644,13 +4693,17 @@
 
       checkoutForm.addEventListener("input", () => {
         saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
+        syncCheckoutUi();
       });
 
       checkoutForm.addEventListener("change", (event) => {
         saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
         if (["country", "shippingMethod"].includes(event.target.name)) {
           renderPage();
+          return;
         }
+
+        syncCheckoutUi();
       });
 
       checkoutForm.addEventListener("submit", (event) => {
@@ -4681,6 +4734,22 @@
         }
 
         saveCheckoutDraft(draft);
+
+        if (!draft.exactAmountConfirmed) {
+          const message = exactAmountConfirmationPrompt();
+
+          if (statusNode) {
+            statusNode.textContent = message;
+          }
+
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = checkoutSubmitLabel(payment);
+          }
+
+          showToast(message);
+          return;
+        }
 
         if (duplicatePaidOrder) {
           saveLastOrder(duplicatePaidOrder);
