@@ -22,6 +22,10 @@
   let arionPayStatusPollTimer = 0;
   let arionPayStatusPollCount = 0;
   let paidOrderRedirectTimer = 0;
+  let checkoutAgreementState = {
+    ageConfirmed: false,
+    exactAmountConfirmed: false
+  };
 
   const ARIONPAY_STATUS_POLL_DELAY_MS = 2500;
   const ARIONPAY_STATUS_POLL_LIMIT = 48;
@@ -1348,8 +1352,32 @@
     next.paymentCurrency = "USDT_TRC20";
     next.createAccount = false;
     next.alternateShipping = false;
-    next.exactAmountConfirmed = next.exactAmountConfirmed === true;
+    delete next.ageConfirmed;
+    delete next.exactAmountConfirmed;
     return next;
+  }
+
+  function readCheckoutAgreements() {
+    return {
+      ageConfirmed: checkoutAgreementState.ageConfirmed === true,
+      exactAmountConfirmed: checkoutAgreementState.exactAmountConfirmed === true
+    };
+  }
+
+  function resetCheckoutAgreements() {
+    checkoutAgreementState = {
+      ageConfirmed: false,
+      exactAmountConfirmed: false
+    };
+  }
+
+  function syncCheckoutAgreementsFromForm(form) {
+    const data = new FormData(form);
+    checkoutAgreementState = {
+      ageConfirmed: data.get("ageConfirmed") === "on",
+      exactAmountConfirmed: data.get("exactAmountConfirmed") === "on"
+    };
+    return readCheckoutAgreements();
   }
 
   function readCheckoutDraft() {
@@ -1628,6 +1656,7 @@
 
     clearStoredCart();
     saveCheckoutDraft({});
+    resetCheckoutAgreements();
     clearCheckoutSessionOrderReference();
 
     if (typeof updateCartBadges === "function") {
@@ -3118,6 +3147,7 @@
     const cart = readCart();
     const total = subtotal(cart);
     const draft = readCheckoutDraft();
+    const agreements = readCheckoutAgreements();
     const country = countryConfig(draft.country || "NG");
     const region = normalizeRegion(country.code, draft.state || "");
     const delivery = DELIVERY_OPTIONS.find((item) => item.id === (draft.shippingMethod || "eu-standard")) || DELIVERY_OPTIONS[0];
@@ -3400,7 +3430,7 @@
                 <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
               </div>
               <label class="checkout-agreement">
-                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${draft.ageConfirmed ? "checked" : ""} required>
+                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${agreements.ageConfirmed ? "checked" : ""} required>
                 <span>${tx("I confirm that I am purchasing for laboratory research use only, that I am of legal age, and that I have read the terms and privacy policy.", "Confirmo que compro solo para investigacion de laboratorio, que soy mayor de edad y que he leido los terminos y la politica de privacidad.")}</span>
               </label>
               <button class="btn btn-primary btn-block" type="submit" form="checkout-form" data-checkout-submit>${checkoutSubmitLabel(payment)}</button>
@@ -4204,6 +4234,7 @@
     const cart = readCart();
     const total = subtotal(cart);
     const draft = readCheckoutDraft();
+    const agreements = readCheckoutAgreements();
     const country = countryConfig(draft.country || "NG");
     const region = normalizeRegion(country.code, draft.state || "");
     const delivery = selectedDelivery(total);
@@ -4459,11 +4490,11 @@
                 <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
               </div>
               <label class="checkout-agreement checkout-agreement-emphasis">
-                <input type="checkbox" name="exactAmountConfirmed" form="checkout-form" data-exact-amount-confirmation ${draft.exactAmountConfirmed ? "checked" : ""} required>
+                <input type="checkbox" name="exactAmountConfirmed" form="checkout-form" data-exact-amount-confirmation ${agreements.exactAmountConfirmed ? "checked" : ""} required>
                 <span>${tx("I understand that I must pay the exact USDT amount shown on the secure ArionPay page for automatic confirmation.", "Entiendo que debo pagar la cantidad exacta de USDT mostrada en la pagina segura de ArionPay para la confirmacion automatica.")}</span>
               </label>
               <label class="checkout-agreement">
-                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${draft.ageConfirmed ? "checked" : ""} required>
+                <input type="checkbox" name="ageConfirmed" form="checkout-form" ${agreements.ageConfirmed ? "checked" : ""} required>
                 <span>${tx("I confirm that I am purchasing for laboratory research use only, that I am of legal age, and that I have read the terms and privacy policy.", "Confirmo que compro solo para investigacion de laboratorio, que soy mayor de edad y que he leido los terminos y la politica de privacidad.")}</span>
               </label>
               ${renderOrderReviewSteps(total, cart)}
@@ -4597,7 +4628,9 @@
 
     if (checkoutForm) {
       const syncCheckoutDraftAndUi = (event) => {
-        saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
+        const draft = checkoutDraftFromForm(checkoutForm);
+        syncCheckoutAgreementsFromForm(checkoutForm);
+        saveCheckoutDraft(draft);
 
         if (event && ["country", "shippingMethod"].includes(event.target.name)) {
           renderPage();
