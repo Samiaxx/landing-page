@@ -2322,6 +2322,13 @@
     );
   }
 
+  function legalAgeConfirmationPrompt() {
+    return tx(
+      "Please confirm the research-use, legal-age, and policy agreement before continuing.",
+      "Confirma el uso de investigacion, la mayoria de edad y la aceptacion de politicas antes de continuar."
+    );
+  }
+
   function renderExactAmountGuidance() {
     return `
       <div class="checkout-side-section">
@@ -2403,17 +2410,21 @@
     const cryptoCurrency = selectedCryptoCurrency();
     const cryptoState = hostedCryptoCheckoutState(payment, cart, shipping, cryptoCurrency.id);
     const exactAmountCheckbox = document.querySelector('[data-exact-amount-confirmation]');
+    const ageConfirmationCheckbox = document.querySelector('[name="ageConfirmed"][form="checkout-form"]');
     const exactAmountConfirmed = !exactAmountCheckbox || exactAmountCheckbox.checked;
+    const ageConfirmed = !ageConfirmationCheckbox || ageConfirmationCheckbox.checked;
 
     if (submitButton) {
       submitButton.textContent = checkoutSubmitLabel(payment);
-      submitButton.disabled = !cryptoState.ready || !exactAmountConfirmed;
+      submitButton.disabled = !cryptoState.ready || !exactAmountConfirmed || !ageConfirmed;
     }
 
     if (statusNode) {
       statusNode.textContent = !cryptoState.ready
         ? cryptoState.reason
-        : (exactAmountConfirmed ? checkoutHelperCopy(payment, cart) : exactAmountConfirmationPrompt());
+        : (!exactAmountConfirmed
+          ? exactAmountConfirmationPrompt()
+          : (!ageConfirmed ? legalAgeConfirmationPrompt() : checkoutHelperCopy(payment, cart)));
     }
   }
 
@@ -4585,6 +4596,17 @@
     });
 
     if (checkoutForm) {
+      const syncCheckoutDraftAndUi = (event) => {
+        saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
+
+        if (event && ["country", "shippingMethod"].includes(event.target.name)) {
+          renderPage();
+          return;
+        }
+
+        syncCheckoutUi();
+      };
+
       document.querySelectorAll("[data-choice-card]").forEach((card) => {
         card.addEventListener("click", (event) => {
           if (event.target.closest("input, select, textarea, a")) {
@@ -4605,19 +4627,23 @@
       });
 
       checkoutForm.addEventListener("input", () => {
-        saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
-        syncCheckoutUi();
+        syncCheckoutDraftAndUi();
       });
 
       checkoutForm.addEventListener("change", (event) => {
-        saveCheckoutDraft(checkoutDraftFromForm(checkoutForm));
-        if (["country", "shippingMethod"].includes(event.target.name)) {
-          renderPage();
-          return;
-        }
-
-        syncCheckoutUi();
+        syncCheckoutDraftAndUi(event);
       });
+
+      document
+        .querySelectorAll('input[form="checkout-form"], select[form="checkout-form"], textarea[form="checkout-form"]')
+        .forEach((field) => {
+          if (field.matches('[type="hidden"], [type="submit"]')) {
+            return;
+          }
+
+          field.addEventListener("input", syncCheckoutDraftAndUi);
+          field.addEventListener("change", syncCheckoutDraftAndUi);
+        });
 
       checkoutForm.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -4650,6 +4676,22 @@
 
         if (!draft.exactAmountConfirmed) {
           const message = exactAmountConfirmationPrompt();
+
+          if (statusNode) {
+            statusNode.textContent = message;
+          }
+
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = checkoutSubmitLabel(payment);
+          }
+
+          showToast(message);
+          return;
+        }
+
+        if (!draft.ageConfirmed) {
+          const message = legalAgeConfirmationPrompt();
 
           if (statusNode) {
             statusNode.textContent = message;
