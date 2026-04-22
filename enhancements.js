@@ -155,18 +155,6 @@
       freeEligible: false
     }
   ];
-  const NO_SHIPPING_OPTION = {
-    id: "test-checkout",
-    label: { en: "No shipping", es: "Sin envio" },
-    eta: { en: "Instant", es: "Instantaneo" },
-    note: {
-      en: "Checkout-only test product with no delivery charge.",
-      es: "Producto de prueba solo para checkout sin coste de envio."
-    },
-    price: 0,
-    freeEligible: true
-  };
-
   const PAYMENT_OPTIONS = [
     {
       id: "USDT_TRC20",
@@ -1263,10 +1251,6 @@
   }
 
   function selectedDelivery(total) {
-    if (!cartRequiresShipping(readCart())) {
-      return NO_SHIPPING_OPTION;
-    }
-
     const saved = readCheckoutDraft();
     return DELIVERY_OPTIONS.find((item) => item.id === saved.shippingMethod)
       || DELIVERY_OPTIONS.find((item) => item.id === "eu-standard")
@@ -1304,22 +1288,8 @@
     return `ArionPay - ${localize((cryptoCurrency || selectedCryptoCurrency()).label)}`;
   }
 
-  function cartRequiresShipping(cart) {
-    if (!Array.isArray(cart) || !cart.length) {
-      return false;
-    }
-
-    return cart.some((item) => {
-      const product = item && item.slug ? getProduct(item.slug) : null;
-      return product && product.requiresShipping !== false;
-    });
-  }
-
   function deliveryPrice(option, total) {
     if (!option) {
-      return 0;
-    }
-    if (option.id === NO_SHIPPING_OPTION.id) {
       return 0;
     }
     if (option.freeEligible && total >= FREE_SHIPPING_THRESHOLD) {
@@ -1329,7 +1299,7 @@
   }
 
   function cartShippingCost(cart, option, total) {
-    return cartRequiresShipping(cart) ? deliveryPrice(option, total) : 0;
+    return deliveryPrice(option, total);
   }
 
   function productProfile(product) {
@@ -1579,10 +1549,6 @@
   }
 
   function deliveryOptionById(id, fallbackId) {
-    if (id === NO_SHIPPING_OPTION.id || fallbackId === NO_SHIPPING_OPTION.id) {
-      return NO_SHIPPING_OPTION;
-    }
-
     return DELIVERY_OPTIONS.find((item) => item.id === id)
       || DELIVERY_OPTIONS.find((item) => item.id === fallbackId)
       || DELIVERY_OPTIONS[0];
@@ -2226,8 +2192,7 @@
 
   function checkoutDraftFromForm(form) {
     const data = new FormData(form);
-    const requiresShipping = cartRequiresShipping(readCart());
-    const country = requiresShipping ? countryConfig(data.get("country")).code : "";
+    const country = countryConfig(data.get("country")).code;
     return {
       firstName: String(data.get("firstName") || "").trim(),
       lastName: String(data.get("lastName") || "").trim(),
@@ -2235,15 +2200,13 @@
       phone: String(data.get("phone") || "").trim(),
       company: String(data.get("company") || "").trim(),
       country,
-      state: requiresShipping ? normalizeRegion(country, String(data.get("state") || "").trim()) : "",
-      city: requiresShipping ? String(data.get("city") || "").trim() : "",
-      postalCode: requiresShipping ? String(data.get("postalCode") || "").trim() : "",
-      address: requiresShipping ? String(data.get("address") || "").trim() : "",
-      addressLine2: requiresShipping ? String(data.get("addressLine2") || "").trim() : "",
+      state: normalizeRegion(country, String(data.get("state") || "").trim()),
+      city: String(data.get("city") || "").trim(),
+      postalCode: String(data.get("postalCode") || "").trim(),
+      address: String(data.get("address") || "").trim(),
+      addressLine2: String(data.get("addressLine2") || "").trim(),
       notes: String(data.get("notes") || "").trim(),
-      shippingMethod: requiresShipping
-        ? String(data.get("shippingMethod") || "eu-standard")
-        : NO_SHIPPING_OPTION.id,
+      shippingMethod: String(data.get("shippingMethod") || "eu-standard"),
       paymentMethod: String(data.get("paymentMethod") || "USDT_TRC20"),
       paymentCurrency: String(data.get("paymentCurrency") || "USDT_TRC20"),
       marketingOptIn: data.get("marketingOptIn") === "on",
@@ -2346,15 +2309,10 @@
   }
 
   function checkoutHelperCopy(payment, cart = []) {
-    return cartRequiresShipping(cart)
-      ? tx(
-        "You will continue to the secure ArionPay page in this tab. The order stays in EUR here, and the next page will show the exact USDT amount to send for automatic confirmation.",
-        "Continuaras a la pagina segura de ArionPay en esta pestana. El pedido se mantiene en EUR aqui y la siguiente pagina mostrara la cantidad exacta de USDT que debes enviar para la confirmacion automatica."
-      )
-      : tx(
-        "This checkout test item has no shipping charge. The next page will show the exact USDT amount to send for automatic confirmation.",
-        "Este articulo de prueba no tiene coste de envio. La siguiente pagina mostrara la cantidad exacta de USDT que debes enviar para la confirmacion automatica."
-      );
+    return tx(
+      "You will continue to the secure ArionPay page in this tab. The order stays in EUR here, and the next page will show the exact USDT amount to send for automatic confirmation.",
+      "Continuaras a la pagina segura de ArionPay en esta pestana. El pedido se mantiene en EUR aqui y la siguiente pagina mostrara la cantidad exacta de USDT que debes enviar para la confirmacion automatica."
+    );
   }
 
   function exactAmountConfirmationPrompt() {
@@ -3995,35 +3953,22 @@
   }
 
   function renderOrderReviewSteps(total, cart = []) {
-    const requiresShipping = cartRequiresShipping(cart);
-
     return `
       <div class="step-list checkout-step-list">
         <div class="detail-card">
           <span class="detail-label">${tx("Step 1", "Paso 1")}</span>
           <strong>${tx("Review the order", "Revisa el pedido")}</strong>
-          <p>${requiresShipping
-            ? tx("Confirm quantities, product mix, and shipping selection before leaving the cart.", "Confirma cantidades, mezcla de productos y envio antes de salir del carrito.")
-            : tx("Confirm the test product and continue straight into payment with the same live gateway flow.", "Confirma el producto de prueba y continua directamente al pago con el mismo flujo real del gateway.")
-          }</p>
+          <p>${tx("Confirm quantities, product mix, and shipping selection before leaving the cart.", "Confirma cantidades, mezcla de productos y envio antes de salir del carrito.")}</p>
         </div>
         <div class="detail-card">
           <span class="detail-label">${tx("Step 2", "Paso 2")}</span>
-          <strong>${requiresShipping
-            ? tx("Complete billing details", "Completa los datos de facturacion")
-            : tx("Enter contact details", "Introduce tus datos de contacto")
-          }</strong>
-          <p>${requiresShipping
-            ? tx("Country, address, and contact details carry directly into the live payment handoff.", "Pais, direccion y contacto pasan directamente a la entrega del pago en vivo.")
-            : tx("Only contact details are required for this no-shipping checkout test.", "Solo se requieren datos de contacto para esta prueba de checkout sin envio.")
-          }</p>
+          <strong>${tx("Complete billing details", "Completa los datos de facturacion")}</strong>
+          <p>${tx("Country, address, and contact details carry directly into the live payment handoff.", "Pais, direccion y contacto pasan directamente a la entrega del pago en vivo.")}</p>
         </div>
         <div class="detail-card">
           <span class="detail-label">${tx("Step 3", "Paso 3")}</span>
           <strong>${tx("Continue to Secure Crypto Payment", "Continua al pago seguro con criptomonedas")}</strong>
-          <p>${!requiresShipping
-            ? tx("The hosted invoice opens immediately after confirmation and shows the exact USDT amount to send.", "La factura alojada se abre inmediatamente tras la confirmacion y muestra la cantidad exacta de USDT a enviar.")
-            : total >= FREE_SHIPPING_THRESHOLD
+          <p>${total >= FREE_SHIPPING_THRESHOLD
             ? tx("Free EU shipping is already unlocked before payment opens, and ArionPay shows the exact USDT amount next.", "El envio UE gratuito ya esta activado antes de abrir el pago y ArionPay mostrara despues la cantidad exacta de USDT.")
             : tx("The hosted invoice opens immediately after order confirmation and shows the exact USDT amount next.", "La factura alojada se abre justo despues de confirmar el pedido y muestra despues la cantidad exacta de USDT.")
           }</p>
@@ -4161,7 +4106,6 @@
     const cart = readCart();
     const total = subtotal(cart);
     const delivery = selectedDelivery(total);
-    const requiresShipping = cartRequiresShipping(cart);
     const payment = selectedPayment();
     const shippingCost = cart.length ? cartShippingCost(cart, delivery, total) : 0;
     const grandTotal = total + shippingCost;
@@ -4177,10 +4121,7 @@
               <div class="section-header">
                 <p class="section-kicker">${tx("Cart", "Carrito")}</p>
                 <h1>${tx("Review the order before secure payment.", "Revisa el pedido antes del pago seguro.")}</h1>
-                <p class="lead">${requiresShipping
-                  ? tx("This step is now structured like a live order review: adjust quantities, lock the delivery method, and continue directly into the hosted ArionPay payment route.", "Este paso ahora funciona como una revision de pedido real: ajusta cantidades, fija el metodo de envio y continua directamente hacia la ruta alojada de pago con ArionPay.")
-                  : tx("This test product skips delivery charges so you can verify the real payment and redirect journey with a minimal order total.", "Este producto de prueba omite los gastos de envio para que puedas verificar el flujo real de pago y redireccion con un total minimo.")
-                }</p>
+                <p class="lead">${tx("This step is now structured like a live order review: adjust quantities, lock the delivery method, and continue directly into the hosted ArionPay payment route.", "Este paso ahora funciona como una revision de pedido real: ajusta cantidades, fija el metodo de envio y continua directamente hacia la ruta alojada de pago con ArionPay.")}</p>
               </div>
               <div class="cart-intro-metrics">
                 <div class="purchase-fact">
@@ -4188,8 +4129,8 @@
                   <strong>${itemCount(cart)}</strong>
                 </div>
                 <div class="purchase-fact">
-                  <span>${requiresShipping ? tx("Delivery", "Entrega") : tx("Checkout", "Checkout")}</span>
-                  <strong>${hasItems ? (requiresShipping ? localize(delivery.label) : tx("No shipping", "Sin envio")) : tx("Pending", "Pendiente")}</strong>
+                  <span>${tx("Delivery", "Entrega")}</span>
+                  <strong>${hasItems ? localize(delivery.label) : tx("Pending", "Pendiente")}</strong>
                 </div>
                 <div class="purchase-fact">
                   <span>${tx("Payment", "Pago")}</span>
@@ -4207,14 +4148,10 @@
               <div class="summary-divider"></div>
               <div class="summary-list">
                 <div class="summary-row"><span class="summary-label">${tx("Subtotal", "Subtotal")}</span><strong>${formatPrice(total)}</strong></div>
-                ${requiresShipping
-                  ? `<div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>`
-                  : ""
-                }
+                <div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>
                 <div class="summary-row summary-row-total"><span class="summary-label">${tx("Estimated total", "Total estimado")}</span><strong>${formatPrice(grandTotal)}</strong></div>
               </div>
-              ${requiresShipping
-                ? `<div class="shipping-progress">
+              <div class="shipping-progress">
                 <div class="shipping-progress-bar" style="width:${progress}%"></div>
                 <p>${shippingProgressCopy(total)}</p>
               </div>
@@ -4223,11 +4160,9 @@
                 <div class="checkout-method-grid">
                   ${DELIVERY_OPTIONS.map((item) => renderDeliveryOption(item, delivery.id, total)).join("")}
                 </div>
-              </div>`
-                : ""
-              }
+              </div>
               <div class="support-chip-row">
-                <div class="support-chip">${requiresShipping ? tx("Dispatch target") : tx("Test checkout", "Checkout de prueba")}: ${requiresShipping ? "24h" : tx("No shipping", "Sin envio")}</div>
+                <div class="support-chip">${tx("Dispatch target")}: 24h</div>
                 <div class="support-chip">${tx("Payment route", "Ruta de pago")}: ArionPay / USDT (TRC20)</div>
               </div>
               ${renderOrderReviewSteps(total, cart)}
@@ -4261,7 +4196,6 @@
     const country = countryConfig(draft.country || "NG");
     const region = normalizeRegion(country.code, draft.state || "");
     const delivery = selectedDelivery(total);
-    const requiresShipping = cartRequiresShipping(cart);
     const payment = ACTIVE_PAYMENT_OPTIONS.find((item) => item.id === (draft.paymentMethod || ACTIVE_PAYMENT_OPTIONS[0].id)) || ACTIVE_PAYMENT_OPTIONS[0];
     const cryptoCurrency = selectedCryptoCurrency();
     const shippingCost = cart.length ? cartShippingCost(cart, delivery, total) : 0;
@@ -4381,29 +4315,20 @@
       <section class="page-hero">
         <div class="container checkout-shell">
           ${renderCheckoutStage("checkout")}
-          <div class="checkout-banner reveal">${requiresShipping
-            ? tx("Free tracked EU shipping on all orders over 200 EUR.", "Envio UE con seguimiento gratis en todos los pedidos superiores a 200 EUR.")
-            : tx("This checkout test product has no shipping charge and goes straight to payment.", "Este producto de prueba no tiene coste de envio y pasa directamente al pago.")
-          }</div>
+          <div class="checkout-banner reveal">${tx("Free tracked EU shipping on all orders over 200 EUR.", "Envio UE con seguimiento gratis en todos los pedidos superiores a 200 EUR.")}</div>
           <div class="checkout-grid checkout-grid-pro">
             <section class="checkout-main reveal">
               <article class="checkout-card checkout-card-form">
                 <div class="section-header">
                   <p class="section-kicker">${tx("Checkout", "Checkout")}</p>
                   <h1>${tx("Billing details and secure payment.", "Datos de facturacion y pago seguro.")}</h1>
-                  <p class="lead">${requiresShipping
-                    ? tx("The checkout now works as a live order handoff: confirm address details, review delivery, and continue directly to the secure hosted ArionPay invoice.", "El checkout ahora funciona como una entrega real de pedido: confirma direccion, revisa el envio y continua directamente hacia la factura segura alojada de ArionPay.")
-                    : tx("This test checkout keeps the real ArionPay payment flow but removes delivery charges and shipping address fields so you can go straight to payment.", "Este checkout de prueba mantiene el flujo real de ArionPay, pero elimina los gastos de envio y los campos de direccion para que puedas ir directo al pago.")
-                  }</p>
+                  <p class="lead">${tx("The checkout now works as a live order handoff: confirm address details, review delivery, and continue directly to the secure hosted ArionPay invoice.", "El checkout ahora funciona como una entrega real de pedido: confirma direccion, revisa el envio y continua directamente hacia la factura segura alojada de ArionPay.")}</p>
                 </div>
                 <form class="form-grid checkout-form-pro" id="checkout-form" data-checkout-form>
                   <section class="full-width checkout-form-section">
                     <div class="checkout-form-section-head">
                       <p class="checkout-eyebrow">${tx("Contact details", "Datos de contacto")}</p>
-                      <h3>${requiresShipping
-                        ? tx("Who should receive dispatch updates?", "Quien debe recibir actualizaciones de envio?")
-                        : tx("Who should receive payment updates?", "Quien debe recibir actualizaciones del pago?")
-                      }</h3>
+                      <h3>${tx("Who should receive dispatch updates?", "Quien debe recibir actualizaciones de envio?")}</h3>
                     </div>
                     <div class="checkout-field-grid">
                       <label>
@@ -4430,7 +4355,7 @@
                       <input class="form-input" name="company" value="${draft.company || ""}">
                     </label>
                   </section>
-                  ${requiresShipping ? `<section class="full-width checkout-form-section">
+                  <section class="full-width checkout-form-section">
                     <div class="checkout-form-section-head">
                       <p class="checkout-eyebrow">${tx("Shipping address", "Direccion de envio")}</p>
                       <h3>${tx("Where should the order be routed?", "A donde debe dirigirse el pedido?")}</h3>
@@ -4467,7 +4392,7 @@
                         <input class="form-input" name="postalCode" required value="${draft.postalCode || ""}">
                       </label>
                     </div>
-                  </section>` : ""}
+                  </section>
                   <section class="full-width checkout-form-section">
                     <div class="checkout-form-section-head">
                       <p class="checkout-eyebrow">${tx("Order notes", "Notas del pedido")}</p>
@@ -4479,10 +4404,7 @@
                     </label>
                     <div class="checkout-note-panel">
                       <strong>${tx("Before payment opens", "Antes de abrir el pago")}</strong>
-                      <p>${requiresShipping
-                        ? tx("Review the delivery method and agreement on the right-hand order summary before continuing to ArionPay.", "Revisa el metodo de envio y el acuerdo en el resumen del pedido antes de continuar a ArionPay.")
-                        : tx("This test checkout item has no delivery fee. Confirm your contact details and continue directly to ArionPay.", "Este articulo de prueba no tiene coste de entrega. Confirma tus datos de contacto y continua directamente a ArionPay.")
-                      }</p>
+                      <p>${tx("Review the delivery method and agreement on the right-hand order summary before continuing to ArionPay.", "Revisa el metodo de envio y el acuerdo en el resumen del pedido antes de continuar a ArionPay.")}</p>
                     </div>
                   </section>
                   <input type="hidden" name="shippingMethod" value="${delivery.id}">
@@ -4498,27 +4420,21 @@
               </div>
               <div class="order-line-items">${renderOrderLineItems(cart)}</div>
               <div class="summary-divider"></div>
-              ${requiresShipping ? `<div class="checkout-side-section">
+              <div class="checkout-side-section">
                 <p class="checkout-eyebrow">${tx("Delivery method", "Metodo de envio")}</p>
                 <div class="checkout-choice-list">
                   ${DELIVERY_OPTIONS.map((item) => renderSidebarDeliveryChoice(item, delivery.id, total)).join("")}
                 </div>
-              </div>` : ""}
+              </div>
               <div class="summary-list">
                 <div class="summary-row"><span class="summary-label">${tx("Subtotal", "Subtotal")}</span><strong>${formatPrice(total)}</strong></div>
-                ${requiresShipping
-                  ? `<div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>`
-                  : ""
-                }
+                <div class="summary-row"><span class="summary-label">${tx("Shipping", "Envio")}</span><strong>${shippingCost === 0 ? tx("Free", "Gratis") : formatPrice(shippingCost)}</strong></div>
                 <div class="summary-row summary-row-total"><span class="summary-label">${tx("Estimated total", "Total estimado")}</span><strong>${formatPrice(grandTotal)}</strong></div>
               </div>
-              ${requiresShipping
-                ? `<div class="shipping-progress">
+              <div class="shipping-progress">
                 <div class="shipping-progress-bar" style="width:${Math.min((total / FREE_SHIPPING_THRESHOLD) * 100, 100)}%"></div>
                 <p>${shippingProgressCopy(total)}</p>
-              </div>`
-                : ""
-              }
+              </div>
               <div class="checkout-side-section">
                 <p class="checkout-eyebrow">${tx("Payment route", "Ruta de pago")}</p>
                 <div class="checkout-choice-list">
@@ -4528,10 +4444,7 @@
               </div>
               ${renderExactAmountGuidance()}
               <div class="support-chip-row">
-                ${requiresShipping
-                  ? `<div class="support-chip">${tx("Selected delivery", "Envio elegido")}: ${localize(delivery.label)}</div>`
-                  : `<div class="support-chip">${tx("Checkout mode", "Modo checkout")}: ${tx("No shipping", "Sin envio")}</div>`
-                }
+                <div class="support-chip">${tx("Selected delivery", "Envio elegido")}: ${localize(delivery.label)}</div>
                 <div class="support-chip">${tx("Selected payment", "Pago elegido")}: ${paymentLabel}</div>
               </div>
               <label class="checkout-agreement checkout-agreement-emphasis">
