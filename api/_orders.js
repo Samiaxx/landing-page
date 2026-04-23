@@ -6,6 +6,7 @@ const fsp = fs.promises;
 
 const ORDER_KEY_PREFIX = "primus:order";
 const ORDER_PENDING_KEY = `${ORDER_KEY_PREFIX}:pending`;
+const ORDER_ALL_KEY = `${ORDER_KEY_PREFIX}:all`;
 const DURABLE_URL_KEYS = ["UPSTASH_REDIS_REST_URL", "KV_REST_API_URL"];
 const DURABLE_TOKEN_KEYS = ["UPSTASH_REDIS_REST_TOKEN", "KV_REST_API_TOKEN"];
 
@@ -128,6 +129,10 @@ function safeInvoiceId(invoiceId) {
     .slice(0, 160);
 }
 
+function normalizeCustomerEmail(email) {
+  return text(email).toLowerCase().slice(0, 320);
+}
+
 function normalizeTrackedStatus(status) {
   const value = text(status).toLowerCase();
 
@@ -161,6 +166,14 @@ function orderReferenceKey(reference) {
 
 function orderInvoiceKey(invoiceId) {
   return `${ORDER_KEY_PREFIX}:invoice:${safeInvoiceId(invoiceId)}`;
+}
+
+function orderCustomerEmailKey(email) {
+  return `${ORDER_KEY_PREFIX}:email:${normalizeCustomerEmail(email)}`;
+}
+
+function customerEmailFromOrder(order) {
+  return normalizeCustomerEmail(order && order.customer && order.customer.email);
 }
 
 async function pathExists(filepath) {
@@ -254,16 +267,52 @@ async function listPendingOrdersFromFile(limit = 20) {
     .slice(0, Math.max(1, Number(limit) || 20));
 }
 
+async function listOrdersByCustomerEmailFromFile(email, limit = 50) {
+  const normalizedEmail = normalizeCustomerEmail(email);
+  if (!normalizedEmail) {
+    return [];
+  }
+
+  ensureDataRoot();
+  const files = await fsp.readdir(ordersDir());
+  const orders = [];
+
+  for (const file of files) {
+    const fullPath = path.join(ordersDir(), file);
+
+    try {
+      const order = JSON.parse(await fsp.readFile(fullPath, "utf8"));
+      if (customerEmailFromOrder(order) === normalizedEmail) {
+        orders.push(order);
+      }
+    } catch {
+      // Ignore unreadable files and keep scanning.
+    }
+  }
+
+  return orders
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
+    .slice(0, Math.max(1, Number(limit) || 50));
+}
+
 function appendFileLog(filepath, payload) {
   ensureDataRoot();
   fs.appendFileSync(filepath, `${JSON.stringify(payload)}\n`);
 }
 
 async function saveOrderToRedis(redis, order) {
-  const tasks = [redis.set(orderReferenceKey(order.reference), order)];
+  const tasks = [
+    redis.set(orderReferenceKey(order.reference), order),
+    redis.sadd(ORDER_ALL_KEY, order.reference)
+  ];
 
   if (order.invoiceId) {
     tasks.push(redis.set(orderInvoiceKey(order.invoiceId), order.reference));
+  }
+
+  const customerEmail = customerEmailFromOrder(order);
+  if (customerEmail) {
+    tasks.push(redis.sadd(orderCustomerEmailKey(customerEmail), order.reference));
   }
 
   if (isTrackedPendingOrder(order)) {
@@ -310,6 +359,47 @@ async function listPendingOrdersFromRedis(redis, limit = 20) {
     .filter((order) => isTrackedPendingOrder(order))
     .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
     .slice(0, Math.max(1, Number(limit) || 20));
+}
+
+async function listOrderReferencesFromRedis(redis) {
+  const indexedReferences = await redis.smembers(ORDER_ALL_KEY);
+  if (Array.isArray(indexedReferences) && indexedReferences.length) {
+    return indexedReferences;
+  }
+
+  const keys = await redis.keys(`${ORDER_KEY_PREFIX}:reference:*`);
+  if (!Array.isArray(keys)) {
+    return [];
+  }
+
+  return keys
+    .map((key) => text(key).split(":").pop())
+    .filter(Boolean);
+}
+
+async function listOrdersByCustomerEmailFromRedis(redis, email, limit = 50) {
+  const normalizedEmail = normalizeCustomerEmail(email);
+  if (!normalizedEmail) {
+    return [];
+  }
+
+  let references = await redis.smembers(orderCustomerEmailKey(normalizedEmail));
+  if (!Array.isArray(references) || !references.length) {
+    references = await listOrderReferencesFromRedis(redis);
+  }
+
+  const orders = await Promise.all(
+    Array.from(new Set(
+      references
+        .map((reference) => safeReference(reference))
+        .filter(Boolean)
+    )).map((reference) => readOrderFromRedis(redis, reference))
+  );
+
+  return orders
+    .filter((order) => customerEmailFromOrder(order) === normalizedEmail)
+    .sort((left, right) => new Date(right.createdAt || 0).getTime() - new Date(left.createdAt || 0).getTime())
+    .slice(0, Math.max(1, Number(limit) || 50));
 }
 
 async function saveOrder(order) {
@@ -382,6 +472,20 @@ async function listPendingOrders(limit = 20) {
   return listPendingOrdersFromFile(limit);
 }
 
+async function listOrdersByCustomerEmail(email, limit = 50) {
+  const normalizedEmail = normalizeCustomerEmail(email);
+  if (!normalizedEmail) {
+    return [];
+  }
+
+  const redis = getRedisClient();
+  if (redis) {
+    return listOrdersByCustomerEmailFromRedis(redis, normalizedEmail, limit);
+  }
+
+  return listOrdersByCustomerEmailFromFile(normalizedEmail, limit);
+}
+
 function appendEmailLog(payload) {
   appendFileLog(emailLogPath(), payload);
 }
@@ -395,6 +499,7 @@ module.exports = {
   appendEmailLog,
   findOrderByInvoiceId,
   getOrderStoreStatus,
+  listOrdersByCustomerEmail,
   listPendingOrders,
   readOrder,
   saveOrder,

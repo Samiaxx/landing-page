@@ -15,6 +15,28 @@
     : "primus-cart-v2";
   const ARIONPAY_INVOICE_ENDPOINT = "/api/create-arionpay-invoice";
   const ORDER_STATUS_ENDPOINT = "/api/order-status";
+  const REGISTER_ENDPOINT = "/api/register";
+  const LOGIN_ENDPOINT = "/api/login";
+  const LOGOUT_ENDPOINT = "/api/logout";
+  const SESSION_ENDPOINT = "/api/session";
+  const ACCOUNT_ORDERS_ENDPOINT = "/api/account-orders";
+  const PUBLIC_PAGE_PATHS = new Set([
+    "/index.html",
+    "/shop.html",
+    "/product.html",
+    "/coa.html",
+    "/faq.html",
+    "/contact.html",
+    "/cart.html",
+    "/checkout.html",
+    "/login.html",
+    "/register.html",
+    "/account.html",
+    "/privacy.html",
+    "/terms.html",
+    "/shipping.html",
+    "/refunds.html"
+  ]);
   let shopGoal = "all";
   let shopSort = "featured";
   let activeProductGalleryImage = 0;
@@ -22,10 +44,24 @@
   let arionPayStatusPollTimer = 0;
   let arionPayStatusPollCount = 0;
   let paidOrderRedirectTimer = 0;
+  let authNavigationTimer = 0;
   let checkoutAgreementState = {
     ageConfirmed: false,
     exactAmountConfirmed: false
   };
+  let authSessionState = {
+    status: "idle",
+    user: null,
+    session: null,
+    error: ""
+  };
+  let authSessionRequest = null;
+  let accountOrdersState = {
+    status: "idle",
+    orders: [],
+    error: ""
+  };
+  let accountOrdersRequest = null;
 
   const ARIONPAY_STATUS_POLL_DELAY_MS = 2500;
   const ARIONPAY_STATUS_POLL_LIMIT = 48;
@@ -1229,6 +1265,10 @@
     return pick(value);
   }
 
+  function text(value) {
+    return typeof value === "string" ? value.trim() : "";
+  }
+
   function readStoredValue(key) {
     if (typeof readPersistedValue === "function") {
       return readPersistedValue(key);
@@ -1252,6 +1292,345 @@
     } catch {
       // Ignore fallback write failure.
     }
+  }
+
+  function accountStatusTone(order) {
+    const summary = `${text(order && order.status)} ${text(order && order.gatewayStatus)}`.toLowerCase();
+
+    if (isPaidOrderStatus(summary)) {
+      return "paid";
+    }
+
+    if (/cancel|failed|expired|closed|void|refund/.test(summary)) {
+      return "closed";
+    }
+
+    return "pending";
+  }
+
+  function accountStatusLabel(order) {
+    const status = text(order && order.status) || text(order && order.gatewayStatus) || "received";
+    return status.replace(/[_-]+/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
+  }
+
+  function accountOrderSummary(order) {
+    const parts = [];
+
+    if (text(order && order.shippingMethod)) {
+      parts.push(text(order.shippingMethod).replace(/[_-]+/g, " "));
+    }
+
+    if (text(order && order.paymentMethod)) {
+      parts.push(text(order.paymentMethod).replace(/[_-]+/g, " "));
+    }
+
+    if (text(order && order.gatewayStatus) && text(order.gatewayStatus).toLowerCase() !== text(order && order.status).toLowerCase()) {
+      parts.push(`${tx("Gateway", "Pasarela")}: ${accountStatusLabel({ status: order.gatewayStatus })}`);
+    }
+
+    return parts.join(" | ");
+  }
+
+  function safeNextPath(value, fallback = "account.html") {
+    const candidate = text(value);
+    if (!candidate || typeof window === "undefined" || !window.location) {
+      return fallback;
+    }
+
+    try {
+      const target = new URL(candidate, window.location.origin);
+      const pathname = target.pathname || "";
+
+      if (target.origin !== window.location.origin || !PUBLIC_PAGE_PATHS.has(pathname) || pathname.startsWith("/api/")) {
+        return fallback;
+      }
+
+      const normalizedPath = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
+
+      if (["login.html", "register.html"].includes(normalizedPath)) {
+        return fallback;
+      }
+
+      return `${normalizedPath}${target.search}${target.hash}`;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function authNextUrl(fallback = "account.html") {
+    if (typeof window === "undefined") {
+      return fallback;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    return safeNextPath(params.get("next"), fallback);
+  }
+
+  function loginPageHref(nextPath = "account.html") {
+    return `login.html?next=${encodeURIComponent(safeNextPath(nextPath, "account.html"))}`;
+  }
+
+  function registerPageHref(nextPath = "account.html") {
+    return `register.html?next=${encodeURIComponent(safeNextPath(nextPath, "account.html"))}`;
+  }
+
+  function updateAuthSessionState(nextState) {
+    authSessionState = {
+      ...authSessionState,
+      ...nextState
+    };
+    return authSessionState;
+  }
+
+  function resetAccountOrdersState() {
+    accountOrdersState = {
+      status: "idle",
+      orders: [],
+      error: ""
+    };
+    accountOrdersRequest = null;
+  }
+
+  async function requestJson(url, options = {}) {
+    const headers = {
+      Accept: "application/json",
+      ...(options.headers || {})
+    };
+    const requestOptions = {
+      method: options.method || "GET",
+      cache: "no-store",
+      credentials: "same-origin",
+      ...options,
+      headers
+    };
+
+    if (requestOptions.body && typeof requestOptions.body !== "string") {
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      requestOptions.headers = {
+        "Content-Type": "application/json",
+        ...headers
+      };
+    }
+
+    const response = await fetch(url, requestOptions);
+    const payload = await response.json().catch(() => ({}));
+
+    return { response, payload };
+  }
+
+  async function loadAuthSession(options = {}) {
+    const { force = false, rerender = true } = options;
+
+    if (authSessionRequest && !force) {
+      return authSessionRequest;
+    }
+
+    if (!force && ["authenticated", "guest"].includes(authSessionState.status)) {
+      return authSessionState;
+    }
+
+    updateAuthSessionState({
+      status: "loading",
+      error: ""
+    });
+
+    authSessionRequest = requestJson(SESSION_ENDPOINT)
+      .then(({ response, payload }) => {
+        if (!response.ok) {
+          throw new Error(payload.error || tx("Unable to verify your session right now.", "No hemos podido verificar tu sesion ahora mismo."));
+        }
+
+        if (payload && payload.authenticated && payload.user) {
+          updateAuthSessionState({
+            status: "authenticated",
+            user: payload.user,
+            session: payload.session || null,
+            error: ""
+          });
+        } else {
+          updateAuthSessionState({
+            status: "guest",
+            user: null,
+            session: null,
+            error: ""
+          });
+          resetAccountOrdersState();
+        }
+
+        return authSessionState;
+      })
+      .catch((error) => {
+        updateAuthSessionState({
+          status: "error",
+          user: null,
+          session: null,
+          error: error instanceof Error && error.message
+            ? error.message
+            : tx("Unable to verify your session right now.", "No hemos podido verificar tu sesion ahora mismo.")
+        });
+        resetAccountOrdersState();
+        return authSessionState;
+      })
+      .finally(() => {
+        authSessionRequest = null;
+
+        if (rerender) {
+          renderHeader();
+          renderPage();
+          if (typeof updateCartBadges === "function") {
+            updateCartBadges();
+          }
+        }
+      });
+
+    return authSessionRequest;
+  }
+
+  async function loadAccountOrders(options = {}) {
+    const { force = false, rerender = true } = options;
+
+    if (authSessionState.status !== "authenticated") {
+      resetAccountOrdersState();
+      return accountOrdersState;
+    }
+
+    if (accountOrdersRequest && !force) {
+      return accountOrdersRequest;
+    }
+
+    if (!force && accountOrdersState.status === "loaded") {
+      return accountOrdersState;
+    }
+
+    accountOrdersState = {
+      ...accountOrdersState,
+      status: "loading",
+      error: ""
+    };
+
+    accountOrdersRequest = requestJson(ACCOUNT_ORDERS_ENDPOINT)
+      .then(({ response, payload }) => {
+        if (response.status === 401) {
+          updateAuthSessionState({
+            status: "guest",
+            user: null,
+            session: null,
+            error: ""
+          });
+          resetAccountOrdersState();
+          return authSessionState;
+        }
+
+        if (!response.ok) {
+          throw new Error(payload.error || tx("Unable to load your order history.", "No hemos podido cargar tu historial de pedidos."));
+        }
+
+        accountOrdersState = {
+          status: "loaded",
+          orders: Array.isArray(payload.orders) ? payload.orders : [],
+          error: ""
+        };
+        return accountOrdersState;
+      })
+      .catch((error) => {
+        accountOrdersState = {
+          status: "error",
+          orders: [],
+          error: error instanceof Error && error.message
+            ? error.message
+            : tx("Unable to load your order history.", "No hemos podido cargar tu historial de pedidos.")
+        };
+        return accountOrdersState;
+      })
+      .finally(() => {
+        accountOrdersRequest = null;
+        if (rerender) {
+          renderHeader();
+          if (getCurrentPage() === "account") {
+            renderPage();
+          }
+        }
+      });
+
+    return accountOrdersRequest;
+  }
+
+  async function submitAuthRequest(endpoint, payload, fallbackMessage) {
+    const { response, payload: result } = await requestJson(endpoint, {
+      method: "POST",
+      body: payload
+    });
+
+    if (!response.ok || !result.ok || !result.user) {
+      throw new Error(result.error || fallbackMessage);
+    }
+
+    updateAuthSessionState({
+      status: "authenticated",
+      user: result.user,
+      session: result.session || null,
+      error: ""
+    });
+    resetAccountOrdersState();
+
+    return result;
+  }
+
+  async function handleLogoutFlow(options = {}) {
+    const { redirectTo = "", silent = false } = options;
+
+    try {
+      await requestJson(LOGOUT_ENDPOINT, { method: "POST" });
+    } catch {
+      // Always clear the client-side view even if the server session is already gone.
+    }
+
+    updateAuthSessionState({
+      status: "guest",
+      user: null,
+      session: null,
+      error: ""
+    });
+    resetAccountOrdersState();
+    renderHeader();
+
+    const page = getCurrentPage();
+    if (!silent) {
+      showToast(tx("You have been signed out.", "Has cerrado la sesion."));
+    }
+
+    if (page === "account") {
+      window.location.replace(loginPageHref("account.html"));
+      return;
+    }
+
+    if (["login", "register"].includes(page)) {
+      renderPage();
+      return;
+    }
+
+    if (redirectTo) {
+      window.location.replace(redirectTo);
+    }
+  }
+
+  function clearAuthNavigation() {
+    if (authNavigationTimer) {
+      window.clearTimeout(authNavigationTimer);
+      authNavigationTimer = 0;
+    }
+  }
+
+  function scheduleAuthNavigation(url, delay = 120) {
+    if (typeof window === "undefined" || !url) {
+      return;
+    }
+
+    clearAuthNavigation();
+    authNavigationTimer = window.setTimeout(() => {
+      authNavigationTimer = 0;
+      window.location.replace(url);
+    }, delay);
   }
 
   function selectedDelivery(total) {
@@ -2456,6 +2835,430 @@
           : (!ageConfirmed ? legalAgeConfirmationPrompt() : checkoutHelperCopy(payment, cart)));
     }
   }
+
+  function authFormStatus(message, tone = "muted") {
+    return `<p class="auth-form-status auth-form-status-${tone}${message ? "" : " is-empty"}" data-auth-form-status>${message || ""}</p>`;
+  }
+
+  function setAuthFormStatus(node, message, tone = "muted") {
+    if (!node) {
+      return;
+    }
+
+    node.textContent = message || "";
+    node.className = `auth-form-status auth-form-status-${tone}${message ? "" : " is-empty"}`;
+  }
+
+  function authField(label, inputMarkup, hint = "") {
+    return `
+      <label class="auth-field">
+        <span>${label}</span>
+        ${inputMarkup}
+        ${hint ? `<small>${hint}</small>` : ""}
+      </label>
+    `;
+  }
+
+  function renderAuthPanel(config) {
+    return `
+      <article class="panel panel-dark auth-panel">
+        <p class="panel-kicker">${config.kicker}</p>
+        <h1>${config.title}</h1>
+        <p class="lead">${config.body}</p>
+        <div class="auth-panel-points">
+          ${config.points.map((point) => `
+            <div class="auth-panel-point">
+              <strong>${point.title}</strong>
+              <span>${point.body}</span>
+            </div>
+          `).join("")}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderLoginPage() {
+    if (authSessionState.status === "authenticated" && authSessionState.user) {
+      const nextUrl = authNextUrl("account.html");
+      scheduleAuthNavigation(nextUrl);
+
+      return `
+        <section class="page-hero page-hero-auth">
+          <div class="container">
+            <div class="auth-redirect-card empty-state">
+              <h1>${tx("You are already signed in.", "Ya has iniciado sesion.")}</h1>
+              <p>${tx("Opening your customer account now.", "Abriendo tu cuenta de cliente ahora.")}</p>
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="${nextUrl}">${tx("Open account", "Abrir cuenta")}</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    clearAuthNavigation();
+
+    return `
+      <section class="page-hero page-hero-auth">
+        <div class="container auth-grid">
+          ${renderAuthPanel({
+            kicker: tx("Customer login", "Acceso de clientes"),
+            title: tx("Access your Primus customer account.", "Accede a tu cuenta de Primus."),
+            body: tx(
+              "Review your profile, reconnect previous guest orders by email, and monitor your latest order statuses in one secure dashboard.",
+              "Revisa tu perfil, vincula pedidos anteriores por email y supervisa tus estados de pedido en un panel seguro."
+            ),
+            points: [
+              {
+                title: tx("Secure sessions", "Sesiones seguras"),
+                body: tx("Server-side session cookies keep login state out of localStorage.", "Las cookies de sesion del lado del servidor mantienen el acceso fuera de localStorage.")
+              },
+              {
+                title: tx("Order history", "Historial de pedidos"),
+                body: tx("Orders placed as a guest are linked automatically when the email matches.", "Los pedidos como invitado se vinculan automaticamente cuando coincide el email.")
+              },
+              {
+                title: tx("Protected account", "Cuenta protegida"),
+                body: tx("Only signed-in customers can view the profile and account order feed.", "Solo los clientes autenticados pueden ver el perfil y el historial de pedidos.")
+              }
+            ]
+          })}
+          <article class="contact-card auth-card">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Login", "Iniciar sesion")}</p>
+              <h2>${tx("Sign in securely", "Acceso seguro")}</h2>
+            </div>
+            <form class="auth-form" data-login-form novalidate>
+              ${authField(
+                tx("Email address", "Correo electronico"),
+                `<input class="search-input auth-input" type="email" name="email" autocomplete="email" required placeholder="name@example.com">`
+              )}
+              ${authField(
+                tx("Password", "Contrasena"),
+                `<input class="search-input auth-input" type="password" name="password" autocomplete="current-password" required minlength="8" placeholder="${tx("Enter your password", "Introduce tu contrasena")}">`
+              )}
+              ${authFormStatus(authSessionState.status === "error" ? authSessionState.error : "")}
+              <div class="checkout-action-stack auth-action-stack">
+                <button class="btn btn-primary btn-block" type="submit" data-auth-submit>${tx("Login", "Iniciar sesion")}</button>
+                <a class="btn btn-secondary btn-block" href="${registerPageHref(authNextUrl("account.html"))}">${tx("Create account", "Crear cuenta")}</a>
+              </div>
+              <p class="helper-copy">${tx("Use the same email address you used during checkout to pull eligible guest orders into your account automatically.", "Usa el mismo correo electronico que utilizaste durante el checkout para vincular automaticamente los pedidos de invitado compatibles.")}</p>
+            </form>
+          </article>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderRegisterPage() {
+    if (authSessionState.status === "authenticated" && authSessionState.user) {
+      const nextUrl = authNextUrl("account.html");
+      scheduleAuthNavigation(nextUrl);
+
+      return `
+        <section class="page-hero page-hero-auth">
+          <div class="container">
+            <div class="auth-redirect-card empty-state">
+              <h1>${tx("Your account is already active.", "Tu cuenta ya esta activa.")}</h1>
+              <p>${tx("Opening your customer account now.", "Abriendo tu cuenta de cliente ahora.")}</p>
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="${nextUrl}">${tx("Open account", "Abrir cuenta")}</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    clearAuthNavigation();
+
+    return `
+      <section class="page-hero page-hero-auth">
+        <div class="container auth-grid">
+          ${renderAuthPanel({
+            kicker: tx("Customer registration", "Registro de clientes"),
+            title: tx("Create your secure customer account.", "Crea tu cuenta segura de cliente."),
+            body: tx(
+              "A basic Primus account lets returning customers review profile details, revisit order references, and track existing order states without exposing any credentials client-side.",
+              "Una cuenta basica de Primus permite revisar el perfil, recuperar referencias de pedido y seguir estados existentes sin exponer credenciales del lado del cliente."
+            ),
+            points: [
+              {
+                title: tx("Password hashing", "Hashing de contrasena"),
+                body: tx("Passwords are stored with one-way hashing on the server, never in plain text.", "Las contrasenas se almacenan con hashing unidireccional en el servidor, nunca en texto plano.")
+              },
+              {
+                title: tx("Durable account records", "Registros duraderos"),
+                body: tx("Account and session records use the same durable store pattern as the order system.", "Las cuentas y sesiones usan el mismo patron de almacenamiento duradero que el sistema de pedidos.")
+              },
+              {
+                title: tx("Order linking", "Vinculacion de pedidos"),
+                body: tx("Existing guest orders are linked by matching the account email when available.", "Los pedidos de invitado existentes se vinculan cuando coincide el correo de la cuenta.")
+              }
+            ]
+          })}
+          <article class="contact-card auth-card">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Register", "Registro")}</p>
+              <h2>${tx("Open your account", "Abre tu cuenta")}</h2>
+            </div>
+            <form class="auth-form" data-register-form novalidate>
+              ${authField(
+                tx("Full name", "Nombre completo"),
+                `<input class="search-input auth-input" type="text" name="fullName" autocomplete="name" required minlength="3" maxlength="120" placeholder="${tx("Full legal name", "Nombre completo")}">`
+              )}
+              ${authField(
+                tx("Email address", "Correo electronico"),
+                `<input class="search-input auth-input" type="email" name="email" autocomplete="email" required placeholder="name@example.com">`
+              )}
+              <div class="auth-field-grid">
+                ${authField(
+                  tx("Password", "Contrasena"),
+                  `<input class="search-input auth-input" type="password" name="password" autocomplete="new-password" required minlength="8" placeholder="${tx("At least 8 characters", "Minimo 8 caracteres")}">`
+                )}
+                ${authField(
+                  tx("Confirm password", "Confirmar contrasena"),
+                  `<input class="search-input auth-input" type="password" name="confirmPassword" autocomplete="new-password" required minlength="8" placeholder="${tx("Repeat your password", "Repite tu contrasena")}">`
+                )}
+              </div>
+              ${authFormStatus("")}
+              <div class="checkout-action-stack auth-action-stack">
+                <button class="btn btn-primary btn-block" type="submit" data-auth-submit>${tx("Register", "Crear cuenta")}</button>
+                <a class="btn btn-secondary btn-block" href="${loginPageHref(authNextUrl("account.html"))}">${tx("Already have an account?", "Ya tienes una cuenta?")}</a>
+              </div>
+              <p class="helper-copy">${tx("Use the same email address you have already used for orders if you want previous guest purchases to appear in your account automatically.", "Utiliza el mismo correo con el que ya hayas hecho pedidos si quieres que las compras anteriores como invitado aparezcan en tu cuenta automaticamente.")}</p>
+            </form>
+          </article>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderAccountOrderItem(item) {
+    const product = item && item.slug ? PRODUCTS.find((entry) => entry.slug === item.slug) : null;
+    const productName = text(item && item.name) || (product ? `${localize(product.name)} ${product.dosage}` : tx("Product", "Producto"));
+    const quantity = Number(item && item.quantity) || 0;
+    const lineTotal = Number(item && item.lineTotal);
+
+    return `
+      <div class="order-line-item">
+        <div>
+          <strong>${productName}</strong>
+          <p>${tx("Qty", "Cant.")}: ${quantity || 1}</p>
+        </div>
+        <strong>${Number.isFinite(lineTotal) && lineTotal > 0 ? formatPrice(lineTotal) : tx("Tracked", "Registrado")}</strong>
+      </div>
+    `;
+  }
+
+  function renderAccountOrderCard(order) {
+    return `
+      <article class="summary-card account-order-card">
+        <div class="account-order-head">
+          <div>
+            <p class="detail-label">${tx("Order reference", "Referencia del pedido")}</p>
+            <h3>${text(order.reference)}</h3>
+          </div>
+          <span class="status-pill ${accountStatusTone(order)}">${accountStatusLabel(order)}</span>
+        </div>
+        <div class="order-meta-grid">
+          <div class="detail-card">
+            <span class="detail-label">${tx("Created", "Creado")}</span>
+            <strong>${formatDate(order.createdAt)}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">${tx("Total", "Total")}</span>
+            <strong>${formatPrice(Number(order.total || 0))}</strong>
+          </div>
+          <div class="detail-card">
+            <span class="detail-label">${tx("Current status", "Estado actual")}</span>
+            <strong>${accountStatusLabel(order)}</strong>
+            <small>${accountOrderSummary(order) || tx("Store status synced from the latest payment and webhook updates.", "Estado de tienda sincronizado con el ultimo pago y las actualizaciones del webhook.")}</small>
+          </div>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="order-line-items">
+          ${(Array.isArray(order.items) ? order.items : []).map(renderAccountOrderItem).join("")}
+        </div>
+      </article>
+    `;
+  }
+
+  function renderAccountPage() {
+    if (authSessionState.status === "idle" || authSessionState.status === "loading") {
+      return `
+        <section class="page-hero page-hero-auth">
+          <div class="container">
+            <div class="empty-state auth-redirect-card">
+              <h1>${tx("Checking your secure session...", "Comprobando tu sesion segura...")}</h1>
+              <p>${tx("Loading your customer profile and linked order history.", "Cargando tu perfil de cliente y el historial de pedidos vinculado.")}</p>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    if (authSessionState.status !== "authenticated" || !authSessionState.user) {
+      scheduleAuthNavigation(loginPageHref("account.html"), 700);
+
+      return `
+        <section class="page-hero page-hero-auth">
+          <div class="container">
+            <div class="empty-state auth-redirect-card">
+              <h1>${tx("Login required", "Acceso requerido")}</h1>
+              <p>${tx("This customer area is protected. Redirecting you to the secure login page now.", "Esta area de cliente esta protegida. Redirigiendo ahora a la pagina segura de acceso.")}</p>
+              <div class="cta-row-inline">
+                <a class="btn btn-primary" href="${loginPageHref("account.html")}">${tx("Go to login", "Ir al acceso")}</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    clearAuthNavigation();
+
+    if (accountOrdersState.status === "idle" && !accountOrdersRequest) {
+      void loadAccountOrders({ rerender: true });
+    }
+
+    const user = authSessionState.user;
+    const orders = Array.isArray(accountOrdersState.orders) ? accountOrdersState.orders : [];
+    const latestOrder = orders[0] || null;
+    const orderHistoryMarkup = accountOrdersState.status === "loading"
+      ? `<div class="empty-state"><h3>${tx("Loading order history...", "Cargando historial...")}</h3><p>${tx("Matching any existing guest orders to your account email.", "Vinculando pedidos existentes de invitado con el correo de tu cuenta.")}</p></div>`
+      : accountOrdersState.status === "error"
+        ? `<div class="empty-state"><h3>${tx("Unable to load order history", "No se pudo cargar el historial")}</h3><p>${accountOrdersState.error}</p></div>`
+        : orders.length
+          ? orders.map(renderAccountOrderCard).join("")
+          : `<div class="empty-state"><h3>${tx("No orders linked yet", "Aun no hay pedidos vinculados")}</h3><p>${tx("When an order uses the same email address as this account, it will appear here automatically.", "Cuando un pedido utilice el mismo correo que esta cuenta, aparecera aqui automaticamente.")}</p></div>`;
+
+    return `
+      <section class="page-hero page-hero-auth">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Customer account", "Cuenta de cliente")}</p>
+            <h1>${tx("Profile, order history, and live order status.", "Perfil, historial y estado de pedidos.")}</h1>
+            <p class="lead">${tx("This protected area uses server-side sessions and links eligible guest purchases by matching your account email.", "Esta area protegida utiliza sesiones del lado del servidor y vincula compras de invitado compatibles cuando coincide el correo de tu cuenta.")}</p>
+          </div>
+          <div class="account-grid">
+            <article class="contact-card account-card">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Profile", "Perfil")}</p>
+                <h2>${user.fullName}</h2>
+              </div>
+              <div class="detail-grid">
+                <div class="detail-card">
+                  <span class="detail-label">${tx("Email", "Correo")}</span>
+                  <strong>${user.email}</strong>
+                </div>
+                <div class="detail-card">
+                  <span class="detail-label">${tx("Member since", "Cliente desde")}</span>
+                  <strong>${formatDate(user.createdAt)}</strong>
+                </div>
+                <div class="detail-card">
+                  <span class="detail-label">${tx("Last login", "Ultimo acceso")}</span>
+                  <strong>${formatDate(user.lastLoginAt || user.updatedAt || user.createdAt)}</strong>
+                </div>
+              </div>
+              <div class="cta-row-inline">
+                <a class="btn btn-secondary" href="shop.html">${tx("Continue shopping", "Seguir comprando")}</a>
+                <button class="btn btn-primary" type="button" data-logout-action>${tx("Logout", "Cerrar sesion")}</button>
+              </div>
+            </article>
+            <article class="summary-card account-card">
+              <div class="section-header">
+                <p class="section-kicker">${tx("Current order status", "Estado actual")}</p>
+                <h2>${latestOrder ? latestOrder.reference : tx("No active order", "Sin pedido activo")}</h2>
+              </div>
+              ${latestOrder ? `
+                <div class="detail-grid">
+                  <div class="detail-card">
+                    <span class="detail-label">${tx("Status", "Estado")}</span>
+                    <strong>${accountStatusLabel(latestOrder)}</strong>
+                  </div>
+                  <div class="detail-card">
+                    <span class="detail-label">${tx("Total", "Total")}</span>
+                    <strong>${formatPrice(Number(latestOrder.total || 0))}</strong>
+                  </div>
+                  <div class="detail-card">
+                    <span class="detail-label">${tx("Updated", "Actualizado")}</span>
+                    <strong>${formatDate(latestOrder.lastWebhookAt || latestOrder.createdAt)}</strong>
+                  </div>
+                </div>
+                <p class="helper-copy">${accountOrderSummary(latestOrder) || tx("Your latest order status is pulled from the stored order record and payment confirmation events.", "El estado del ultimo pedido se obtiene del registro guardado del pedido y de los eventos de confirmacion de pago.")}</p>
+              ` : `
+                <p class="helper-copy">${tx("Once you place an order with this email address, the latest status will appear here automatically.", "Cuando realices un pedido con este correo electronico, el ultimo estado aparecera aqui automaticamente.")}</p>
+              `}
+            </article>
+          </div>
+          <section class="section-stack">
+            <div class="section-header">
+              <p class="section-kicker">${tx("Order history", "Historial de pedidos")}</p>
+              <h2>${tx("Linked orders", "Pedidos vinculados")}</h2>
+            </div>
+            <div class="stack-sm">
+              ${orderHistoryMarkup}
+            </div>
+          </section>
+        </div>
+      </section>
+    `;
+  }
+
+  renderHeader = function () {
+    const host = document.querySelector("[data-site-header]");
+
+    if (!host) {
+      return;
+    }
+
+    const page = getCurrentPage();
+    const navLinks = NAV_ITEMS.map((item) => `
+      <a class="${page === item.key ? "is-current" : ""}" href="${item.href}">${pick(COPY.nav[item.key])}</a>
+    `).join("");
+    const chips = PAYMENT_METHODS.map((item) => `<span class="payment-chip">${item}</span>`).join("");
+    const isAuthenticated = authSessionState.status === "authenticated" && authSessionState.user;
+    const authActions = isAuthenticated
+      ? `
+        <div class="header-account-actions">
+          <a class="header-auth-link ${page === "account" ? "is-current" : ""}" href="account.html">${tx("Account", "Cuenta")}</a>
+          <button class="header-auth-link header-auth-button" type="button" data-logout-action>${tx("Logout", "Cerrar sesion")}</button>
+        </div>
+      `
+      : `
+        <div class="header-account-actions">
+          <a class="header-auth-link ${page === "login" ? "is-current" : ""}" href="${loginPageHref("account.html")}">${tx("Login", "Acceso")}</a>
+          <a class="header-auth-link header-auth-link-primary ${page === "register" ? "is-current" : ""}" href="${registerPageHref("account.html")}">${tx("Register", "Registro")}</a>
+        </div>
+      `;
+
+    host.innerHTML = `
+      <div class="topbar">
+        <div class="container topbar-inner">
+          <p class="topbar-copy">${pick(COPY.shell.topbar)}</p>
+          <div class="payment-chips" aria-label="Accepted payment methods">${chips}</div>
+        </div>
+      </div>
+      <div class="site-header-wrap">
+        <header class="container header-inner">
+          <a class="brand" href="index.html" aria-label="Primus Peptides home">
+            <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
+          </a>
+          <nav class="site-nav" aria-label="Primary navigation">${navLinks}</nav>
+          <div class="header-actions">
+            <div class="lang-toggle" role="group" aria-label="Language selector">
+              <button type="button" class="lang-btn ${currentLanguage === "en" ? "is-active" : ""}" data-lang-switch="en">EN</button>
+              <button type="button" class="lang-btn ${currentLanguage === "es" ? "is-active" : ""}" data-lang-switch="es">ES</button>
+            </div>
+            ${authActions}
+            <a class="cart-link" href="cart.html">${pick(COPY.shell.cartLabel)} <span class="cart-badge" data-cart-count>0</span></a>
+          </div>
+        </header>
+      </div>
+    `;
+  };
 
   renderFooter = function () {
     const host = document.querySelector("[data-site-footer]");
@@ -4520,6 +5323,10 @@
     const page = getCurrentPage();
     document.documentElement.lang = currentLanguage;
 
+    if (authSessionState.status === "idle" && !authSessionRequest) {
+      void loadAuthSession({ rerender: true });
+    }
+
     if (page === "home") {
       host.innerHTML = renderEnhancedHomePage();
     } else if (page === "shop") {
@@ -4537,6 +5344,12 @@
       host.innerHTML = renderCartPage();
     } else if (page === "checkout") {
       host.innerHTML = renderCheckoutPage();
+    } else if (page === "login") {
+      host.innerHTML = renderLoginPage();
+    } else if (page === "register") {
+      host.innerHTML = renderRegisterPage();
+    } else if (page === "account") {
+      host.innerHTML = renderAccountPage();
     } else if (["privacy", "terms", "shipping", "refunds"].includes(page)) {
       host.innerHTML = renderLegalPage(page);
     }
@@ -4567,6 +5380,9 @@
       contact: tx("Contact", "Contacto"),
       cart: tx("Cart", "Carrito"),
       checkout: tx("Checkout", "Checkout"),
+      login: tx("Login", "Acceso"),
+      register: tx("Register", "Registro"),
+      account: tx("Account", "Cuenta"),
       privacy: tx("Privacy Policy", "Política de privacidad"),
       terms: tx("Terms & Conditions", "Términos y condiciones"),
       shipping: tx("Shipping Policy", "Política de envíos"),
@@ -4603,6 +5419,101 @@
           status.textContent = localize(COPY.shell.toastContact);
         }
         showToast(localize(COPY.shell.toastContact));
+      });
+    }
+
+    const loginForm = document.querySelector("[data-login-form]");
+
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (typeof loginForm.reportValidity === "function" && !loginForm.reportValidity()) {
+          return;
+        }
+
+        const submitButton = loginForm.querySelector("[data-auth-submit]");
+        const statusNode = loginForm.querySelector("[data-auth-form-status]");
+        const formData = new FormData(loginForm);
+        const email = text(formData.get("email"));
+        const password = String(formData.get("password") || "");
+
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = tx("Signing in...", "Accediendo...");
+        }
+
+        setAuthFormStatus(statusNode, tx("Verifying your secure session...", "Verificando tu sesion segura..."));
+
+        try {
+          await submitAuthRequest(LOGIN_ENDPOINT, { email, password }, tx("Unable to sign in right now.", "No se pudo iniciar sesion ahora mismo."));
+          renderHeader();
+          showToast(tx("Login successful.", "Acceso completado."));
+          window.location.replace(authNextUrl("account.html"));
+        } catch (error) {
+          const message = error instanceof Error && error.message
+            ? error.message
+            : tx("Unable to sign in right now.", "No se pudo iniciar sesion ahora mismo.");
+
+          setAuthFormStatus(statusNode, message, "error");
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = tx("Login", "Iniciar sesion");
+          }
+        }
+      });
+    }
+
+    const registerForm = document.querySelector("[data-register-form]");
+
+    if (registerForm) {
+      registerForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (typeof registerForm.reportValidity === "function" && !registerForm.reportValidity()) {
+          return;
+        }
+
+        const submitButton = registerForm.querySelector("[data-auth-submit]");
+        const statusNode = registerForm.querySelector("[data-auth-form-status]");
+        const formData = new FormData(registerForm);
+        const fullName = text(formData.get("fullName"));
+        const email = text(formData.get("email"));
+        const password = String(formData.get("password") || "");
+        const confirmPassword = String(formData.get("confirmPassword") || "");
+
+        if (password !== confirmPassword) {
+          setAuthFormStatus(statusNode, tx("Password confirmation does not match.", "La confirmacion de la contrasena no coincide."), "error");
+          return;
+        }
+
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = tx("Creating account...", "Creando cuenta...");
+        }
+
+        setAuthFormStatus(statusNode, tx("Creating your secure account...", "Creando tu cuenta segura..."));
+
+        try {
+          await submitAuthRequest(
+            REGISTER_ENDPOINT,
+            { fullName, email, password, confirmPassword },
+            tx("Unable to create your account right now.", "No se pudo crear tu cuenta ahora mismo.")
+          );
+          renderHeader();
+          showToast(tx("Account created successfully.", "Cuenta creada correctamente."));
+          window.location.replace(authNextUrl("account.html"));
+        } catch (error) {
+          const message = error instanceof Error && error.message
+            ? error.message
+            : tx("Unable to create your account right now.", "No se pudo crear tu cuenta ahora mismo.");
+
+          setAuthFormStatus(statusNode, message, "error");
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = tx("Register", "Crear cuenta");
+          }
+        }
       });
     }
 
@@ -4940,6 +5851,22 @@
       });
     });
   };
+
+  document.addEventListener("click", (event) => {
+    const logoutButton = event.target.closest("[data-logout-action]");
+
+    if (!logoutButton) {
+      return;
+    }
+
+    event.preventDefault();
+    if (logoutButton.disabled) {
+      return;
+    }
+
+    logoutButton.disabled = true;
+    void handleLogoutFlow();
+  });
 
   patchSharedCopy();
   enrichProducts();

@@ -4,8 +4,13 @@ const path = require("path");
 const { URL } = require("url");
 const createArionPayInvoice = require("./api/create-arionpay-invoice");
 const arionPayWebhook = require("./api/arionpay-webhook");
+const accountOrdersHandler = require("./api/account-orders");
 const contactHandler = require("./api/contact");
+const loginHandler = require("./api/login");
+const logoutHandler = require("./api/logout");
 const orderStatusHandler = require("./api/order-status");
+const registerHandler = require("./api/register");
+const sessionHandler = require("./api/session");
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 3000);
@@ -33,6 +38,9 @@ const PUBLIC_FILES = new Set([
   "/contact.html",
   "/cart.html",
   "/checkout.html",
+  "/login.html",
+  "/register.html",
+  "/account.html",
   "/privacy.html",
   "/terms.html",
   "/shipping.html",
@@ -218,8 +226,33 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (pathname === "/api/register") {
+      await handleApiRoute(registerHandler, req, res, currentUrl);
+      return;
+    }
+
+    if (pathname === "/api/login") {
+      await handleApiRoute(loginHandler, req, res, currentUrl);
+      return;
+    }
+
+    if (pathname === "/api/logout") {
+      await handleApiRoute(logoutHandler, req, res, currentUrl);
+      return;
+    }
+
+    if (pathname === "/api/session") {
+      await handleApiRoute(sessionHandler, req, res, currentUrl);
+      return;
+    }
+
     if (pathname === "/api/order-status") {
       await handleApiRoute(orderStatusHandler, req, res, currentUrl);
+      return;
+    }
+
+    if (pathname === "/api/account-orders") {
+      await handleApiRoute(accountOrdersHandler, req, res, currentUrl);
       return;
     }
 
