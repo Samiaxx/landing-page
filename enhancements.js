@@ -2342,6 +2342,12 @@
     if (index === 0 || src.includes("/packshots/")) {
       return tx("Packshot", "Packshot");
     }
+    if (src.includes("lab-vial-closeup")) {
+      return tx("Vial close-up", "Primer plano del vial");
+    }
+    if (src.includes("lab-tube-tray")) {
+      return tx("Lab tray", "Bandeja de laboratorio");
+    }
     if (src.includes("lab-hand")) {
       return tx("Lab handling", "Manipulacion en laboratorio");
     }

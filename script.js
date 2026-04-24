@@ -35,6 +35,48 @@ const SUPPORT_IMAGE_SET = [
   "assets/brand-caps.webp"
 ];
 
+const SUPPORT_IMAGE_GROUPS = {
+  metabolic: [
+    "assets/lab-vial-closeup.webp",
+    "assets/lab-tube-tray.webp",
+    "assets/brand-caps.webp"
+  ],
+  recovery: [
+    "assets/lab-hand-vial.webp",
+    "assets/lab-vial-closeup.webp",
+    "assets/brand-caps.webp"
+  ],
+  neuro: [
+    "assets/lab-tube-tray.webp",
+    "assets/lab-hand-vial.webp",
+    "assets/brand-caps.webp"
+  ],
+  specialty: [
+    "assets/lab-vial-closeup.webp",
+    "assets/lab-hand-vial.webp",
+    "assets/brand-caps.webp"
+  ]
+};
+
+const PRODUCT_SUPPORT_GROUP = {
+  "tirzepatide-30mg": "metabolic",
+  "retatrutide-30mg": "metabolic",
+  "mots-c-40mg": "metabolic",
+  "nad-1000mg": "metabolic",
+  "tb-500-20mg": "recovery",
+  "bpc-157-10mg": "recovery",
+  "ghk-cu-50mg": "recovery",
+  "ss-31-50mg": "recovery",
+  "semax-30mg": "neuro",
+  "selank-10mg": "neuro",
+  "dsip-10mg": "neuro",
+  "epithalon-40mg": "neuro",
+  "ipamorelin-10mg": "specialty",
+  "melanotan-mt2-10mg": "specialty",
+  "pt141-10mg": "specialty",
+  "oxytocin-10mg": "specialty"
+};
+
 const NAV_ITEMS = [
   { key: "home", href: "index.html" },
   { key: "shop", href: "shop.html" },
@@ -310,7 +352,11 @@ function productPackshot(slug) {
 }
 
 function standardProductGallery(product) {
-  return [productPackshot(product.slug)].concat(SUPPORT_IMAGE_SET);
+  const group = PRODUCT_SUPPORT_GROUP[product.slug];
+  const supportSet = group && SUPPORT_IMAGE_GROUPS[group]
+    ? SUPPORT_IMAGE_GROUPS[group]
+    : SUPPORT_IMAGE_SET;
+  return [productPackshot(product.slug)].concat(supportSet);
 }
 
 PRODUCTS.forEach((product) => {
