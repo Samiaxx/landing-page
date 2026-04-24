@@ -51,38 +51,38 @@ const SUPPORT_IMAGE_GROUPS = {
     "assets/lab-hand-vial.webp",
     "assets/brand-caps.webp"
   ],
-  specialty: [
-    "assets/lab-vial-closeup.webp",
-    "assets/lab-hand-vial.webp",
-    "assets/brand-caps.webp"
-  ]
-};
-
-const PRODUCT_SUPPORT_GROUP = {
-  "tirzepatide-30mg": "metabolic",
-  "retatrutide-30mg": "metabolic",
-  "mots-c-40mg": "metabolic",
-  "nad-1000mg": "metabolic",
-  "tb-500-20mg": "recovery",
-  "bpc-157-10mg": "recovery",
-  "ghk-cu-50mg": "recovery",
-  "ss-31-50mg": "recovery",
-  "semax-30mg": "neuro",
-  "selank-10mg": "neuro",
-  "dsip-10mg": "neuro",
-  "epithalon-40mg": "neuro",
-  "ipamorelin-10mg": "specialty",
-  "melanotan-mt2-10mg": "specialty",
-  "pt141-10mg": "specialty",
-  "oxytocin-10mg": "specialty"
-};
-
-const NAV_ITEMS = [
-  { key: "home", href: "index.html" },
-  { key: "shop", href: "shop.html" },
-  { key: "coa", href: "coa.html" },
-  { key: "faq", href: "faq.html" },
-  { key: "contact", href: "contact.html" }
+  home: {
+    heroKicker: { en: "Trusted Peptide Research Products for Serious Buyers", es: "Péptidos de investigación confiables para compradores exigentes" },
+    heroTitle: {
+      en: "Secure Access to High-Quality Research Compounds",
+      es: "Acceso seguro a compuestos de investigación de alta calidad"
+    },
+    heroBody: {
+      en: "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers.",
+      es: "Explora productos premium, checkout crypto seguro y una experiencia de compra fluida diseñada para clientes reales."
+    },
+    heroNote: {
+      en: "Optimised for mobile with clear trust placement and fast, reliable checkout.",
+      es: "Optimizado para móvil con colocación clara de confianza y checkout rápido y fiable."
+    },
+    trustTitle: { en: "Built for Customer Confidence", es: "Diseñado para la confianza del cliente" },
+    trustBody: { en: "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.", es: "Desde pagos seguros hasta cuentas protegidas y un flujo de checkout transparente, cada parte de la tienda está diseñada para generar confianza." },
+    featuredKicker: { en: "Shop Premium Research Categories", es: "Compra categorías de investigación premium" },
+    featuredTitle: { en: "Find the right products with a cleaner catalog built for fast browsing.", es: "Encuentra los productos adecuados con un catálogo más limpio y rápido de explorar." },
+    featuredBody: { en: "Cards are tuned for quick mobile scanning while keeping dosage, price, and trust details readable.", es: "Las tarjetas están ajustadas para una lectura rápida en móvil manteniendo visibles dosis, precio y confianza." },
+    servicesKicker: { en: "Professional Services", es: "Servicios profesionales" },
+    servicesTitle: { en: "Expert team, safety protocols, GMP manufacturing, and quality assurance.", es: "Equipo experto, protocolos de seguridad, fabricación GMP y aseguramiento de calidad." },
+    servicesBody: { en: "Short proof points covering team expertise, safety, manufacturing standards, and lab verification.", es: "Puntos breves sobre experiencia del equipo, seguridad, estándares de fabricación y verificación de laboratorio." },
+    shippingKicker: { en: "Shipping Info", es: "Información de envío" },
+    shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
+    shippingBody: { en: "Shipping options and delivery costs are presented clearly before payment. Fast processing and clear order updates after successful payment.", es: "Las opciones de envío y los costes se muestran con claridad antes del pago. Procesamiento rápido y actualizaciones claras del pedido tras el pago exitoso." },
+    benefitsKicker: { en: "Why Customers Choose Primus", es: "Por qué los clientes eligen Primus" },
+    benefitsTitle: { en: "Secure Cryptocurrency Payments · Fast Order Processing · Premium Product Standards · Professional Customer Support · Privacy-Focused Checkout", es: "Pagos cripto seguros · Procesamiento rápido · Estándares de producto premium · Soporte profesional · Checkout centrado en privacidad" },
+    benefitsBody: { en: "Secure Cryptocurrency Payments · Fast Order Processing · Premium Product Standards · Professional Customer Support · Privacy-Focused Checkout", es: "Pagos cripto seguros · Procesamiento rápido · Estándares premium · Soporte profesional · Checkout centrado en privacidad" },
+    ctaKicker: { en: "Ready to explore the catalogue?", es: "¿Listo para explorar el catálogo?" },
+    ctaTitle: { en: "Explore the catalogue, view COAs, or proceed to secure checkout.", es: "Explora el catálogo, consulta COAs o procede al checkout seguro." },
+    ctaBody: { en: "Clear, repeated CTAs guide researchers from discovery to COA access and fast, secure payment.", es: "CTAs claros y repetidos guían desde el descubrimiento hasta acceso a COA y pago rápido y seguro." }
+  },
 ];
 
 const PRODUCTS = [
@@ -382,8 +382,8 @@ const COPY = {
       es: "Primus Peptides — Péptidos grado investigación"
     },
     footerTagline: {
-      en: "Premium research peptides with transparent COA and reliable EU fulfillment.",
-      es: "Péptidos premium con COA transparente y despacho fiable desde la UE."
+      en: "Secure ecommerce experience built for modern customers.",
+      es: "Experiencia de ecommerce segura diseñada para clientes modernos."
     },
     footerLegal: {
       en: "For laboratory research use only.",
@@ -430,7 +430,7 @@ const COPY = {
     upcoming: { en: "Coming May", es: "Llega en mayo" },
     batchReady: { en: "COA ready", es: "COA listo" },
     batchPending: { en: "Awaiting release", es: "Pendiente de lanzamiento" },
-    checkout: { en: "Checkout", es: "Finalizar compra" },
+    checkout: { en: "Secure Checkout", es: "Pago seguro" },
     keepBrowsing: { en: "Continue shopping", es: "Seguir comprando" },
     guestCheckout: { en: "Guest checkout ready", es: "Checkout como invitado" },
     searchPlaceholder: { en: "Search peptide, dosage, or status", es: "Buscar péptido, dosis o estado" },
@@ -440,6 +440,11 @@ const COPY = {
     shipping: { en: "Shipping", es: "Envío" },
     calculatedLater: { en: "Calculated later", es: "Se calcula después" },
     sendMessage: { en: "Send Message", es: "Enviar mensaje" }
+    ,shopNow: { en: "Shop Now", es: "Comprar ahora" }
+    ,browseProducts: { en: "Browse Products", es: "Ver productos" }
+    ,secureCheckout: { en: "Secure Checkout", es: "Pago seguro" }
+    ,createAccount: { en: "Create Account", es: "Crear cuenta" }
+    ,completeOrder: { en: "Complete Order", es: "Completar pedido" }
   },
   home: {
     heroKicker: { en: "COA‑backed research peptides", es: "Péptidos de investigación con COA" },
@@ -568,7 +573,7 @@ const COPY = {
     ]
   },
   contact: {
-    kicker: { en: "Contact", es: "Contacto" },
+    kicker: { en: "Need Help? Contact Support", es: "¿Necesitas ayuda? Contacta con soporte" },
     title: { en: "Support, shipping, and payment questions presented in a clean trust-first contact layout.", es: "Soporte, envíos y pagos presentados en una página de contacto limpia y centrada en confianza." },
     body: { en: "The brief called for a dedicated Contact page. This version combines direct support information with a simple form and visible crypto-payment guidance.", es: "El brief pedía una página Contact. Esta versión combina información directa, un formulario simple y guía visible sobre pagos crypto." },
     emailTitle: { en: "Email", es: "Email" },
@@ -589,7 +594,7 @@ const COPY = {
     kicker: { en: "Cart", es: "Carrito" },
     title: { en: "Minimal-step cart flow with free shipping progress and guest checkout messaging.", es: "Flujo de carrito con pocos pasos, progreso de envío gratis y mensaje de checkout invitado." },
     body: { en: "The cart keeps the same trust-heavy design language while surfacing subtotal, payment options, and a direct path to checkout.", es: "El carrito mantiene el mismo lenguaje visual centrado en confianza y muestra subtotal, pagos y una vía directa al checkout." },
-    emptyTitle: { en: "Your cart is empty.", es: "Tu carrito está vacío." },
+    emptyTitle: { en: "Your cart is ready for your next order. Browse premium products to get started.", es: "Tu carrito está listo para tu próximo pedido. Explora productos premium para comenzar." },
     emptyBody: { en: "Add a product from the catalogue or product page to test the conversion flow.", es: "Añade un producto desde el catálogo o desde la ficha para probar el flujo de conversión." },
     paymentTitle: { en: "Payment options", es: "Opciones de pago" },
     paymentBody: { en: "Use hosted USDT checkout to complete your order.", es: "Usa el checkout USDT alojado para completar tu pedido." },
