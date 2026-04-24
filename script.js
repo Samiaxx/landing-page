@@ -449,19 +449,19 @@ const COPY = {
   home: {
     heroKicker: { en: "Secure Access to High-Quality Research Compounds", es: "Acceso seguro a compuestos de alta calidad" },
     heroTitle: {
-      en: "Trusted Peptide Research Products for Serious Buyers",
-      es: "Productos de investigacion peptidica de confianza para compradores serios"
+      en: "Premium Research Products With Secure Crypto Checkout",
+      es: "Productos premium de investigacion con checkout crypto seguro"
     },
     heroBody: {
-      en: "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers.",
-      es: "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales."
+      en: "Built for buyers who value quality, privacy, and a smoother purchasing experience.",
+      es: "Pensado para compradores que valoran calidad, privacidad y una experiencia de compra mas fluida."
     },
     heroNote: {
-      en: "Mobile-first browsing with clear trust placement and fast, reliable checkout.",
-      es: "Diseñado para móvil con colocación clara de confianza y checkout rápido y fiable."
+      en: "Real lab-support visuals, batch-linked listings, and a calmer route into secure hosted payment.",
+      es: "Visuales reales de apoyo de laboratorio, fichas vinculadas a lote y una ruta mas clara hacia el pago seguro alojado."
     },
     trustTitle: { en: "Built for Customer Confidence", es: "Pensado para generar confianza" },
-    trustBody: { en: "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.", es: "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." },
+    trustBody: { en: "Secure access to high-quality research compounds, shaped around clear batch context and a calmer route to payment.", es: "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila." },
     featuredKicker: { en: "Shop Premium Research Categories", es: "Compra categorias premium de investigacion" },
     featuredTitle: { en: "Find the right products with a cleaner catalog built for fast browsing.", es: "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." },
     featuredBody: { en: "Premium product cards keep dosage, price, and quality context easy to scan on desktop and mobile.", es: "Las tarjetas premium mantienen dosis, precio y contexto de calidad faciles de leer en escritorio y movil." },
@@ -606,19 +606,29 @@ const COPY = {
 
 const HOME_TRUST = [
   {
-    icon: "LT",
-    title: { en: "Lab tested", es: "Analizado en laboratorio" },
-    body: { en: "HPLC-tested cues are repeated through hero, product, and COA surfaces.", es: "Las señales HPLC se repiten en hero, producto y COA." }
+    icon: "USDT",
+    title: { en: "Secure Crypto Payments", es: "Pagos crypto seguros" },
+    body: { en: "Hosted ArionPay checkout shows the exact payable amount before funds are sent.", es: "El checkout alojado de ArionPay muestra la cantidad exacta antes de enviar fondos." }
   },
   {
-    icon: "EU",
-    title: { en: "EU shipping", es: "Envío UE" },
-    body: { en: "Shipping clarity is built into the homepage and cart flow.", es: "La claridad de envío está integrada en la home y en el carrito." }
+    icon: "ACC",
+    title: { en: "Customer Accounts", es: "Cuentas de cliente" },
+    body: { en: "Protected account access keeps order history and profile details in one secure area.", es: "El acceso protegido mantiene historial y perfil en una sola area segura." }
   },
   {
-    icon: "COA",
-    title: { en: "COA per product", es: "COA por producto" },
-    body: { en: "Every product can surface a COA-ready batch card from the archive.", es: "Cada producto puede mostrar una tarjeta COA desde el archivo." }
+    icon: "24H",
+    title: { en: "Fast Processing", es: "Procesamiento rapido" },
+    body: { en: "Dispatch targets and shipping routes stay visible before the customer reaches payment.", es: "Los objetivos de salida y las rutas de envio permanecen visibles antes del pago." }
+  },
+  {
+    icon: "PRIV",
+    title: { en: "Privacy Focused", es: "Centrada en privacidad" },
+    body: { en: "Protected sessions, clear checkout steps, and discreet ordering cues reduce hesitation.", es: "Sesiones protegidas, pasos claros de checkout y senales discretas reducen la duda." }
+  },
+  {
+    icon: "SUP",
+    title: { en: "Responsive Support", es: "Soporte accesible" },
+    body: { en: "Support, policy, and shipping guidance stay close to the buying decision across the store.", es: "Soporte, politicas y guia de envio permanecen cerca de la decision de compra en toda la tienda." }
   }
 ];
 
@@ -1072,8 +1082,9 @@ function renderProductCard(product, options = {}) {
 
 function renderTrustCards() {
   return HOME_TRUST.map((item, index) => `
-    <article class="trust-card reveal${index % 2 ? " reveal-delay" : ""}">
+    <article class="trust-card trust-strip-card reveal${index % 2 ? " reveal-delay" : ""}">
       <span class="icon-chip">${item.icon}</span>
+      <span class="detail-label">${currentLanguage === "es" ? "Primus standard" : "Primus standard"}</span>
       <h3>${pick(item.title)}</h3>
       <p class="card-copy">${pick(item.body)}</p>
     </article>
@@ -1124,9 +1135,22 @@ function renderHomePage() {
             <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.viewCatalog)}</a>
           </div>
           <div class="hero-trust">
-            <div class="trust-chip"><strong>${pick(COPY.labels.hplc)}</strong></div>
-            <div class="trust-chip"><strong>${pick(COPY.labels.shipped)}</strong></div>
-            <div class="trust-chip"><strong>${pick(COPY.labels.freeShipping)}</strong></div>
+            <div class="trust-chip">
+              <strong>${currentLanguage === "es" ? "Listados vinculados a lote" : "Batch-linked listings"}</strong>
+              <span>${currentLanguage === "es" ? "Contexto claro antes del checkout." : "Clear product context before checkout."}</span>
+            </div>
+            <div class="trust-chip">
+              <strong>${currentLanguage === "es" ? "Cuentas protegidas" : "Protected customer accounts"}</strong>
+              <span>${currentLanguage === "es" ? "Perfil e historial en una sola area segura." : "Profile and order history in one secure area."}</span>
+            </div>
+            <div class="trust-chip">
+              <strong>${currentLanguage === "es" ? "Procesamiento rapido" : "Fast order processing"}</strong>
+              <span>${currentLanguage === "es" ? "Los objetivos de salida siguen visibles." : "Dispatch targets stay visible."}</span>
+            </div>
+            <div class="trust-chip">
+              <strong>${currentLanguage === "es" ? "Checkout USDT con ArionPay" : "USDT checkout via ArionPay"}</strong>
+              <span>${currentLanguage === "es" ? "Cantidad exacta en la pagina segura." : "Exact amount shown on the secure hosted page."}</span>
+            </div>
           </div>
         </div>
         <div class="hero-stack reveal reveal-delay">

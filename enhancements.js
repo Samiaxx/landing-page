@@ -2579,20 +2579,20 @@
     return `
       <div class="purchase-fact-grid">
         <div class="purchase-fact">
-          <span>${tx("Batch", "Lote")}</span>
+          <span>${tx("Batch linked", "Lote vinculado")}</span>
           <strong>${product.batch}</strong>
         </div>
         <div class="purchase-fact">
-          <span>${tx("Last analysis", "Ultimo analisis")}</span>
+          <span>${tx("Latest analysis", "Ultimo analisis")}</span>
           <strong>${formatDate(product.coaDate)}</strong>
         </div>
         <div class="purchase-fact">
-          <span>${tx("Dispatch", "Salida")}</span>
+          <span>${tx("Dispatch target", "Objetivo de salida")}</span>
           <strong>${tx("24h target", "Objetivo 24h")}</strong>
         </div>
         <div class="purchase-fact">
-          <span>${tx("Payment", "Pago")}</span>
-          <strong>ArionPay / USDT</strong>
+          <span>${tx("Payment route", "Ruta de pago")}</span>
+          <strong>${tx("ArionPay / USDT", "ArionPay / USDT")}</strong>
         </div>
       </div>
     `;
@@ -3445,13 +3445,18 @@
               <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
             </a>
             <p class="footer-copy">${tx(
-              "Secure ecommerce experience built for modern customers.",
-              "Experiencia de ecommerce segura para clientes modernos."
+              "Built for modern customers seeking secure premium ecommerce.",
+              "Pensado para clientes modernos que buscan un ecommerce premium y seguro."
             )}</p>
             <p class="footer-note">${tx(
               "For laboratory research use only.",
               "Solo para uso de investigacion en laboratorio."
             )}</p>
+            <div class="footer-assurance">
+              <span>${tx("Secure Crypto Payments", "Pagos crypto seguros")}</span>
+              <span>${tx("Protected Accounts", "Cuentas protegidas")}</span>
+              <span>${tx("24h Dispatch Target", "Objetivo de salida 24h")}</span>
+            </div>
           </div>
           <div class="footer-column">
             <div class="footer-title">${tx("Store", "Tienda")}</div>
@@ -3485,12 +3490,12 @@
           <div class="hero-copy reveal">
             <p class="kicker">${tx("Secure Access to High-Quality Research Compounds", "Acceso seguro a compuestos de alta calidad")}</p>
             <h1>${tx(
-              "Trusted Peptide Research Products for Serious Buyers",
-              "Productos de investigacion peptidica de confianza para compradores serios"
+              "Premium Research Products With Secure Crypto Checkout",
+              "Productos premium de investigacion con checkout crypto seguro"
             )}</h1>
             <p class="lead">${tx(
-              "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers.",
-              "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales."
+              "Built for buyers who value quality, privacy, and a smoother purchasing experience.",
+              "Pensado para compradores que valoran calidad, privacidad y una experiencia de compra mas fluida."
             )}</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="shop.html">${tx("Shop Now", "Comprar ahora")}</a>
@@ -3526,7 +3531,7 @@
         </div>
       </section>
       <section class="section section-tight">
-        <div class="container trust-grid">${renderTrustCards()}</div>
+        <div class="container trust-grid hero-signal-strip">${renderTrustCards()}</div>
       </section>
       <section class="section" id="featured-products">
         <div class="container">
@@ -3545,8 +3550,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Why Customers Choose Primus", "Por que los clientes eligen Primus")}</p>
             <h2 class="section-title">${tx(
-              "Secure cryptocurrency payments, fast order processing, premium product standards, and professional customer support.",
-              "Pagos seguros con criptomonedas, procesamiento rapido, estandares premium y soporte profesional."
+              "Operational confidence is built into the storefront before a buyer ever reaches payment.",
+              "La confianza operativa esta integrada en la tienda antes de que el comprador llegue al pago."
             )}</h2>
           </div>
           <div class="service-grid">${renderServiceCards()}</div>
@@ -4510,17 +4515,30 @@
               <a class="btn btn-secondary" href="#featured-products">${tx("Browse Products", "Ver productos")}</a>
             </div>
             <div class="hero-trust">
-              <div class="trust-chip"><strong>${localize(COPY.labels.hplc)}</strong></div>
-              <div class="trust-chip"><strong>${localize(COPY.labels.shipped)}</strong></div>
-              <div class="trust-chip"><strong>${tx("Secure hosted USDT checkout", "Checkout USDT seguro alojado")}</strong></div>
+              <div class="trust-chip">
+                <strong>${tx("Batch-linked listings", "Listados vinculados a lote")}</strong>
+                <span>${tx("Clear product context before checkout.", "Contexto claro del producto antes del checkout.")}</span>
+              </div>
+              <div class="trust-chip">
+                <strong>${tx("Protected customer accounts", "Cuentas protegidas")}</strong>
+                <span>${tx("Profile and order history in one secure area.", "Perfil e historial en una sola area segura.")}</span>
+              </div>
+              <div class="trust-chip">
+                <strong>${tx("Fast order processing", "Procesamiento rapido")}</strong>
+                <span>${tx("Dispatch targets stay visible before payment.", "Los objetivos de salida siguen visibles antes del pago.")}</span>
+              </div>
+              <div class="trust-chip">
+                <strong>${tx("USDT checkout via ArionPay", "Checkout USDT con ArionPay")}</strong>
+                <span>${tx("Exact amount shown on the secure hosted page.", "Cantidad exacta mostrada en la pagina segura alojada.")}</span>
+              </div>
             </div>
           </div>
           <div class="hero-stack reveal reveal-delay">
             <article class="panel panel-dark">
               <p class="panel-kicker">${tx("Built for Customer Confidence", "Pensado para generar confianza")}</p>
               <h2>${tx(
-                "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.",
-                "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza."
+                "Secure access to high-quality research compounds, shaped around clear batch context and a calmer route to payment.",
+                "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila."
               )}</h2>
               <div class="metric-grid">
                 <div class="metric-card"><strong>${liveCount}</strong><small>${tx("live products", "productos activos")}</small></div>
@@ -4531,8 +4549,8 @@
             <article class="hero-visual hero-visual-photo reveal">
               <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
               <div class="overlay-card">${tx(
-                "Premium branded packshots now sit alongside real laboratory-support visuals so the storefront feels more trustworthy before the customer reaches checkout.",
-                "Los packshots premium de marca ahora conviven con visuales reales de apoyo de laboratorio para que la tienda se sienta mas confiable antes de llegar al checkout."
+                "Real laboratory-support visuals, branded packshots, and stronger trust placement help the storefront feel more accountable before checkout begins.",
+                "Los visuales reales de apoyo de laboratorio, los packshots de marca y una mejor colocacion de confianza hacen que la tienda se sienta mas responsable antes del checkout."
               )}</div>
             </article>
           </div>
@@ -4558,8 +4576,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Shop Premium Research Categories", "Compra categorias premium de investigacion")}</p>
             <h2 class="section-title">${tx(
-              "Find the right products with a cleaner catalog built for fast browsing.",
-              "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer."
+              "Browse research lanes with cleaner spacing, clearer dosage cues, and stronger catalog storytelling.",
+              "Recorre lineas de investigacion con mejor espacio, dosis mas claras y un catalogo con mas narrativa."
             )}</h2>
           </div>
           <div class="objective-grid">${renderGoalCards()}</div>
@@ -4570,8 +4588,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Shop Premium Research Categories", "Compra categorias premium de investigacion")}</p>
             <h2 class="section-title">${tx(
-              "Find the right products with a cleaner catalog built for fast browsing.",
-              "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer."
+              "Featured products arranged for faster comparison and a more premium first pass.",
+              "Productos destacados organizados para comparar mas rapido y con una primera impresion mas premium."
             )}</h2>
           </div>
           <div class="catalog-grid">${featured}</div>
@@ -4621,8 +4639,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("How ordering works", "Como funciona el pedido")}</p>
             <h2 class="section-title">${tx(
-              "A premium checkout journey should feel calm and obvious from first click to payment confirmation.",
-              "Un recorrido de checkout premium debe sentirse claro y tranquilo desde el primer clic hasta la confirmacion del pago."
+              "From first click to payment confirmation, the buying path stays clear, calm, and accountable.",
+              "Desde el primer clic hasta la confirmacion del pago, el recorrido de compra se mantiene claro, tranquilo y responsable."
             )}</h2>
           </div>
           <div class="detail-grid journey-grid">${renderOrderJourneyCards()}</div>
@@ -4633,8 +4651,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Built for Customer Confidence", "Pensado para generar confianza")}</p>
             <h2 class="section-title">${tx(
-              "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.",
-              "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza."
+              "Protected accounts, secure crypto payments, and transparent order flow designed to earn trust.",
+              "Cuentas protegidas, pagos crypto seguros y un flujo de pedido transparente disenado para ganar confianza."
             )}</h2>
           </div>
           <div class="proof-grid">${renderProofCards()}</div>
@@ -4645,8 +4663,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Testimonials", "Testimonios")}</p>
             <h2 class="section-title">${tx(
-              "A final layer of reassurance for cautious buyers who want the store to feel accountable before purchase.",
-              "Una capa final de tranquilidad para compradores cautos que quieren que la tienda se sienta responsable antes de comprar."
+              "A specialist store should feel accountable before a customer commits to buy.",
+              "Una tienda especialista debe sentirse responsable antes de que el cliente se comprometa a comprar."
             )}</h2>
           </div>
           <div class="testimonial-grid">${renderTestimonialCards()}</div>
@@ -4839,22 +4857,37 @@
                 <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
                 <span class="badge">${localize(COPY.labels.hplc)}</span>
               </div>
-              <p class="panel-kicker">${tx("Product detail", "Detalle de producto")}</p>
+              <p class="panel-kicker">${tx("Premium product overview", "Resumen premium del producto")}</p>
               <h1>${localize(product.name)} ${product.dosage}</h1>
               <div class="card-tag-row">
                 ${laneTags}
                 <span class="product-tag product-tag-muted">${product.batch}</span>
               </div>
               <p class="product-subtext">${localize(product.short)}</p>
+              <div class="product-buyer-note">
+                <strong>${tx("Built for confident ordering", "Pensado para pedir con confianza")}</strong>
+                <p>${tx(
+                  "Clear batch context, exact pricing, and secure hosted payment guidance stay visible before the customer leaves the store.",
+                  "El contexto de lote, el precio exacto y la guia de pago seguro siguen visibles antes de salir de la tienda."
+                )}</p>
+              </div>
               <div class="price-row">
                 <strong class="price-value">${productPriceLabel(product)}</strong>
                 <span>${product.status === "available" ? "EUR" : tx("Release pending", "Lanzamiento pendiente")}</span>
               </div>
-              ${renderPurchaseFacts(product)}
               <div class="product-trust">
-                <div class="trust-icon">${localize(COPY.labels.shipped)}</div>
-                <div class="trust-icon">${localize(COPY.labels.freeShipping)}</div>
-                <div class="trust-icon">${localize(COPY.labels.hplc)}</div>
+                <div class="trust-icon trust-icon-detail">
+                  <strong>${tx("Batch-linked listing", "Listado vinculado a lote")}</strong>
+                  <span>${tx("Latest analysis data remains visible before checkout.", "Los datos del ultimo analisis siguen visibles antes del checkout.")}</span>
+                </div>
+                <div class="trust-icon trust-icon-detail">
+                  <strong>${tx("Secure hosted payment", "Pago seguro alojado")}</strong>
+                  <span>${tx("ArionPay shows the exact USDT amount on the final secure page.", "ArionPay muestra la cantidad exacta de USDT en la pagina segura final.")}</span>
+                </div>
+                <div class="trust-icon trust-icon-detail">
+                  <strong>${tx("Responsive order support", "Soporte de pedido accesible")}</strong>
+                  <span>${tx("Shipping, policy, and support links stay close to the buying decision.", "Los enlaces de envio, politicas y soporte se mantienen cerca de la decision de compra.")}</span>
+                </div>
               </div>
               <div class="shipping-progress">
                 <div class="shipping-progress-bar" style="width:${progress}%"></div>
@@ -4878,7 +4911,24 @@
                   <a href="contact.html">${tx("Need Help? Contact Support", "Necesitas ayuda? Contacta con soporte")}</a>
                 </div>
               </div>
-              ${actionBlock}
+              <div class="product-buy-box">
+                <div class="product-buy-box-head">
+                  <span class="detail-label">${tx("Secure Checkout", "Checkout seguro")}</span>
+                  <strong>${tx("Review the essentials before moving into payment.", "Revisa lo esencial antes de pasar al pago.")}</strong>
+                  <p>${tx(
+                    "Batch, dispatch, and payment-route details stay visible here so the secure handoff feels clear instead of rushed.",
+                    "Los detalles de lote, salida y ruta de pago permanecen visibles aqui para que el paso seguro se sienta claro y no apresurado."
+                  )}</p>
+                </div>
+                ${renderPurchaseFacts(product)}
+                <div class="product-buy-actions">
+                  ${actionBlock}
+                </div>
+                <p class="product-buy-note">${tx(
+                  "Exact payment amounts are confirmed automatically for a smoother order process once ArionPay shows the final USDT amount.",
+                  "Los importes exactos se confirman automaticamente para un proceso mas fluido cuando ArionPay muestra la cantidad final de USDT."
+                )}</p>
+              </div>
             </aside>
           </div>
         </div>
@@ -4934,7 +4984,7 @@
         <div class="container section-stack">
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Related products", "Productos relacionados")}</p>
-            <h2 class="section-title">${tx("Continue through the same product lane.", "Continua por la misma linea de producto.")}</h2>
+            <h2 class="section-title">${tx("Compare nearby compounds without losing the buying flow.", "Compara compuestos cercanos sin perder el flujo de compra.")}</h2>
           </div>
           <div class="related-grid">${related}</div>
         </div>
@@ -4954,11 +5004,29 @@
       .slice(0, 2)
       .map((goal) => `<span class="product-tag">${localize(goalConfig(goal).label)}</span>`)
       .join("");
+    const cardBadge = product.status === "available"
+      ? tx("Secure checkout ready", "Listo para checkout seguro")
+      : tx("Launch batch", "Lote de lanzamiento");
+    const trustBits = product.status === "available"
+      ? [
+        tx("Batch-linked", "Lote visible"),
+        tx("COA-ready", "COA listo"),
+        tx("24h target", "Objetivo 24h")
+      ]
+      : [
+        tx("Launch batch", "Lote de lanzamiento"),
+        tx("Archive ready", "Archivo listo"),
+        tx("Release updates", "Actualizaciones de salida")
+      ];
 
     return `
       <article class="${cardClass}">
         ${renderProductVisual(product, "card")}
         <div class="card-body">
+          <div class="card-storyline">
+            <span class="card-storyline-label">${tx("Research compound", "Compuesto de investigacion")}</span>
+            <span class="card-badge-soft">${cardBadge}</span>
+          </div>
           <div class="card-meta">
             <span class="status-pill ${product.status === "available" ? "available" : "coming"}">${productStatusLabel(product)}</span>
             <strong class="card-price">${productPriceLabel(product)}</strong>
@@ -4968,6 +5036,9 @@
           </div>
           <h3>${localize(product.name)} ${product.dosage}</h3>
           <p class="card-copy">${localize(product.short)}</p>
+          <div class="card-confidence-row">
+            ${trustBits.map((item) => `<span>${item}</span>`).join("")}
+          </div>
           <div class="product-action-row">
             <a class="text-link" href="product.html?slug=${product.slug}">${localize(COPY.labels.viewProduct)}</a>
             ${actionButton}
