@@ -419,8 +419,8 @@ const COPY = {
     priceOnRelease: { en: "Price on release", es: "Precio al lanzamiento" },
     addToCart: { en: "Add to Cart", es: "Añadir al carrito" },
     viewProduct: { en: "View Product", es: "Ver producto" },
-    viewCatalog: { en: "View Products", es: "Ver productos" },
-    browseShop: { en: "Browse the full catalogue", es: "Ver el catálogo completo" },
+    viewCatalog: { en: "Browse Products", es: "Ver productos" },
+    browseShop: { en: "Browse Products", es: "Ver productos" },
     seeCoa: { en: "See COA archive", es: "Ver archivo COA" },
     hplc: { en: "HPLC tested", es: "HPLC verificado" },
     shipped: { en: "Shipped 24h", es: "Enviado en 24h" },
@@ -431,7 +431,7 @@ const COPY = {
     batchReady: { en: "COA ready", es: "COA listo" },
     batchPending: { en: "Awaiting release", es: "Pendiente de lanzamiento" },
     checkout: { en: "Secure Checkout", es: "Pago seguro" },
-    keepBrowsing: { en: "Continue shopping", es: "Seguir comprando" },
+    keepBrowsing: { en: "Browse Products", es: "Ver productos" },
     guestCheckout: { en: "Guest checkout ready", es: "Checkout como invitado" },
     searchPlaceholder: { en: "Search peptide, dosage, or status", es: "Buscar péptido, dosis o estado" },
     qty: { en: "Quantity", es: "Cantidad" },
@@ -439,7 +439,7 @@ const COPY = {
     items: { en: "Items", es: "Artículos" },
     shipping: { en: "Shipping", es: "Envío" },
     calculatedLater: { en: "Calculated later", es: "Se calcula después" },
-    sendMessage: { en: "Send Message", es: "Enviar mensaje" }
+    sendMessage: { en: "Contact Support", es: "Contactar soporte" }
     ,shopNow: { en: "Shop Now", es: "Comprar ahora" }
     ,browseProducts: { en: "Browse Products", es: "Ver productos" }
     ,secureCheckout: { en: "Secure Checkout", es: "Pago seguro" }
@@ -447,40 +447,40 @@ const COPY = {
     ,completeOrder: { en: "Complete Order", es: "Completar pedido" }
   },
   home: {
-    heroKicker: { en: "COA‑backed research peptides", es: "Péptidos de investigación con COA" },
+    heroKicker: { en: "Secure Access to High-Quality Research Compounds", es: "Acceso seguro a compuestos de alta calidad" },
     heroTitle: {
-      en: "Research‑grade peptides — verified, documented, and EU‑shipped.",
-      es: "Péptidos de grado investigación — verificados, documentados y enviados desde la UE."
+      en: "Trusted Peptide Research Products for Serious Buyers",
+      es: "Productos de investigacion peptidica de confianza para compradores serios"
     },
     heroBody: {
-      en: "COA access, third‑party HPLC verification, discreet lab‑grade packaging, and secure ArionPay checkout — optimized for research workflows.",
-      es: "Acceso a COA, verificación HPLC de terceros, embalaje discreto de grado laboratorio y checkout seguro ArionPay — optimizado para flujos de investigación."
+      en: "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers.",
+      es: "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales."
     },
     heroNote: {
       en: "Mobile-first browsing with clear trust placement and fast, reliable checkout.",
       es: "Diseñado para móvil con colocación clara de confianza y checkout rápido y fiable."
     },
-    trustTitle: { en: "Trust signals above the fold", es: "Señales de confianza sobre el pliegue" },
-    trustBody: { en: "Structured to look credible to biohacking shoppers and athlete-focused buyers.", es: "Estructurado para resultar creíble a compradores de biohacking y público deportista." },
-    featuredKicker: { en: "Featured Products", es: "Productos destacados" },
-    featuredTitle: { en: "Four hero SKUs with quick actions and clean pricing hierarchy.", es: "Cuatro SKUs principales con acciones rápidas y jerarquía de precio clara." },
-    featuredBody: { en: "Cards are tuned for quick mobile scanning while keeping dosage, price, and trust details readable.", es: "Las tarjetas están ajustadas para una lectura rápida en móvil manteniendo visibles dosis, precio y confianza." },
-    servicesKicker: { en: "Professional Services", es: "Servicios profesionales" },
-    servicesTitle: { en: "Expert team, safety protocols, GMP manufacturing, and quality assurance.", es: "Equipo experto, protocolos de seguridad, fabricación GMP y aseguramiento de calidad." },
-    servicesBody: { en: "Short proof points covering team expertise, safety, manufacturing standards, and lab verification.", es: "Puntos breves sobre experiencia del equipo, seguridad, estándares de fabricación y verificación de laboratorio." },
+    trustTitle: { en: "Built for Customer Confidence", es: "Pensado para generar confianza" },
+    trustBody: { en: "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.", es: "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." },
+    featuredKicker: { en: "Shop Premium Research Categories", es: "Compra categorias premium de investigacion" },
+    featuredTitle: { en: "Find the right products with a cleaner catalog built for fast browsing.", es: "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." },
+    featuredBody: { en: "Premium product cards keep dosage, price, and quality context easy to scan on desktop and mobile.", es: "Las tarjetas premium mantienen dosis, precio y contexto de calidad faciles de leer en escritorio y movil." },
+    servicesKicker: { en: "Why Customers Choose Primus", es: "Por que los clientes eligen Primus" },
+    servicesTitle: { en: "Secure cryptocurrency payments, fast order processing, premium product standards, and professional customer support.", es: "Pagos seguros con criptomonedas, procesamiento rapido, estandares premium y soporte profesional." },
+    servicesBody: { en: "Every major buying objection is answered clearly before the customer reaches payment.", es: "Cada objecion de compra importante se responde con claridad antes del pago." },
     shippingKicker: { en: "Shipping Info", es: "Información de envío" },
-    shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
-    shippingBody: { en: "Shipping options and delivery costs are presented clearly before payment.", es: "Las opciones de envio y los costes de entrega se muestran con claridad antes del pago." },
-    benefitsKicker: { en: "Why Choose Us", es: "Por qué elegirnos" },
-    benefitsTitle: { en: "Short icon-led proof points reinforce trust mid-page and near the footer.", es: "Puntos de prueba con iconos refuerzan la confianza a mitad de página y cerca del footer." },
-    benefitsBody: { en: "This section is deliberately compact so it reads quickly on mobile traffic.", es: "Esta sección es compacta a propósito para una lectura rápida en tráfico móvil." },
-    ctaKicker: { en: "Ready to explore the catalogue?", es: "¿Listo para explorar el catálogo?" },
-    ctaTitle: { en: "Explore the catalogue, view COAs, or proceed to secure checkout.", es: "Explora el catálogo, consulta COAs o procede al checkout seguro." },
-    ctaBody: { en: "Clear, repeated CTAs guide researchers from discovery to COA access and fast, secure payment.", es: "CTAs claros y repetidos guían desde el descubrimiento hasta acceso a COA y pago rápido y seguro." }
+    shippingTitle: { en: "Fast processing and clear order updates after successful payment.", es: "Procesamiento rapido y actualizaciones claras tras el pago." },
+    shippingBody: { en: "Shipping options and delivery costs are presented clearly before payment begins.", es: "Las opciones de envio y los costes se muestran claramente antes del pago." },
+    benefitsKicker: { en: "Why Customers Choose Primus", es: "Por que los clientes eligen Primus" },
+    benefitsTitle: { en: "Secure payments, clearer product standards, and a more trustworthy route to checkout.", es: "Pagos seguros, estandares mas claros y una ruta de checkout mas fiable." },
+    benefitsBody: { en: "These proof points are positioned to reduce hesitation where real customers decide to buy.", es: "Estos puntos de confianza se colocan donde los clientes reales deciden comprar." },
+    ctaKicker: { en: "Built for Customer Confidence", es: "Pensado para generar confianza" },
+    ctaTitle: { en: "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust.", es: "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." },
+    ctaBody: { en: "Move from product discovery to secure checkout with a calmer, clearer buying experience.", es: "Pasa del descubrimiento del producto al checkout seguro con una experiencia mas clara." }
   },  shop: {
     kicker: { en: "Shop", es: "Tienda" },
-    title: { en: "Searchable catalogue with live stock states and conversion-ready product cards.", es: "Catálogo con búsqueda, estados de stock y tarjetas listas para convertir." },
-    body: { en: "The shop view keeps the hero simple, surfaces search immediately, and separates available products from upcoming May launches.", es: "La vista de tienda mantiene un hero simple, muestra la búsqueda de inmediato y separa productos disponibles de lanzamientos de mayo." },
+    title: { en: "Shop Premium Research Categories", es: "Compra categorias premium de investigacion" },
+    body: { en: "Find the right products with a cleaner catalog built for fast browsing.", es: "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." },
     statAvailable: { en: "available now", es: "disponibles ahora" },
     statUpcoming: { en: "coming in May", es: "llegan en mayo" },
     statBilingual: { en: "language-ready UI", es: "UI bilingüe lista" },
@@ -574,15 +574,15 @@ const COPY = {
   },
   contact: {
     kicker: { en: "Need Help? Contact Support", es: "¿Necesitas ayuda? Contacta con soporte" },
-    title: { en: "Support, shipping, and payment questions presented in a clean trust-first contact layout.", es: "Soporte, envíos y pagos presentados en una página de contacto limpia y centrada en confianza." },
-    body: { en: "The brief called for a dedicated Contact page. This version combines direct support information with a simple form and visible crypto-payment guidance.", es: "El brief pedía una página Contact. Esta versión combina información directa, un formulario simple y guía visible sobre pagos crypto." },
+    title: { en: "Need Help? Contact Support", es: "Necesitas ayuda? Contacta con soporte" },
+    body: { en: "Support, shipping, and order questions are handled through a cleaner, trust-first contact experience.", es: "Soporte, envios y consultas de pedido se gestionan con una experiencia de contacto mas clara." },
     emailTitle: { en: "Email", es: "Email" },
     shippingTitle: { en: "Shipping coverage", es: "Cobertura de envío" },
     shippingBody: { en: "EU-first fulfilment, tracked dispatch, and international options from the shipping table.", es: "Cumplimiento UE primero, envío con tracking y opciones internacionales según la tabla de envíos." },
     paymentTitle: { en: "Payment", es: "Pago" },
     paymentBody: { en: "USDT is available through secure cryptocurrency checkout.", es: "USDT está disponible mediante checkout seguro con criptomonedas." },
-    formTitle: { en: "Send a message", es: "Enviar un mensaje" },
-    formBody: { en: "Use this form for shipping, COA, and order support requests.", es: "Usa este formulario para solicitudes de envio, COA y soporte de pedidos." },
+    formTitle: { en: "Need Help? Contact Support", es: "Necesitas ayuda? Contacta con soporte" },
+    formBody: { en: "Send your request directly to support.", es: "Envia tu solicitud directamente a soporte." },
     nameLabel: { en: "Name", es: "Nombre" },
     emailLabel: { en: "Email", es: "Email" },
     subjectLabel: { en: "Subject", es: "Asunto" },
@@ -592,12 +592,12 @@ const COPY = {
   },
   cart: {
     kicker: { en: "Cart", es: "Carrito" },
-    title: { en: "Minimal-step cart flow with free shipping progress and guest checkout messaging.", es: "Flujo de carrito con pocos pasos, progreso de envío gratis y mensaje de checkout invitado." },
-    body: { en: "The cart keeps the same trust-heavy design language while surfacing subtotal, payment options, and a direct path to checkout.", es: "El carrito mantiene el mismo lenguaje visual centrado en confianza y muestra subtotal, pagos y una vía directa al checkout." },
+    title: { en: "Secure Checkout", es: "Pago seguro" },
+    body: { en: "Complete your order safely with encrypted payment processing.", es: "Completa tu pedido con seguridad mediante procesamiento cifrado." },
     emptyTitle: { en: "Your cart is ready for your next order. Browse premium products to get started.", es: "Tu carrito está listo para tu próximo pedido. Explora productos premium para comenzar." },
     emptyBody: { en: "Add a product from the catalogue or product page to test the conversion flow.", es: "Añade un producto desde el catálogo o desde la ficha para probar el flujo de conversión." },
     paymentTitle: { en: "Payment options", es: "Opciones de pago" },
-    paymentBody: { en: "Use hosted USDT checkout to complete your order.", es: "Usa el checkout USDT alojado para completar tu pedido." },
+    paymentBody: { en: "Exact payment amounts are confirmed automatically for a smooth order process.", es: "Los importes exactos se confirman automaticamente para un proceso de pedido mas fluido." },
     thresholdPrefix: { en: "Add", es: "Añade" },
     thresholdSuffix: { en: "more for free shipping.", es: "más para envío gratis." },
     thresholdDone: { en: "Free shipping unlocked.", es: "Envío gratis desbloqueado." }
@@ -1298,12 +1298,12 @@ function renderUpdatedHomePage() {
     <section class="hero-home">
       <div class="container hero-grid">
         <div class="hero-copy reveal">
-          <p class="kicker">${currentLanguage === "es" ? "Tienda de Peptidos pensada para convertir" : "Conversion-First Peptide Storefront"}</p>
-          <h1>${currentLanguage === "es" ? "Peptidos de grado investigacion con una presencia mas limpia y creible desde el primer vistazo." : "Research-grade peptides with a cleaner, more credible storefront from the first screen."}</h1>
-          <p class="lead">${currentLanguage === "es" ? "Primus Peptides se presenta con una direccion cientifica mas fuerte: hero premium, CTAs repetidos, navegacion sticky y una lectura movil mucho mas rapida." : "Primus Peptides is presented with the premium scientific feel from your brief: dark trust-led hero, repeated CTA placement, sticky navigation, and a faster mobile reading experience."}</p>
+          <p class="kicker">${currentLanguage === "es" ? "Acceso seguro a compuestos de alta calidad" : "Secure Access to High-Quality Research Compounds"}</p>
+          <h1>${currentLanguage === "es" ? "Productos de investigacion peptidica de confianza para compradores serios" : "Trusted Peptide Research Products for Serious Buyers"}</h1>
+          <p class="lead">${currentLanguage === "es" ? "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales." : "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers."}</p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.viewCatalog)}</a>
-            <a class="btn btn-secondary" href="coa.html">${pick(COPY.labels.seeCoa)}</a>
+            <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.shopNow)}</a>
+            <a class="btn btn-secondary" href="#featured-products">${pick(COPY.labels.browseProducts)}</a>
           </div>
           <div class="hero-trust">
             <div class="trust-chip"><strong>${pick(COPY.labels.hplc)}</strong></div>
@@ -1313,8 +1313,8 @@ function renderUpdatedHomePage() {
         </div>
         <div class="hero-stack reveal reveal-delay">
           <article class="panel panel-dark">
-            <p class="panel-kicker">${currentLanguage === "es" ? "Posicionamiento premium de investigacion" : "Premium Research Positioning"}</p>
-            <h2>${currentLanguage === "es" ? "Pensado para generar confianza en atletas y compradores biohacker de alta intencion." : "Built to feel trustworthy to athletes and high-intent biohacking buyers."}</h2>
+            <p class="panel-kicker">${currentLanguage === "es" ? "Pensado para generar confianza" : "Built for Customer Confidence"}</p>
+            <h2>${currentLanguage === "es" ? "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." : "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust."}</h2>
             <div class="metric-grid">
               <div class="metric-card"><strong>11</strong><small>${currentLanguage === "es" ? "productos activos" : "live products"}</small></div>
               <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "flujo bilingue" : "bilingual flow"}</small></div>
@@ -1331,12 +1331,12 @@ function renderUpdatedHomePage() {
     <section class="section section-tight">
       <div class="container trust-grid">${renderTrustCards()}</div>
     </section>
-    <section class="section">
+    <section class="section" id="featured-products">
       <div class="container">
         <div class="section-header reveal">
-          <p class="section-kicker">${currentLanguage === "es" ? "Productos destacados" : "Featured Products"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Imagenes de vial sobre blanco para una lectura mas limpia y medica." : "White-background vial visuals with less clutter and better product scanning."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "La parrilla destacada ahora se siente mas clinica y minimal, con menos ruido visual." : "The featured grid now leans medical and minimal instead of lifestyle-heavy."}</p>
+          <p class="section-kicker">${currentLanguage === "es" ? "Compra categorias premium de investigacion" : "Shop Premium Research Categories"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." : "Find the right products with a cleaner catalog built for fast browsing."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Las tarjetas premium mantienen dosis, precio y contexto de calidad faciles de leer en escritorio y movil." : "Premium product cards keep dosage, price, and quality context easy to scan on desktop and mobile."}</p>
         </div>
         <div class="catalog-grid">${featured}</div>
       </div>
@@ -1344,9 +1344,9 @@ function renderUpdatedHomePage() {
     <section class="section section-dark">
       <div class="container section-stack">
         <div class="section-header reveal">
-          <p class="section-kicker">${currentLanguage === "es" ? "Bloques profesionales" : "Professional Services"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Los cuatro bloques de apoyo ahora se sienten mas precisos y menos genericos." : "The four support blocks now feel more precise and less generic."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Se mantienen la estructura solicitada y una presencia visual mas propia para Primus Peptides." : "Adapted from the requested structure while keeping the new storefront visually distinct."}</p>
+          <p class="section-kicker">${currentLanguage === "es" ? "Por que los clientes eligen Primus" : "Why Customers Choose Primus"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Pagos seguros con criptomonedas, procesamiento rapido, estandares premium y soporte profesional." : "Secure cryptocurrency payments, fast order processing, premium product standards, and professional customer support."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Cada gran objecion de compra se responde antes de que el cliente llegue al pago." : "Every major buying objection is answered before the customer reaches payment."}</p>
         </div>
         <div class="service-grid">${renderServiceCards()}</div>
       </div>
@@ -1355,8 +1355,8 @@ function renderUpdatedHomePage() {
       <div class="container shipping-layout">
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Informacion de envio" : "Shipping Info"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "La logistica sigue visual, simple y facil de comparar." : "Logistics stay visual, simple, and easy to compare."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "La tabla esta pensada para que el visitante entienda las opciones de entrega de un vistazo." : "This section is intentionally straightforward so mobile visitors can understand delivery options at a glance."}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Procesamiento rapido y actualizaciones claras tras el pago." : "Fast processing and clear order updates after successful payment."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Las opciones de entrega se muestran claramente antes del pago para reducir dudas." : "Delivery options are shown clearly before payment to reduce hesitation."}</p>
         </div>
         <article class="info-panel reveal reveal-delay">
           <table class="shipping-table">
@@ -1376,9 +1376,9 @@ function renderUpdatedHomePage() {
     <section class="section section-tight">
       <div class="container section-stack">
         <div class="section-header reveal">
-          <p class="section-kicker">${currentLanguage === "es" ? "Por que confiar en nosotros" : "Why Trust Us"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Una seccion pensada para sentirse como pruebas de laboratorio, no solo beneficios." : "Designed to feel like a lab certificates section, not just another benefits row."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Este bloque añade a la home una capa de credibilidad mucho más cercana a un archivo técnico." : "This section gives the homepage a stronger certificate-driven trust layer."}</p>
+          <p class="section-kicker">${currentLanguage === "es" ? "Pensado para generar confianza" : "Built for Customer Confidence"}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." : "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Esta capa aporta una credibilidad mas fuerte y profesional en todo el storefront." : "This layer brings a stronger, more professional trust signal across the storefront."}</p>
         </div>
         <div class="proof-grid">${renderProofCards()}</div>
       </div>
