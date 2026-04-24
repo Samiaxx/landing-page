@@ -7,6 +7,8 @@ const FREE_SHIPPING_THRESHOLD = 200;
 const SITE_EMAIL = "contact@peptidos-primus.com";
 const SITE_DOMAIN = "peptidos-primus.com";
 const BRAND_LOGO_SRC = "assets/store-logo.png";
+const HERO_VISUAL_SRC = "assets/lab-hand-vial.webp";
+const PACKSHOT_ROOT = "assets/packshots";
 const PAYMENT_METHODS = ["USDT"];
 const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
@@ -25,7 +27,12 @@ const KPV_IMAGE_SET = [
   "assets/kpv-label.jpg",
   "assets/kpv-vial-1.jpg",
   "assets/kpv-vial-2.jpg",
-  "assets/brand-caps.jpg"
+  "assets/brand-caps.webp"
+];
+
+const SUPPORT_IMAGE_SET = [
+  "assets/lab-hand-vial.webp",
+  "assets/brand-caps.webp"
 ];
 
 const NAV_ITEMS = [
@@ -297,6 +304,26 @@ const PRODUCTS = [
     coaDate: null
   }
 ];
+
+function productPackshot(slug) {
+  return `${PACKSHOT_ROOT}/${slug}.svg`;
+}
+
+function standardProductGallery(product) {
+  return [productPackshot(product.slug)].concat(SUPPORT_IMAGE_SET);
+}
+
+PRODUCTS.forEach((product) => {
+  const packshot = productPackshot(product.slug);
+  product.image = packshot;
+
+  if (product.slug === "kpv-10mg") {
+    product.gallery = [packshot].concat(KPV_IMAGE_SET);
+    return;
+  }
+
+  product.gallery = standardProductGallery(product);
+});
 
 const COPY = {
   shell: {
@@ -1061,8 +1088,8 @@ function renderHomePage() {
               <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "experiencia bilingüe" : "bilingual flow"}</small></div>
             </div>
           </article>
-          <article class="hero-visual reveal">
-            <img src="${IMAGE_SET[0]}" alt="Primus Peptides hero visual">
+          <article class="hero-visual hero-visual-photo reveal">
+            <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
             <div class="overlay-card">${pick(COPY.home.heroNote)}</div>
           </article>
         </div>
@@ -1243,8 +1270,8 @@ function renderUpdatedHomePage() {
               <div class="metric-card"><strong>COA</strong><small>${currentLanguage === "es" ? "archivo listo" : "archive-ready trust"}</small></div>
             </div>
           </article>
-          <article class="hero-visual reveal">
-            <img src="${IMAGE_SET[0]}" alt="Primus Peptides hero visual">
+          <article class="hero-visual hero-visual-photo reveal">
+            <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
             <div class="overlay-card">${currentLanguage === "es" ? "Visuales de vial mas limpias, modulos de confianza repetidos y rutas mas cortas al detalle de producto." : "Clean vial visuals, repeated trust modules, and shorter paths into product detail."}</div>
           </article>
         </div>

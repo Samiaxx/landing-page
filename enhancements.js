@@ -2337,6 +2337,34 @@
     return Array.from(new Set([product.image].concat(Array.isArray(product.gallery) ? product.gallery : []).filter(Boolean)));
   }
 
+  function galleryImageLabel(image, index) {
+    const src = String(image || "").toLowerCase();
+    if (index === 0 || src.includes("/packshots/")) {
+      return tx("Packshot", "Packshot");
+    }
+    if (src.includes("lab-hand")) {
+      return tx("Lab handling", "Manipulacion en laboratorio");
+    }
+    if (src.includes("brand-caps")) {
+      return tx("Packaging detail", "Detalle de empaque");
+    }
+    if (src.includes("kpv-label")) {
+      return tx("Label close-up", "Detalle de etiqueta");
+    }
+    if (src.includes("kpv-vial")) {
+      return tx("Vial detail", "Detalle del vial");
+    }
+    return `${tx("View", "Vista")} ${index + 1}`;
+  }
+
+  function imagePresentationKind(image) {
+    const src = String(image || "").toLowerCase();
+    if (src.includes("/packshots/") || src.endsWith(".svg")) {
+      return "packshot";
+    }
+    return "photo";
+  }
+
   function availableProducts() {
     return PRODUCTS.filter((product) => product.status === "available");
   }
@@ -2493,7 +2521,7 @@
     return products.map((product) => `
       <a class="merch-row" href="product.html?slug=${product.slug}">
         <span class="merch-row-media">
-          <img src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
+          <img class="product-visual-image product-visual-image-${imagePresentationKind(product.image)}" src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
         </span>
         <span class="merch-row-copy">
           <strong>${localize(product.name)} ${product.dosage}</strong>
@@ -2696,10 +2724,11 @@
     const trust = product.status === "available"
       ? tx("COA ready", "COA listo")
       : tx("Coming May", "Llega en mayo");
+    const imageKind = imagePresentationKind(product.image);
 
     return `
-      <figure class="product-visual product-visual-${variant}" style="--visual-primary:${tone.primary}; --visual-soft:${tone.soft}; --visual-shadow:${tone.shadow};">
-        <div class="product-visual-stage">
+      <figure class="product-visual product-visual-${variant} product-visual-${imageKind}" style="--visual-primary:${tone.primary}; --visual-soft:${tone.soft}; --visual-shadow:${tone.shadow};">
+        <div class="product-visual-stage product-visual-stage-${imageKind}">
           <span class="product-visual-glow" aria-hidden="true"></span>
           <span class="product-visual-badge">${product.dosage}</span>
           <div class="product-visual-info">
@@ -2712,7 +2741,7 @@
             <strong>${product.batch}</strong>
             <small>${tx("Peptide line", "Línea peptídica")}</small>
           </div>
-          <img src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
+          <img class="product-visual-image product-visual-image-${imageKind}" src="${product.image}" alt="${localize(product.name)} ${product.dosage}">
         </div>
         <figcaption class="product-visual-caption">
           <strong>${trust}</strong>
@@ -3868,8 +3897,8 @@
     const gallery = product.gallery
       .map((image, index) => `
         <div class="gallery-thumb gallery-thumb-enhanced">
-          <span class="gallery-thumb-label">${index === 0 ? tx("Primary", "Principal") : `${tx("View", "Vista")} ${index + 1}`}</span>
-          <img src="${image}" alt="${localize(product.name)} ${product.dosage}">
+          <span class="gallery-thumb-label">${galleryImageLabel(image, index)}</span>
+          <img class="gallery-image gallery-image-${imagePresentationKind(image)}" src="${image}" alt="${localize(product.name)} ${product.dosage}">
         </div>
       `)
       .join("");
@@ -4485,11 +4514,11 @@
                 <div class="metric-card"><strong>USDT</strong><small>${tx("secure hosted checkout", "checkout seguro alojado")}</small></div>
               </div>
             </article>
-            <article class="hero-visual reveal">
-              <img src="${IMAGE_SET[0]}" alt="Primus Peptides product visual">
+            <article class="hero-visual hero-visual-photo reveal">
+              <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
               <div class="overlay-card">${tx(
-                "Batch-linked product visuals, COA-led confidence, and a cleaner journey from discovery to payment confirmation.",
-                "Visuales de producto vinculados a lote, confianza guiada por COA y un recorrido mas limpio desde el descubrimiento hasta la confirmacion del pago."
+                "Premium branded packshots now sit alongside real laboratory-support visuals so the storefront feels more trustworthy before the customer reaches checkout.",
+                "Los packshots premium de marca ahora conviven con visuales reales de apoyo de laboratorio para que la tienda se sienta mas confiable antes de llegar al checkout."
               )}</div>
             </article>
           </div>
@@ -4729,8 +4758,8 @@
     const gallery = galleryImages
       .map((image, index) => `
         <button class="gallery-thumb gallery-thumb-enhanced ${index === activeProductGalleryImage ? "is-active" : ""}" type="button" data-gallery-image="${index}">
-          <span class="gallery-thumb-label">${index === 0 ? tx("Primary", "Principal") : `${tx("View", "Vista")} ${index + 1}`}</span>
-          <img src="${image}" alt="${localize(product.name)} ${product.dosage}">
+          <span class="gallery-thumb-label">${galleryImageLabel(image, index)}</span>
+          <img class="gallery-image gallery-image-${imagePresentationKind(image)}" src="${image}" alt="${localize(product.name)} ${product.dosage}">
         </button>
       `)
       .join("");
