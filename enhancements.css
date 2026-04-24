@@ -805,6 +805,91 @@
   background: rgba(9, 22, 48, 0.04);
 }
 
+.commerce-promise-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.commerce-promise-card,
+.journey-card,
+.product-quick-grid .detail-card {
+  align-content: start;
+}
+
+.commerce-promise-card p,
+.journey-card p {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.commerce-inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.commerce-inline-links a,
+.product-policy-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.75rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 23, 48, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  font-weight: 700;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.commerce-inline-links a:hover,
+.commerce-inline-links a:focus-visible,
+.product-policy-links a:hover,
+.product-policy-links a:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(26, 111, 214, 0.22);
+  box-shadow: 0 14px 28px rgba(13, 59, 122, 0.08);
+}
+
+.journey-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.product-confidence-panel {
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(244, 249, 255, 0.96), rgba(255, 255, 255, 0.92));
+}
+
+.product-confidence-panel p {
+  margin: 0;
+}
+
+.product-policy-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.product-quick-grid .detail-card p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.product-faq-list {
+  gap: 14px;
+}
+
+.product-faq-list .faq-item {
+  border-color: rgba(10, 23, 48, 0.07);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.product-sticky-cta,
+.product-sticky-cta-spacer {
+  display: none;
+}
+
 .checkout-stage,
 .checkout-stage-item,
 .checkout-stage-copy,
@@ -1379,6 +1464,20 @@
   width: fit-content;
 }
 
+.cookie-banner {
+  left: auto;
+  width: min(460px, calc(100vw - 36px));
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 0.95rem 1rem;
+  border-radius: 20px;
+}
+
+.cookie-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1120px) {
   .footer-grid-enhanced,
   .checkout-grid,
@@ -1395,6 +1494,11 @@
   }
 
   .objective-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .commerce-promise-grid,
+  .journey-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1461,7 +1565,9 @@
   }
 
   .objective-grid,
-  .purchase-fact-grid {
+  .purchase-fact-grid,
+  .commerce-promise-grid,
+  .journey-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1525,10 +1631,86 @@
   }
 
   .header-account-actions {
-    width: 100%;
+    width: auto;
+    flex-wrap: wrap;
   }
 
   .header-auth-link {
+    width: auto;
+    min-width: 112px;
+  }
+
+  .commerce-inline-links,
+  .product-policy-links {
+    flex-direction: column;
+  }
+
+  .cookie-banner {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    gap: 10px;
+    padding: 0.9rem 0.95rem;
+    border-radius: 18px;
+  }
+
+  .cookie-actions {
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .cookie-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.8rem 0.95rem;
+  }
+
+  .product-sticky-cta-spacer {
+    display: block;
+    height: 94px;
+  }
+
+  .product-sticky-cta {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    z-index: 35;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.85rem 0.9rem;
+    border-radius: 20px;
+    border: 1px solid rgba(10, 23, 48, 0.08);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 18px 34px rgba(7, 16, 29, 0.16);
+    backdrop-filter: blur(14px);
+  }
+
+  .product-sticky-cta .btn {
+    flex: 0 0 auto;
+    min-width: 140px;
+  }
+
+  .product-sticky-cta-copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .product-sticky-cta-copy strong {
+    color: var(--text);
+    font-size: 0.94rem;
+    line-height: 1.25;
+  }
+
+  .product-sticky-cta-copy span {
+    color: var(--text-soft);
+    font-size: 0.8rem;
+    line-height: 1.4;
   }
 }

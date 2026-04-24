@@ -2564,6 +2564,130 @@
     `;
   }
 
+  function renderHomePromiseCards() {
+    const cards = [
+      {
+        label: tx("Why buy here", "Por que comprar aqui"),
+        title: tx("Specialist catalogue presentation", "Presentacion de catalogo especialista"),
+        copy: tx(
+          "Product pages are built to keep batch visibility, price, and buying confidence close to the decision point instead of burying them in long text blocks.",
+          "Las paginas de producto mantienen la visibilidad del lote, el precio y la confianza de compra cerca del punto de decision en lugar de enterrarlos en bloques largos de texto."
+        )
+      },
+      {
+        label: tx("Quality visibility", "Visibilidad de calidad"),
+        title: tx("COA-ready batch context", "Contexto de lote listo para COA"),
+        copy: tx(
+          "Every available product keeps its batch reference and latest analysis date visible so cautious buyers can review with more confidence before checkout.",
+          "Cada producto disponible mantiene visible su referencia de lote y la fecha del ultimo analisis para que compradores cautos revisen con mas confianza antes del checkout."
+        )
+      },
+      {
+        label: tx("Secure payment", "Pago seguro"),
+        title: tx("Hosted ArionPay handoff", "Entrega alojada en ArionPay"),
+        copy: tx(
+          "Customers review shipping and totals on the store first, then pay on the hosted ArionPay page where the exact USDT amount and network are shown before funds are sent.",
+          "Los clientes revisan primero el envio y el total en la tienda, y despues pagan en la pagina alojada de ArionPay donde se muestra la cantidad exacta de USDT y la red antes de enviar fondos."
+        )
+      },
+      {
+        label: tx("Human support", "Soporte humano"),
+        title: tx("Contact and policies stay visible", "Contacto y politicas siempre visibles"),
+        copy: tx(
+          "Shipping, policy, and support details stay easy to reach throughout the buying journey so the store feels accountable and launch-ready.",
+          "Los detalles de envio, politicas y soporte permanecen faciles de encontrar durante todo el recorrido de compra para que la tienda se sienta responsable y lista para lanzamiento."
+        )
+      }
+    ];
+
+    return cards.map((card, index) => `
+      <article class="detail-card commerce-promise-card reveal${index % 2 ? " reveal-delay" : ""}">
+        <span class="detail-label">${card.label}</span>
+        <strong>${card.title}</strong>
+        <p>${card.copy}</p>
+      </article>
+    `).join("");
+  }
+
+  function renderOrderJourneyCards() {
+    const cards = [
+      {
+        step: tx("Step 1", "Paso 1"),
+        title: tx("Choose the right product", "Elige el producto adecuado"),
+        copy: tx(
+          "Browse by research lane, compare dosage and batch context, and move into the cart only when the fit feels clear.",
+          "Explora por linea de investigacion, compara dosificacion y contexto de lote, y pasa al carrito solo cuando la eleccion este clara."
+        )
+      },
+      {
+        step: tx("Step 2", "Paso 2"),
+        title: tx("Review shipping and checkout details", "Revisa envio y detalles de checkout"),
+        copy: tx(
+          "Shipping options, order totals, and payment guidance stay visible before the secure handoff, reducing hesitation right before payment.",
+          "Las opciones de envio, los totales del pedido y la guia de pago permanecen visibles antes de la entrega segura, reduciendo la duda justo antes del pago."
+        )
+      },
+      {
+        step: tx("Step 3", "Paso 3"),
+        title: tx("Pay the exact amount on the hosted page", "Paga la cantidad exacta en la pagina alojada"),
+        copy: tx(
+          "ArionPay shows the exact USDT amount and network on the secure hosted payment page, then returns the customer to the store after confirmation.",
+          "ArionPay muestra la cantidad exacta de USDT y la red en la pagina de pago segura alojada, y despues devuelve al cliente a la tienda tras la confirmacion."
+        )
+      }
+    ];
+
+    return cards.map((card, index) => `
+      <article class="detail-card journey-card reveal${index % 2 ? " reveal-delay" : ""}">
+        <span class="detail-label">${card.step}</span>
+        <strong>${card.title}</strong>
+        <p>${card.copy}</p>
+      </article>
+    `).join("");
+  }
+
+  function renderProductFaq(product) {
+    const items = [
+      {
+        question: tx("Is this listing connected to a batch reference?", "Esta ficha esta conectada a una referencia de lote?"),
+        answer: tx(
+          `Yes. This product is presented with batch ${product.batch} and the latest analysis date of ${formatDate(product.coaDate)} so quality context stays visible before checkout.`,
+          `Si. Este producto se presenta con el lote ${product.batch} y la fecha del ultimo analisis ${formatDate(product.coaDate)} para que el contexto de calidad permanezca visible antes del checkout.`
+        )
+      },
+      {
+        question: tx("How does payment work?", "Como funciona el pago?"),
+        answer: tx(
+          "The store keeps shipping and total review on-site first. ArionPay then opens a secure hosted payment page showing the exact USDT amount and network before the customer sends funds.",
+          "La tienda mantiene primero la revision del envio y del total dentro del sitio. Despues ArionPay abre una pagina de pago segura alojada que muestra la cantidad exacta de USDT y la red antes de que el cliente envie fondos."
+        )
+      },
+      {
+        question: tx("When is dispatch handled?", "Cuando se gestiona el envio?"),
+        answer: tx(
+          "Available products are presented with a 24-hour dispatch target, and delivery options are shown before the customer reaches the payment handoff.",
+          "Los productos disponibles se presentan con un objetivo de salida de 24 horas, y las opciones de entrega se muestran antes de que el cliente llegue a la entrega del pago."
+        )
+      },
+      {
+        question: tx("Can I contact support before ordering?", "Puedo contactar soporte antes de pedir?"),
+        answer: tx(
+          `Yes. Email ${SITE_EMAIL} for help with batch questions, shipping routes, or checkout concerns before you place the order.`,
+          `Si. Escribe a ${SITE_EMAIL} para ayuda con dudas sobre lotes, rutas de envio o inquietudes del checkout antes de realizar el pedido.`
+        )
+      }
+    ];
+
+    return items.map((item) => `
+      <article class="faq-item">
+        <button class="faq-question" type="button" data-faq-button aria-expanded="false">${item.question}</button>
+        <div class="faq-answer" hidden>
+          <p>${item.answer}</p>
+        </div>
+      </article>
+    `).join("");
+  }
+
   function renderProductVisual(product, variant = "card") {
     const tone = productTone(product);
     const note = product.status === "available"
@@ -4321,12 +4445,9 @@
 
   function renderEnhancedHomePage() {
     const liveCount = availableProducts().length;
-    const launchCount = comingSoonProducts().length;
     const featured = bestSellerProducts()
       .map((product, index) => renderProductCard(product, { delay: index % 2 === 1 }))
       .join("");
-    const readyNow = renderCompactProductRows(sortShopProducts(availableProducts()).slice(0, 5));
-    const launchQueue = renderCompactProductRows(sortShopProducts(comingSoonProducts()).slice(0, 5));
 
     return `
       <section class="hero-home">
@@ -4334,41 +4455,41 @@
           <div class="hero-copy reveal">
             <p class="kicker">${tx("Research-Grade Peptide Storefront", "Storefront de peptidos para investigacion")}</p>
             <h1>${tx(
-              "A more complete catalogue flow from discovery to checkout.",
-              "Un flujo de catalogo mas completo desde el descubrimiento hasta el checkout."
+              "Premium research peptides with clearer trust, cleaner product pages, and secure crypto checkout.",
+              "Peptidos premium para investigacion con confianza mas clara, paginas de producto mas limpias y checkout crypto seguro."
             )}</h1>
             <p class="lead">${tx(
-              "Primus Peptides now presents the catalogue as a live store: clearer lanes, stronger product browsing, faster comparison, and a shorter route into ArionPay checkout.",
-              "Primus Peptides ahora presenta el catalogo como una tienda activa: lineas mas claras, mejor exploracion de productos, comparacion mas rapida y una ruta mas corta hacia el checkout con ArionPay."
+              "Primus Peptides is built for buyers who want batch visibility, certificate-led confidence, clear shipping information, and a calm route into hosted ArionPay payment on both desktop and mobile.",
+              "Primus Peptides esta pensada para compradores que quieren visibilidad por lote, confianza guiada por certificados, informacion clara de envio y una ruta fluida hacia el pago alojado con ArionPay tanto en escritorio como en movil."
             )}</p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="shop.html">${tx("Shop all products", "Comprar todos los productos")}</a>
-              <a class="btn btn-secondary" href="coa.html">${tx("COA Archive", "Archivo COA")}</a>
+              <a class="btn btn-primary" href="shop.html">${tx("Shop the catalogue", "Comprar el catalogo")}</a>
+              <a class="btn btn-secondary" href="coa.html">${tx("Review the COA archive", "Revisar el archivo COA")}</a>
             </div>
             <div class="hero-trust">
               <div class="trust-chip"><strong>${localize(COPY.labels.hplc)}</strong></div>
               <div class="trust-chip"><strong>${localize(COPY.labels.shipped)}</strong></div>
-              <div class="trust-chip"><strong>${localize(COPY.labels.freeShipping)}</strong></div>
+              <div class="trust-chip"><strong>${tx("Secure hosted USDT checkout", "Checkout USDT seguro alojado")}</strong></div>
             </div>
           </div>
           <div class="hero-stack reveal reveal-delay">
             <article class="panel panel-dark">
-              <p class="panel-kicker">${tx("Store snapshot", "Resumen de la tienda")}</p>
+              <p class="panel-kicker">${tx("Why buyers trust Primus", "Por que los compradores confian en Primus")}</p>
               <h2>${tx(
-                "Live catalogue depth, bilingual navigation, and trust signals kept close to the buying path.",
-                "Profundidad real de catalogo, navegacion bilingue y senales de confianza cerca del recorrido de compra."
+                "A launch-ready storefront that answers the biggest buying questions before customers ever leave the site.",
+                "Una tienda lista para lanzamiento que responde las dudas de compra mas importantes antes de que el cliente abandone el sitio."
               )}</h2>
               <div class="metric-grid">
-                <div class="metric-card"><strong>${liveCount}</strong><small>${tx("available now", "disponibles ahora")}</small></div>
-                <div class="metric-card"><strong>${launchCount}</strong><small>${tx("in launch queue", "en cola de lanzamiento")}</small></div>
-                <div class="metric-card"><strong>USDT</strong><small>${tx("ArionPay checkout", "checkout ArionPay")}</small></div>
+                <div class="metric-card"><strong>${liveCount}</strong><small>${tx("live products", "productos activos")}</small></div>
+                <div class="metric-card"><strong>24h</strong><small>${tx("dispatch target", "objetivo de salida")}</small></div>
+                <div class="metric-card"><strong>USDT</strong><small>${tx("secure hosted checkout", "checkout seguro alojado")}</small></div>
               </div>
             </article>
             <article class="hero-visual reveal">
               <img src="${IMAGE_SET[0]}" alt="Primus Peptides product visual">
               <div class="overlay-card">${tx(
-                "White-background product imagery, batch-linked presentation, and catalogue sections that feel closer to a working store.",
-                "Imagenes de producto sobre fondo blanco, presentacion vinculada a lote y secciones de catalogo mas cercanas a una tienda operativa."
+                "Batch-linked product visuals, COA-led confidence, and a cleaner journey from discovery to payment confirmation.",
+                "Visuales de producto vinculados a lote, confianza guiada por COA y un recorrido mas limpio desde el descubrimiento hasta la confirmacion del pago."
               )}</div>
             </article>
           </div>
@@ -4380,10 +4501,22 @@
       <section class="section section-tight">
         <div class="container section-stack">
           <div class="section-header reveal">
+            <p class="section-kicker">${tx("Why choose Primus", "Por que elegir Primus")}</p>
+            <h2 class="section-title">${tx(
+              "A premium storefront feels trustworthy before checkout. These are the signals that reduce hesitation fastest.",
+              "Una tienda premium se siente confiable antes del checkout. Estas son las senales que mas rapido reducen la duda."
+            )}</h2>
+          </div>
+          <div class="detail-grid commerce-promise-grid">${renderHomePromiseCards()}</div>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
             <p class="section-kicker">${tx("Shop by lane", "Comprar por linea")}</p>
             <h2 class="section-title">${tx(
-              "Move through the catalogue by product intent instead of browsing one long undifferentiated grid.",
-              "Recorre el catalogo por intencion de producto en lugar de una sola parrilla sin diferenciar."
+              "Find the right product faster by entering through the research objective that matches the buyer intent.",
+              "Encuentra el producto adecuado mas rapido entrando por el objetivo de investigacion que mejor coincide con la intencion de compra."
             )}</h2>
           </div>
           <div class="objective-grid">${renderGoalCards()}</div>
@@ -4394,49 +4527,11 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Best sellers", "Mas vendidos")}</p>
             <h2 class="section-title">${tx(
-              "Core catalogue products surfaced first, with cleaner comparison points and direct cart access.",
-              "Productos clave del catalogo visibles primero, con comparacion mas limpia y acceso directo al carrito."
+              "The strongest live products, surfaced first with cleaner comparison points and direct cart access.",
+              "Los productos activos mas fuertes, mostrados primero con comparacion mas limpia y acceso directo al carrito."
             )}</h2>
           </div>
           <div class="catalog-grid">${featured}</div>
-        </div>
-      </section>
-      <section class="section section-tight">
-        <div class="container launch-grid">
-          <article class="detail-card reveal">
-            <div class="section-header">
-              <p class="section-kicker">${tx("Ready now", "Listo ahora")}</p>
-              <h2 class="section-title">${tx("Current catalogue", "Catalogo actual")}</h2>
-              <p class="section-copy">${tx(
-                "Available products ready for immediate browsing and checkout.",
-                "Productos disponibles listos para explorar y comprar de inmediato."
-              )}</p>
-            </div>
-            <div class="stack-sm">${readyNow}</div>
-          </article>
-          <article class="detail-card reveal reveal-delay">
-            <div class="section-header">
-              <p class="section-kicker">${tx("Launch queue", "Cola de lanzamiento")}</p>
-              <h2 class="section-title">${tx("Coming soon", "Proximamente")}</h2>
-              <p class="section-copy">${tx(
-                "Products already positioned in the storefront before release pricing is opened.",
-                "Productos ya posicionados en la tienda antes de abrir el precio de lanzamiento."
-              )}</p>
-            </div>
-            <div class="stack-sm">${launchQueue}</div>
-          </article>
-        </div>
-      </section>
-      <section class="section section-dark">
-        <div class="container section-stack">
-          <div class="section-header reveal">
-            <p class="section-kicker">${tx("Store operations", "Operativa de tienda")}</p>
-            <h2 class="section-title">${tx(
-              "Core support blocks now work as selling infrastructure, not just static brand sections.",
-              "Los bloques de soporte ahora funcionan como infraestructura de venta, no solo como secciones estaticas."
-            )}</h2>
-          </div>
-          <div class="service-grid">${renderServiceCards()}</div>
         </div>
       </section>
       <section class="section section-tight">
@@ -4445,8 +4540,8 @@
             <div class="section-header">
               <p class="section-kicker">${tx("Shipping clarity", "Claridad de envios")}</p>
               <h2 class="section-title">${tx(
-                "Dispatch and delivery information that answers objections before checkout.",
-                "Informacion de salida y entrega que resuelve objeciones antes del checkout."
+                "Dispatch and delivery information that removes uncertainty before payment begins.",
+                "Informacion de salida y entrega que elimina incertidumbre antes de que empiece el pago."
               )}</h2>
             </div>
             <table class="shipping-table">
@@ -4461,16 +4556,33 @@
             </table>
           </article>
           <article class="info-panel reveal reveal-delay">
-            <p class="panel-kicker">${tx("Checkout routing", "Ruta de checkout")}</p>
+            <p class="panel-kicker">${tx("Secure payment confidence", "Confianza en el pago seguro")}</p>
             <h3>${tx(
-              "Cart, checkout, and payment steps now sit closer together so the store feels transactional instead of brochure-led.",
-              "Carrito, checkout y pago ahora quedan mas conectados para que la tienda se sienta transaccional y no solo informativa."
+              "Customers stay on the store until shipping and totals are confirmed, then move into the hosted ArionPay page for the exact USDT amount and final payment.",
+              "Los clientes permanecen en la tienda hasta confirmar envio y totales, y despues pasan a la pagina alojada de ArionPay para ver la cantidad exacta de USDT y completar el pago."
             )}</h3>
             <p class="section-copy">${tx(
-              "The storefront keeps COA, batch, shipping, and payment information visible earlier in the journey.",
-              "La tienda mantiene visible antes en el recorrido la informacion de COA, lote, envio y pago."
+              "That separation keeps payment secure while preserving a more trustworthy storefront experience before checkout begins.",
+              "Esa separacion mantiene el pago seguro mientras preserva una experiencia de tienda mas confiable antes de que comience el checkout."
             )}</p>
+            <div class="policy-links commerce-inline-links">
+              <a href="shipping.html">${tx("Shipping policy", "Politica de envios")}</a>
+              <a href="terms.html">${tx("Terms", "Terminos")}</a>
+              <a href="contact.html">${tx("Contact support", "Contactar soporte")}</a>
+            </div>
           </article>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("How ordering works", "Como funciona el pedido")}</p>
+            <h2 class="section-title">${tx(
+              "A premium checkout journey should feel calm and obvious from first click to payment confirmation.",
+              "Un recorrido de checkout premium debe sentirse claro y tranquilo desde el primer clic hasta la confirmacion del pago."
+            )}</h2>
+          </div>
+          <div class="detail-grid journey-grid">${renderOrderJourneyCards()}</div>
         </div>
       </section>
       <section class="section section-tight">
@@ -4490,8 +4602,8 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Testimonials", "Testimonios")}</p>
             <h2 class="section-title">${tx(
-              "Social proof placed where the catalogue now feels more operational and purchase-ready.",
-              "Prueba social colocada donde el catalogo ya se siente mas operativo y listo para compra."
+              "A final layer of reassurance for cautious buyers who want the store to feel accountable before purchase.",
+              "Una capa final de tranquilidad para compradores cautos que quieren que la tienda se sienta responsable antes de comprar."
             )}</h2>
           </div>
           <div class="testimonial-grid">${renderTestimonialCards()}</div>
@@ -4650,6 +4762,19 @@
         <button class="btn btn-muted btn-block" type="button" disabled>${tx("Coming Soon", "Proximamente")}</button>
       `;
 
+    const stickyCta = product.status === "available"
+      ? `
+        <div class="product-sticky-cta-spacer" aria-hidden="true"></div>
+        <div class="product-sticky-cta">
+          <div class="product-sticky-cta-copy">
+            <strong>${localize(product.name)} ${product.dosage}</strong>
+            <span>${productPriceLabel(product)} · ${tx("Batch", "Lote")} ${product.batch}</span>
+          </div>
+          <button class="btn btn-primary" type="button" data-add-to-cart="${product.slug}">${tx("Add to Cart", "Anadir al carrito")}</button>
+        </div>
+      `
+      : "";
+
     return `
       <section class="page-hero">
         <div class="container product-main">
@@ -4692,9 +4817,23 @@
                 <div class="shipping-progress-bar" style="width:${progress}%"></div>
                 <p>${shippingProgressCopy(total)}</p>
               </div>
-              <div class="support-list">
-                <strong>${tx("Operational detail", "Detalle operativo")}</strong>
-                <p>${tx("COA archive, shipping rates, and payment routing stay visible during the buying journey.", "Archivo COA, tarifas de envio y ruta de pago visibles durante el recorrido de compra.")}</p>
+              <div class="support-list product-confidence-panel">
+                <strong>${tx("Buy with confidence", "Compra con confianza")}</strong>
+                <p>${tx(
+                  "This listing keeps batch context, shipping clarity, and secure hosted payment guidance visible before the customer leaves the store.",
+                  "Esta ficha mantiene visibles el contexto de lote, la claridad de envio y la guia de pago seguro alojado antes de que el cliente salga de la tienda."
+                )}</p>
+                <div class="support-chip-row">
+                  <div class="support-chip">${tx("Batch", "Lote")}: ${product.batch}</div>
+                  <div class="support-chip">${tx("Last analysis", "Ultimo analisis")}: ${formatDate(product.coaDate)}</div>
+                  <div class="support-chip">${tx("Dispatch target", "Objetivo de salida")}: 24h</div>
+                  <div class="support-chip">${tx("Support", "Soporte")}: ${SITE_EMAIL}</div>
+                </div>
+                <div class="product-policy-links">
+                  <a href="shipping.html">${tx("Shipping", "Envios")}</a>
+                  <a href="terms.html">${tx("Terms", "Terminos")}</a>
+                  <a href="contact.html">${tx("Contact", "Contacto")}</a>
+                </div>
               </div>
               ${actionBlock}
             </aside>
@@ -4702,14 +4841,50 @@
         </div>
       </section>
       <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="detail-grid product-quick-grid reveal">
+            <article class="detail-card">
+              <span class="detail-label">${tx("Quick summary", "Resumen rapido")}</span>
+              <strong>${tx("What you are ordering", "Que estas pidiendo")}</strong>
+              <p>${localize(product.short)}</p>
+            </article>
+            <article class="detail-card">
+              <span class="detail-label">${tx("Research focus", "Foco de investigacion")}</span>
+              <strong>${localize(product.name)} ${product.dosage}</strong>
+              <p>${localize(product.focus)}</p>
+            </article>
+            <article class="detail-card">
+              <span class="detail-label">${tx("Ordering confidence", "Confianza de pedido")}</span>
+              <strong>${tx("Secure hosted payment after store review", "Pago seguro alojado despues de revisar la tienda")}</strong>
+              <p>${tx(
+                "Customers review shipping on-site first, then ArionPay shows the exact USDT amount and network on the secure page before payment is sent.",
+                "Los clientes revisan primero el envio dentro del sitio, y despues ArionPay muestra la cantidad exacta de USDT y la red en la pagina segura antes de enviar el pago."
+              )}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section class="section section-tight">
         <div class="container">
           <article class="tabs-card reveal">
             <div class="tab-row">
-              <button type="button" class="tab-button ${activeProductTab === "description" ? "is-active" : ""}" data-tab="description">${tx("Description", "Descripcion")}</button>
-              <button type="button" class="tab-button ${activeProductTab === "additional" ? "is-active" : ""}" data-tab="additional">${tx("Additional Info", "Informacion adicional")}</button>
+              <button type="button" class="tab-button ${activeProductTab === "description" ? "is-active" : ""}" data-tab="description">${tx("Product Overview", "Resumen del producto")}</button>
+              <button type="button" class="tab-button ${activeProductTab === "additional" ? "is-active" : ""}" data-tab="additional">${tx("Research Guide", "Guia de investigacion")}</button>
             </div>
             <div data-tab-panel>${tabPanel}</div>
           </article>
+        </div>
+      </section>
+      <section class="section section-tight">
+        <div class="container section-stack">
+          <div class="section-header reveal">
+            <p class="section-kicker">${tx("Buyer FAQ", "FAQ de compra")}</p>
+            <h2 class="section-title">${tx(
+              "Questions buyers ask before moving from product page to checkout.",
+              "Preguntas que los compradores hacen antes de pasar de la pagina de producto al checkout."
+            )}</h2>
+          </div>
+          <div class="faq-list product-faq-list reveal">${renderProductFaq(product)}</div>
         </div>
       </section>
       <section class="section section-tight">
@@ -4721,6 +4896,7 @@
           <div class="related-grid">${related}</div>
         </div>
       </section>
+      ${stickyCta}
     `;
   };
 
