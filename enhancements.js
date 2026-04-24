@@ -3445,8 +3445,8 @@
               <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
             </a>
             <p class="footer-copy">${tx(
-              "Built for modern customers seeking secure premium ecommerce.",
-              "Pensado para clientes modernos que buscan un ecommerce premium y seguro."
+              "Modern premium ecommerce built for secure purchasing.",
+              "Ecommerce premium moderno pensado para compras seguras."
             )}</p>
             <p class="footer-note">${tx(
               "For laboratory research use only.",
@@ -4503,12 +4503,12 @@
           <div class="hero-copy reveal">
             <p class="kicker">${tx("Secure Access to High-Quality Research Compounds", "Acceso seguro a compuestos de alta calidad")}</p>
             <h1>${tx(
-              "Trusted Peptide Research Products for Serious Buyers",
-              "Productos de investigacion peptidica de confianza para compradores serios"
+              "Premium Research Products With Secure Crypto Checkout",
+              "Productos premium de investigacion con checkout crypto seguro"
             )}</h1>
             <p class="lead">${tx(
-              "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers.",
-              "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales."
+              "Built for serious buyers who value privacy, speed, and trusted quality.",
+              "Pensado para compradores serios que valoran privacidad, rapidez y calidad confiable."
             )}</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="shop.html">${tx("Shop Now", "Comprar ahora")}</a>
@@ -4557,7 +4557,7 @@
         </div>
       </section>
       <section class="section section-tight">
-        <div class="container trust-grid">${renderTrustCards()}</div>
+        <div class="container trust-grid hero-signal-strip">${renderTrustCards()}</div>
       </section>
       <section class="section section-tight">
         <div class="container section-stack">
@@ -5004,9 +5004,11 @@
       .slice(0, 2)
       .map((goal) => `<span class="product-tag">${localize(goalConfig(goal).label)}</span>`)
       .join("");
-    const cardBadge = product.status === "available"
-      ? tx("Secure checkout ready", "Listo para checkout seguro")
-      : tx("Launch batch", "Lote de lanzamiento");
+    const cardBadge = product.status === "coming"
+      ? tx("New", "Nuevo")
+      : (product.featured
+        ? tx("Popular", "Popular")
+        : tx("Trusted", "Confiable"));
     const trustBits = product.status === "available"
       ? [
         tx("Batch-linked", "Lote visible"),

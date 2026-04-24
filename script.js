@@ -453,8 +453,8 @@ const COPY = {
       es: "Productos premium de investigacion con checkout crypto seguro"
     },
     heroBody: {
-      en: "Built for buyers who value quality, privacy, and a smoother purchasing experience.",
-      es: "Pensado para compradores que valoran calidad, privacidad y una experiencia de compra mas fluida."
+      en: "Built for serious buyers who value privacy, speed, and trusted quality.",
+      es: "Pensado para compradores serios que valoran privacidad, rapidez y calidad confiable."
     },
     heroNote: {
       en: "Real lab-support visuals, batch-linked listings, and a calmer route into secure hosted payment.",
@@ -606,8 +606,8 @@ const COPY = {
 
 const HOME_TRUST = [
   {
-    icon: "USDT",
-    title: { en: "Secure Crypto Payments", es: "Pagos crypto seguros" },
+    icon: "PAY",
+    title: { en: "Secure Payments", es: "Pagos seguros" },
     body: { en: "Hosted ArionPay checkout shows the exact payable amount before funds are sent.", es: "El checkout alojado de ArionPay muestra la cantidad exacta antes de enviar fondos." }
   },
   {
@@ -616,9 +616,9 @@ const HOME_TRUST = [
     body: { en: "Protected account access keeps order history and profile details in one secure area.", es: "El acceso protegido mantiene historial y perfil en una sola area segura." }
   },
   {
-    icon: "24H",
-    title: { en: "Fast Processing", es: "Procesamiento rapido" },
-    body: { en: "Dispatch targets and shipping routes stay visible before the customer reaches payment.", es: "Los objetivos de salida y las rutas de envio permanecen visibles antes del pago." }
+    icon: "CHK",
+    title: { en: "Verified Checkout", es: "Checkout verificado" },
+    body: { en: "Exact payment guidance and protected session flow keep the final handoff clearer for real buyers.", es: "La guia de pago exacto y el flujo protegido mantienen mas claro el paso final para compradores reales." }
   },
   {
     icon: "PRIV",
@@ -1323,8 +1323,8 @@ function renderUpdatedHomePage() {
       <div class="container hero-grid">
         <div class="hero-copy reveal">
           <p class="kicker">${currentLanguage === "es" ? "Acceso seguro a compuestos de alta calidad" : "Secure Access to High-Quality Research Compounds"}</p>
-          <h1>${currentLanguage === "es" ? "Productos de investigacion peptidica de confianza para compradores serios" : "Trusted Peptide Research Products for Serious Buyers"}</h1>
-          <p class="lead">${currentLanguage === "es" ? "Explora productos premium, checkout crypto seguro y una experiencia de compra mas fluida para clientes reales." : "Browse premium-grade products, secure crypto checkout, and a smoother buying experience built for real customers."}</p>
+          <h1>${currentLanguage === "es" ? "Productos premium de investigacion con checkout crypto seguro" : "Premium Research Products With Secure Crypto Checkout"}</h1>
+          <p class="lead">${currentLanguage === "es" ? "Pensado para compradores serios que valoran privacidad, rapidez y calidad confiable." : "Built for serious buyers who value privacy, speed, and trusted quality."}</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.shopNow)}</a>
             <a class="btn btn-secondary" href="#featured-products">${pick(COPY.labels.browseProducts)}</a>
@@ -1338,7 +1338,7 @@ function renderUpdatedHomePage() {
         <div class="hero-stack reveal reveal-delay">
           <article class="panel panel-dark">
             <p class="panel-kicker">${currentLanguage === "es" ? "Pensado para generar confianza" : "Built for Customer Confidence"}</p>
-            <h2>${currentLanguage === "es" ? "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." : "From secure payments to protected accounts and transparent checkout flow, every part of the store is designed to create trust."}</h2>
+            <h2>${currentLanguage === "es" ? "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila." : "Secure access to high-quality research compounds, shaped around clear batch context and a calmer route to payment."}</h2>
             <div class="metric-grid">
               <div class="metric-card"><strong>11</strong><small>${currentLanguage === "es" ? "productos activos" : "live products"}</small></div>
               <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "flujo bilingue" : "bilingual flow"}</small></div>
@@ -1347,7 +1347,7 @@ function renderUpdatedHomePage() {
           </article>
           <article class="hero-visual hero-visual-photo reveal">
             <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
-            <div class="overlay-card">${currentLanguage === "es" ? "Visuales de vial mas limpias, modulos de confianza repetidos y rutas mas cortas al detalle de producto." : "Clean vial visuals, repeated trust modules, and shorter paths into product detail."}</div>
+            <div class="overlay-card">${currentLanguage === "es" ? "Visuales reales de apoyo de laboratorio, packshots de marca y una colocacion mas fuerte de confianza antes del checkout." : "Real laboratory-support visuals, branded packshots, and stronger trust placement before checkout begins."}</div>
           </article>
         </div>
       </div>
