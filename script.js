@@ -374,16 +374,16 @@ PRODUCTS.forEach((product) => {
 const COPY = {
   shell: {
     topbar: {
-      en: "COA-backed batches, HPLC-tested listings, and secure cryptocurrency checkout with live USDT payment.",
-      es: "Lotes con COA, listados verificados por HPLC y checkout seguro con pagos USDT en vivo."
+      en: "COA-backed batches, HPLC‑verified purity, and secure ArionPay crypto checkout.",
+      es: "Lotes con COA, pureza verificada por HPLC y checkout seguro ArionPay (crypto)."
     },
     brandTag: {
-      en: "Research-grade peptide store",
-      es: "Tienda de péptidos grado investigación"
+      en: "Primus Peptides — Research‑grade peptides",
+      es: "Primus Peptides — Péptidos grado investigación"
     },
     footerTagline: {
-      en: "Scientific, trustworthy, modern storefront for high-intent peptide buyers.",
-      es: "Tienda científica, confiable y moderna para compradores de péptidos de alta intención."
+      en: "Premium research peptides with transparent COA and reliable EU fulfillment.",
+      es: "Péptidos premium con COA transparente y despacho fiable desde la UE."
     },
     footerLegal: {
       en: "For laboratory research use only.",
@@ -392,7 +392,7 @@ const COPY = {
     linkColumn: { en: "Links", es: "Enlaces" },
     contactColumn: { en: "Contact", es: "Contacto" },
     shippingLine: { en: "EU dispatch target: 24h", es: "Objetivo de despacho UE: 24h" },
-    paymentsLine: { en: "Payments: USDT", es: "Pagos: USDT" },
+    paymentsLine: { en: "Payments: ArionPay / USDT (TRC20)", es: "Pagos: ArionPay / USDT (TRC20)" },
     cookieTitle: { en: "Cookie notice", es: "Aviso de cookies" },
     cookieBody: {
       en: "This storefront uses cookies to remember language preference, cart contents, and consent choices.",
@@ -431,7 +431,7 @@ const COPY = {
     batchReady: { en: "COA ready", es: "COA listo" },
     batchPending: { en: "Awaiting release", es: "Pendiente de lanzamiento" },
     checkout: { en: "Checkout", es: "Finalizar compra" },
-    keepBrowsing: { en: "Keep Browsing", es: "Seguir comprando" },
+    keepBrowsing: { en: "Continue shopping", es: "Seguir comprando" },
     guestCheckout: { en: "Guest checkout ready", es: "Checkout como invitado" },
     searchPlaceholder: { en: "Search peptide, dosage, or status", es: "Buscar péptido, dosis o estado" },
     qty: { en: "Quantity", es: "Cantidad" },
@@ -442,18 +442,18 @@ const COPY = {
     sendMessage: { en: "Send Message", es: "Enviar mensaje" }
   },
   home: {
-    heroKicker: { en: "Conversion-first peptide storefront", es: "Tienda de péptidos orientada a conversión" },
+    heroKicker: { en: "COA‑backed research peptides", es: "Péptidos de investigación con COA" },
     heroTitle: {
-      en: "Research-grade peptides with the premium, scientific trust layer your brand brief calls for.",
-      es: "Péptidos de grado investigación con la capa premium y científica de confianza que pide tu brief."
+      en: "Research‑grade peptides — verified, documented, and EU‑shipped.",
+      es: "Péptidos de grado investigación — verificados, documentados y enviados desde la UE."
     },
     heroBody: {
-      en: "This storefront follows the BioBoostX-style conversion architecture while adapting it to Primus Peptides: blue gradient palette, high-trust cues, faster mobile scanning, and crypto checkout messaging.",
-      es: "Esta tienda sigue la arquitectura de conversión tipo BioBoostX adaptada a Primus Peptides: paleta azul, señales de confianza, lectura móvil más rápida y mensajes de checkout crypto."
+      en: "COA access, third‑party HPLC verification, discreet lab‑grade packaging, and secure ArionPay checkout — optimized for research workflows.",
+      es: "Acceso a COA, verificación HPLC de terceros, embalaje discreto de grado laboratorio y checkout seguro ArionPay — optimizado para flujos de investigación."
     },
     heroNote: {
-      en: "Built for mobile-first browsing, sticky navigation, repeat CTAs, and stronger trust placement.",
-      es: "Creado para navegación mobile-first, cabecera sticky, CTAs repetidos y mejor colocación de confianza."
+      en: "Mobile-first browsing with clear trust placement and fast, reliable checkout.",
+      es: "Diseñado para móvil con colocación clara de confianza y checkout rápido y fiable."
     },
     trustTitle: { en: "Trust signals above the fold", es: "Señales de confianza sobre el pliegue" },
     trustBody: { en: "Structured to look credible to biohacking shoppers and athlete-focused buyers.", es: "Estructurado para resultar creíble a compradores de biohacking y público deportista." },
@@ -461,8 +461,8 @@ const COPY = {
     featuredTitle: { en: "Four hero SKUs with quick actions and clean pricing hierarchy.", es: "Cuatro SKUs principales con acciones rápidas y jerarquía de precio clara." },
     featuredBody: { en: "Cards are tuned for quick mobile scanning while keeping dosage, price, and trust details readable.", es: "Las tarjetas están ajustadas para una lectura rápida en móvil manteniendo visibles dosis, precio y confianza." },
     servicesKicker: { en: "Professional Services", es: "Servicios profesionales" },
-    servicesTitle: { en: "Adapted from the Primus Anabolics structure without copying the visual style.", es: "Adaptado de la estructura de Primus Anabolics sin copiar el estilo visual." },
-    servicesBody: { en: "The four content blocks mirror the required Team / Health / GMP / Quality narrative with a cleaner research-store tone.", es: "Los cuatro bloques replican la narrativa Team / Health / GMP / Quality con un tono más limpio de tienda de investigación." },
+    servicesTitle: { en: "Expert team, safety protocols, GMP manufacturing, and quality assurance.", es: "Equipo experto, protocolos de seguridad, fabricación GMP y aseguramiento de calidad." },
+    servicesBody: { en: "Short proof points covering team expertise, safety, manufacturing standards, and lab verification.", es: "Puntos breves sobre experiencia del equipo, seguridad, estándares de fabricación y verificación de laboratorio." },
     shippingKicker: { en: "Shipping Info", es: "Información de envío" },
     shippingTitle: { en: "A visual rate table keeps logistics transparent.", es: "Una tabla visual hace que la logística sea transparente." },
     shippingBody: { en: "Shipping options and delivery costs are presented clearly before payment.", es: "Las opciones de envio y los costes de entrega se muestran con claridad antes del pago." },
@@ -470,8 +470,8 @@ const COPY = {
     benefitsTitle: { en: "Short icon-led proof points reinforce trust mid-page and near the footer.", es: "Puntos de prueba con iconos refuerzan la confianza a mitad de página y cerca del footer." },
     benefitsBody: { en: "This section is deliberately compact so it reads quickly on mobile traffic.", es: "Esta sección es compacta a propósito para una lectura rápida en tráfico móvil." },
     ctaKicker: { en: "Ready to explore the catalogue?", es: "¿Listo para explorar el catálogo?" },
-    ctaTitle: { en: "Send users from the homepage into the catalogue, COA archive, or checkout flow without friction.", es: "Lleva al usuario desde el inicio al catálogo, archivo COA o checkout sin fricción." },
-    ctaBody: { en: "The brief asked for repeated CTAs throughout the page, so this section gives you a strong mid-page conversion handoff.", es: "El brief pedía CTAs repetidos, así que esta sección crea una transición de conversión a mitad de página." }
+    ctaTitle: { en: "Explore the catalogue, view COAs, or proceed to secure checkout.", es: "Explora el catálogo, consulta COAs o procede al checkout seguro." },
+    ctaBody: { en: "Clear, repeated CTAs guide researchers from discovery to COA access and fast, secure payment.", es: "CTAs claros y repetidos guían desde el descubrimiento hasta acceso a COA y pago rápido y seguro." }
   },  shop: {
     kicker: { en: "Shop", es: "Tienda" },
     title: { en: "Searchable catalogue with live stock states and conversion-ready product cards.", es: "Catálogo con búsqueda, estados de stock y tarjetas listas para convertir." },
