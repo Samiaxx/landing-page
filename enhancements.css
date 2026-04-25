@@ -2156,6 +2156,65 @@ body[data-page="home"] .hero-signal-strip {
   color: rgba(244, 249, 255, 0.92);
 }
 
+/* Final micro-polish: sharper premium details without changing layout or flow. */
+body[data-page="home"] .hero-home-premium .hero-copy h1 {
+  background: linear-gradient(180deg, #ffffff 0%, #eef7ff 54%, #bcdcff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body[data-page="home"] .hero-home-premium .lead {
+  text-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
+}
+
+body[data-page="home"] .section-stack {
+  gap: clamp(1.65rem, 3vw, 2.45rem);
+}
+
+body[data-page="home"] .section-kicker {
+  letter-spacing: 0.18em;
+}
+
+.product-card-enhanced {
+  outline: 1px solid rgba(255, 255, 255, 0.72);
+  outline-offset: -10px;
+}
+
+.product-visual-stage::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  z-index: 1;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  pointer-events: none;
+}
+
+.product-card-enhanced .product-action-row .btn {
+  box-shadow: 0 14px 28px rgba(26, 111, 214, 0.14);
+}
+
+.product-card-enhanced .text-link {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.footer-assurance span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.footer-assurance span::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #8fdfff;
+  box-shadow: 0 0 18px rgba(143, 223, 255, 0.82);
+}
+
 @media (max-width: 1120px) {
   .footer-grid-enhanced,
   .hero-grid,
@@ -2467,6 +2526,7 @@ body[data-page="home"] .hero-signal-strip {
   .product-card-enhanced {
     border-radius: 28px;
     box-shadow: 0 20px 48px rgba(7, 16, 29, 0.1);
+    outline-offset: -8px;
   }
 
   .product-card-enhanced:hover,
@@ -2477,6 +2537,11 @@ body[data-page="home"] .hero-signal-strip {
   .product-visual-stage {
     min-height: 250px;
     border-radius: 24px;
+  }
+
+  .product-visual-stage::before {
+    inset: 9px;
+    border-radius: 18px;
   }
 
   .product-visual-stage img {
@@ -2491,5 +2556,11 @@ body[data-page="home"] .hero-signal-strip {
   .footer-assurance {
     display: grid;
     grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .footer-assurance span {
+    justify-content: flex-start;
+    min-height: 42px;
   }
 }

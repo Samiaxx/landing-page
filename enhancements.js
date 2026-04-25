@@ -3445,7 +3445,7 @@
               <img class="brand-logo" src="${BRAND_LOGO_SRC}" alt="Primus Peptides">
             </a>
             <p class="footer-copy">${tx(
-              "Quality-focused products, reliable dispatch, secure USDT checkout, and clear support before and after every order.",
+              "Secure checkout, reliable delivery, responsive support, and privacy-minded ordering for confident repeat buyers.",
               "Productos centrados en calidad, envio fiable, checkout USDT seguro y soporte claro antes y despues de cada pedido."
             )}</p>
             <p class="footer-note">${tx(
@@ -3489,13 +3489,13 @@
       <section class="hero-home hero-home-premium">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
-            <p class="kicker">${tx("Quality-backed peptides. Reliable fulfilment. Secure payment.", "Acceso seguro a compuestos de alta calidad")}</p>
+            <p class="kicker">${tx("Verified quality. Reliable dispatch. Secure USDT checkout.", "Acceso seguro a compuestos de alta calidad")}</p>
             <h1>${tx(
-              "Premium Research Products, Delivered With Confidence",
+              "Premium Research Peptides With Verified Quality",
               "Productos premium de investigacion con checkout crypto seguro"
             )}</h1>
             <p class="lead">${tx(
-              "Choose products with clear quality signals, reliable delivery expectations, and a secure checkout that shows the exact amount before payment.",
+              "Review quality cues, delivery timing, and exact USDT payment details before placing your order.",
               "Elige productos con senales claras de calidad, entrega fiable y checkout seguro antes del pago."
             )}</p>
             <div class="hero-actions">
@@ -3512,7 +3512,7 @@
             <article class="panel panel-dark">
               <p class="panel-kicker">${tx("Confidence Before You Pay", "Confianza antes de pagar")}</p>
               <h2>${tx(
-                "Quality cues, delivery clarity, and exact payment guidance before the order is confirmed.",
+                "Verified details, clear delivery, and exact payment guidance before checkout.",
                 "Calidad clara, entrega fiable y pago seguro antes de confirmar el pedido."
               )}</h2>
               <div class="metric-grid">
@@ -3524,7 +3524,7 @@
             <article class="hero-visual reveal">
               <img src="${IMAGE_SET[0]}" alt="Primus Peptides product visual">
               <div class="overlay-card">${tx(
-                "A cleaner path from product review to secure payment, designed for serious repeat buyers.",
+                "Premium browsing that moves smoothly from product review to secure payment.",
                 "Viales sobre fondo blanco, sombras mínimas y menos pasos entre confianza, producto y checkout."
               )}</div>
             </article>
@@ -3539,7 +3539,7 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Quality-Focused Product Selection", "Seleccion centrada en calidad")}</p>
             <h2 class="section-title">${tx(
-              "Compare products quickly by dosage, price, quality cues, and availability.",
+              "Browse premium cards with clear dosage, pricing, quality cues, and availability.",
               "Compara productos fiables por dosis, precio y contexto de lote."
             )}</h2>
           </div>
@@ -3551,7 +3551,7 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Why Customers Order Again", "Por que los clientes vuelven a pedir")}</p>
             <h2 class="section-title">${tx(
-              "Quality that is easy to verify, delivery that is clear, and checkout that feels controlled.",
+              "Clear quality signals, reliable fulfillment, and secure payment in one calm buying path.",
               "Calidad constante, entrega fiable, checkout seguro y soporte cercano al pedido."
             )}</h2>
           </div>
@@ -4502,13 +4502,13 @@
       <section class="hero-home hero-home-premium">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
-            <p class="kicker">${tx("Quality-backed peptides. Reliable fulfilment. Secure payment.", "Peptidos con calidad visible. Entrega fiable. Pago seguro.")}</p>
+            <p class="kicker">${tx("Verified quality. Reliable dispatch. Secure USDT checkout.", "Peptidos con calidad visible. Entrega fiable. Pago seguro.")}</p>
             <h1>${tx(
-              "Premium Research Products, Delivered With Confidence",
+              "Premium Research Peptides With Verified Quality",
               "Productos premium de investigacion entregados con confianza"
             )}</h1>
             <p class="lead">${tx(
-              "Shop with clear product signals, transparent delivery expectations, and exact USDT checkout guidance before you leave the store.",
+              "Review quality cues, delivery timing, and exact USDT payment details before placing your order.",
               "Compra con senales claras de producto, expectativas de entrega transparentes y guia de pago USDT exacta antes de salir de la tienda."
             )}</p>
             <div class="hero-actions">
@@ -4517,12 +4517,12 @@
             </div>
             <div class="hero-trust">
               <div class="trust-chip">
-                <strong>${tx("Quality visible early", "Calidad visible")}</strong>
-                <span>${tx("Product, dosage, and batch context stay easy to review.", "Producto, dosis y lote faciles de revisar.")}</span>
+                <strong>${tx("Quality cues upfront", "Calidad visible")}</strong>
+                <span>${tx("Dosage, availability, and batch context are clear before checkout.", "Producto, dosis y lote faciles de revisar.")}</span>
               </div>
               <div class="trust-chip">
-                <strong>${tx("Repeat orders feel easier", "Repetir pedidos es mas facil")}</strong>
-                <span>${tx("Account history keeps returning buyers moving faster.", "El historial ayuda a compradores recurrentes.")}</span>
+                <strong>${tx("Built for repeat buyers", "Repetir pedidos es mas facil")}</strong>
+                <span>${tx("Protected accounts make future orders faster and calmer.", "El historial ayuda a compradores recurrentes.")}</span>
               </div>
               <div class="trust-chip">
                 <strong>${tx("Reliable delivery", "Procesamiento rapido")}</strong>
@@ -4538,7 +4538,7 @@
             <article class="panel panel-dark">
               <p class="panel-kicker">${tx("Confidence Before You Pay", "Pensado para generar confianza")}</p>
               <h2>${tx(
-                "Quality cues, delivery clarity, and exact payment guidance before the order is confirmed.",
+                "Verified details, clear delivery, and exact payment guidance before checkout.",
                 "Senales de calidad, entrega clara y guia de pago exacta antes de confirmar el pedido."
               )}</h2>
               <div class="metric-grid">
@@ -4550,7 +4550,7 @@
             <article class="hero-visual hero-visual-photo hero-visual-premium reveal">
               <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
               <div class="overlay-card">${tx(
-                "A cleaner path from product review to secure payment, designed for serious repeat buyers.",
+                "Premium browsing that moves smoothly from product review to secure payment.",
                 "Una ruta mas clara desde la revision del producto hasta el pago seguro, pensada para compradores recurrentes."
               )}</div>
             </article>
@@ -4565,7 +4565,7 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Why Customers Order Again", "Por que los clientes eligen Primus")}</p>
             <h2 class="section-title">${tx(
-              "Quality that is easy to verify, delivery that is clear, and checkout that feels controlled.",
+              "Clear quality signals, reliable fulfillment, and secure payment in one calm buying path.",
               "Calidad facil de revisar, entrega clara y checkout controlado."
             )}</h2>
           </div>
@@ -4577,7 +4577,7 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Quality-Focused Product Selection", "Compra categorias premium de investigacion")}</p>
             <h2 class="section-title">${tx(
-              "Compare products quickly by dosage, price, quality cues, and availability.",
+              "Browse premium cards with clear dosage, pricing, quality cues, and availability.",
               "Compara productos por dosis, precio, senales de calidad y disponibilidad."
             )}</h2>
           </div>
@@ -4589,7 +4589,7 @@
           <div class="section-header reveal">
             <p class="section-kicker">${tx("Quality Products Ready to Order", "Compra categorias premium de investigacion")}</p>
             <h2 class="section-title">${tx(
-              "Clear product cards built for confident browsing and faster decisions.",
+              "Premium product cards make comparison faster without losing trust signals.",
               "Tarjetas claras para navegar con confianza y decidir mas rapido."
             )}</h2>
           </div>
