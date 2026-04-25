@@ -1986,6 +1986,176 @@
   flex-wrap: wrap;
 }
 
+/* Final launch polish: premium rhythm, card depth, and trust cues. */
+body[data-page="home"] .hero-home-premium {
+  min-height: min(820px, 86vh);
+  padding-top: clamp(4.8rem, 8vw, 7.6rem);
+  padding-bottom: clamp(5.4rem, 8vw, 7.4rem);
+  background:
+    radial-gradient(circle at 18% 22%, rgba(56, 151, 255, 0.28), rgba(56, 151, 255, 0) 36%),
+    linear-gradient(92deg, rgba(4, 13, 30, 0.94) 0%, rgba(8, 26, 55, 0.78) 48%, rgba(8, 26, 55, 0.34) 100%),
+    linear-gradient(180deg, rgba(4, 10, 22, 0.12), rgba(4, 10, 22, 0.48)),
+    url("assets/lab-hand-vial.webp") center / cover no-repeat;
+}
+
+body[data-page="home"] .hero-home-premium .hero-copy h1 {
+  max-width: 11.8ch;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+  text-shadow: 0 22px 54px rgba(0, 0, 0, 0.28);
+}
+
+body[data-page="home"] .hero-home-premium .hero-copy .lead {
+  max-width: 50ch;
+  font-size: clamp(1.06rem, 1.35vw, 1.22rem);
+  line-height: 1.72;
+}
+
+body[data-page="home"] .hero-home-premium .hero-actions {
+  margin-top: 4px;
+}
+
+body[data-page="home"] .hero-home-premium .hero-copy .kicker {
+  border-color: rgba(143, 223, 255, 0.32);
+  background: rgba(4, 13, 30, 0.48);
+  letter-spacing: 0.13em;
+}
+
+body[data-page="home"] .hero-home-premium .hero-copy .trust-chip {
+  min-height: 122px;
+  border-color: rgba(143, 223, 255, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045)),
+    rgba(7, 18, 39, 0.62);
+}
+
+body[data-page="home"] .hero-home-premium .hero-copy .trust-chip strong {
+  font-size: 1rem;
+}
+
+body[data-page="home"] .hero-home-premium .panel {
+  border-color: rgba(143, 223, 255, 0.22);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05)),
+    rgba(6, 18, 39, 0.7);
+}
+
+body[data-page="home"] .hero-home-premium .panel h2 {
+  text-wrap: balance;
+}
+
+body[data-page="home"] .hero-home-premium .hero-visual-premium {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 34px 84px rgba(0, 0, 0, 0.28);
+}
+
+body[data-page="home"] .section {
+  padding-top: clamp(4.4rem, 6.5vw, 6.4rem);
+  padding-bottom: clamp(4.4rem, 6.5vw, 6.4rem);
+}
+
+body[data-page="home"] .section-tight {
+  padding-top: clamp(3rem, 5vw, 4.8rem);
+  padding-bottom: clamp(3rem, 5vw, 4.8rem);
+}
+
+body[data-page="home"] .section-header {
+  max-width: 760px;
+}
+
+body[data-page="home"] .section-title {
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+body[data-page="home"] .section-copy {
+  max-width: 66ch;
+}
+
+body[data-page="home"] .hero-signal-strip {
+  margin-top: -2.6rem;
+}
+
+.trust-strip-card {
+  border-radius: 26px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(239, 247, 255, 0.94)),
+    radial-gradient(circle at 15% 0%, rgba(26, 111, 214, 0.11), rgba(26, 111, 214, 0));
+}
+
+.trust-strip-card .icon-chip {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+.product-card-enhanced {
+  border-radius: 34px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(244, 249, 255, 0.94)),
+    radial-gradient(circle at 18% 0%, var(--visual-soft, rgba(218, 234, 255, 0.8)), rgba(255, 255, 255, 0) 46%);
+  border-color: rgba(10, 23, 48, 0.07);
+  box-shadow: 0 26px 70px rgba(7, 16, 29, 0.1);
+}
+
+.product-card-enhanced::before {
+  height: 4px;
+  opacity: 0.78;
+}
+
+.product-card-enhanced::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  z-index: -1;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  pointer-events: none;
+}
+
+.product-card-enhanced:hover,
+.product-card-enhanced:focus-within {
+  transform: translateY(-8px);
+  box-shadow: 0 40px 94px rgba(7, 16, 29, 0.16);
+}
+
+.product-visual-stage {
+  min-height: 320px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 50% 24%, var(--visual-soft, #e6f0ff), rgba(126, 183, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(237, 246, 255, 0.95));
+}
+
+.product-card-enhanced h3 {
+  letter-spacing: -0.035em;
+}
+
+.card-confidence-row span,
+.card-storyline-label,
+.card-badge-soft {
+  letter-spacing: 0.09em;
+}
+
+.site-footer .footer-grid-enhanced {
+  position: relative;
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(56, 151, 255, 0.16), rgba(56, 151, 255, 0) 34%),
+    linear-gradient(145deg, rgba(14, 31, 57, 0.72), rgba(7, 17, 34, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-assurance {
+  gap: 8px;
+}
+
+.footer-assurance span {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(143, 223, 255, 0.16);
+  color: rgba(244, 249, 255, 0.92);
+}
+
 @media (max-width: 1120px) {
   .footer-grid-enhanced,
   .hero-grid,
@@ -2240,5 +2410,86 @@
     color: var(--text-soft);
     font-size: 0.8rem;
     line-height: 1.4;
+  }
+}
+
+@media (max-width: 760px) {
+  body[data-page="home"] .hero-home-premium {
+    min-height: auto;
+    padding-top: 3.2rem;
+    padding-bottom: 4.4rem;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-copy {
+    gap: 18px;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-copy h1 {
+    max-width: 10.8ch;
+    font-size: clamp(3rem, 16vw, 4.9rem);
+    line-height: 0.92;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-copy .lead {
+    font-size: 1rem;
+    line-height: 1.68;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-actions {
+    display: grid;
+    width: 100%;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-actions .btn {
+    width: 100%;
+  }
+
+  body[data-page="home"] .hero-home-premium .hero-copy .trust-chip {
+    min-height: auto;
+    padding: 0.95rem;
+    border-radius: 20px;
+  }
+
+  body[data-page="home"] .hero-signal-strip {
+    margin-top: -1.2rem;
+  }
+
+  body[data-page="home"] .section {
+    padding-top: 3.25rem;
+    padding-bottom: 3.25rem;
+  }
+
+  body[data-page="home"] .section-tight {
+    padding-top: 2.6rem;
+    padding-bottom: 2.6rem;
+  }
+
+  .product-card-enhanced {
+    border-radius: 28px;
+    box-shadow: 0 20px 48px rgba(7, 16, 29, 0.1);
+  }
+
+  .product-card-enhanced:hover,
+  .product-card-enhanced:focus-within {
+    transform: translateY(-3px);
+  }
+
+  .product-visual-stage {
+    min-height: 250px;
+    border-radius: 24px;
+  }
+
+  .product-visual-stage img {
+    max-height: 235px;
+  }
+
+  .site-footer .footer-grid-enhanced {
+    padding: 1.45rem;
+    border-radius: 26px;
+  }
+
+  .footer-assurance {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 }

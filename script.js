@@ -405,7 +405,7 @@ const COPY = {
       es: "Primus Peptides — Péptidos grado investigación"
     },
     footerTagline: {
-      en: "Quality products, reliable delivery, and secure checkout for confident repeat orders.",
+      en: "Quality-focused products, reliable dispatch, secure USDT checkout, and clear support before and after every order.",
       es: "Experiencia de ecommerce segura diseñada para clientes modernos."
     },
     footerLegal: {
@@ -470,27 +470,27 @@ const COPY = {
     ,completeOrder: { en: "Complete Order", es: "Completar pedido" }
   },
   home: {
-    heroKicker: { en: "Quality Products. Reliable Delivery. Secure Checkout.", es: "Acceso seguro a compuestos de alta calidad" },
+    heroKicker: { en: "Quality-backed peptides. Reliable fulfilment. Secure payment.", es: "Acceso seguro a compuestos de alta calidad" },
     heroTitle: {
-      en: "Order Quality Research Products With Confidence",
+      en: "Premium Research Products, Delivered With Confidence",
       es: "Productos premium de investigacion con checkout crypto seguro"
     },
     heroBody: {
-      en: "Choose products with clear quality signals, reliable delivery expectations, and a secure checkout that shows the exact amount before payment.",
+      en: "Shop with clear product signals, transparent delivery expectations, and exact USDT checkout guidance before you leave the store.",
       es: "Una ruta mas clara desde la investigacion del producto hasta cuenta protegida, pago USDT exacto y pedido confirmado."
     },
     heroNote: {
-      en: "Branded packshots, real laboratory-support imagery, and visible payment reassurance before the buyer leaves the store.",
+      en: "A cleaner path from product review to secure payment, designed for serious repeat buyers.",
       es: "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda."
     },
     trustTitle: { en: "Confidence Before You Pay", es: "Pensado para generar confianza" },
-    trustBody: { en: "Clear product context, reliable delivery expectations, and secure payment guidance help customers order without second guessing.", es: "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila." },
+    trustBody: { en: "Quality cues, delivery clarity, and exact payment guidance help customers order without second guessing.", es: "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila." },
     featuredKicker: { en: "Quality-Focused Product Selection", es: "Compra categorias premium de investigacion" },
-    featuredTitle: { en: "Compare trusted products by dosage, price, and batch context.", es: "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." },
-    featuredBody: { en: "Product cards keep quality cues, delivery confidence, and checkout readiness easy to scan on desktop and mobile.", es: "Las tarjetas premium mantienen dosis, precio y contexto de calidad faciles de leer en escritorio y movil." },
+    featuredTitle: { en: "Compare products quickly by dosage, price, quality cues, and availability.", es: "Encuentra el producto adecuado con un catalogo mas limpio y facil de recorrer." },
+    featuredBody: { en: "Product cards are tuned for confident browsing: premium visuals, clear pricing, and fast paths to secure checkout.", es: "Las tarjetas premium mantienen dosis, precio y contexto de calidad faciles de leer en escritorio y movil." },
     servicesKicker: { en: "Why Customers Order Again", es: "Por que los clientes eligen Primus" },
-    servicesTitle: { en: "Consistent product quality, reliable delivery, secure checkout, and support that stays close to the order.", es: "Pagos seguros con criptomonedas, procesamiento rapido, estandares premium y soporte profesional." },
-    servicesBody: { en: "The buying path answers the questions that matter before a customer reaches payment.", es: "Cada objecion de compra importante se responde con claridad antes del pago." },
+    servicesTitle: { en: "Quality that is easy to verify, delivery that is clear, and checkout that feels controlled.", es: "Pagos seguros con criptomonedas, procesamiento rapido, estandares premium y soporte profesional." },
+    servicesBody: { en: "The buying path keeps the important answers close to the decision point.", es: "Cada objecion de compra importante se responde con claridad antes del pago." },
     shippingKicker: { en: "Reliable Delivery", es: "Información de envío" },
     shippingTitle: { en: "Fast processing, clear delivery options, and order updates after payment.", es: "Procesamiento rapido y actualizaciones claras tras el pago." },
     shippingBody: { en: "Delivery timing and shipping costs are shown before payment, so customers know what to expect before placing the order.", es: "Las opciones de envio y los costes se muestran claramente antes del pago." },
@@ -498,8 +498,8 @@ const COPY = {
     benefitsTitle: { en: "Secure payments, clearer product standards, and a more trustworthy route to checkout.", es: "Pagos seguros, estandares mas claros y una ruta de checkout mas fiable." },
     benefitsBody: { en: "These proof points are positioned to reduce hesitation where real customers decide to buy.", es: "Estos puntos de confianza se colocan donde los clientes reales deciden comprar." },
     ctaKicker: { en: "Ready to Order With Confidence?", es: "Pensado para generar confianza" },
-    ctaTitle: { en: "Choose quality products, review delivery clearly, and complete secure checkout with the exact payment amount.", es: "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." },
-    ctaBody: { en: "A smoother route from product selection to confirmed order helps first-time customers become returning buyers.", es: "Pasa del descubrimiento del producto al checkout seguro con una experiencia mas clara." }
+    ctaTitle: { en: "Choose the right product, review delivery clearly, and complete secure checkout.", es: "Desde pagos seguros hasta cuentas protegidas y un checkout transparente, toda la tienda esta pensada para crear confianza." },
+    ctaBody: { en: "A calmer, clearer order journey helps first-time customers feel comfortable returning.", es: "Pasa del descubrimiento del producto al checkout seguro con una experiencia mas clara." }
   },  shop: {
     kicker: { en: "Shop", es: "Tienda" },
     title: { en: "Shop Quality-Focused Research Products", es: "Compra categorias premium de investigacion" },
@@ -1366,9 +1366,9 @@ function renderUpdatedHomePage() {
     <section class="hero-home hero-home-premium">
       <div class="container hero-grid">
         <div class="hero-copy reveal">
-          <p class="kicker">${currentLanguage === "es" ? "Productos de calidad. Entrega fiable. Checkout seguro." : "Quality Products. Reliable Delivery. Secure Checkout."}</p>
-          <h1>${currentLanguage === "es" ? "Compra productos de investigacion de calidad con confianza" : "Order Quality Research Products With Confidence"}</h1>
-          <p class="lead">${currentLanguage === "es" ? "Elige productos con senales claras de calidad, entrega fiable y checkout seguro." : "Choose products with clear quality signals, reliable delivery expectations, and secure checkout before payment."}</p>
+          <p class="kicker">${currentLanguage === "es" ? "Productos de calidad. Entrega fiable. Checkout seguro." : "Quality-backed peptides. Reliable fulfilment. Secure payment."}</p>
+          <h1>${currentLanguage === "es" ? "Compra productos de investigacion de calidad con confianza" : "Premium Research Products, Delivered With Confidence"}</h1>
+          <p class="lead">${currentLanguage === "es" ? "Elige productos con senales claras de calidad, entrega fiable y checkout seguro." : "Shop with clear product signals, transparent delivery expectations, and exact USDT checkout guidance."}</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="shop.html">${pick(COPY.labels.shopNow)}</a>
             <a class="btn btn-secondary" href="#featured-products">${pick(COPY.labels.browseProducts)}</a>
@@ -1382,7 +1382,7 @@ function renderUpdatedHomePage() {
         <div class="hero-stack reveal reveal-delay">
           <article class="panel panel-dark">
             <p class="panel-kicker">${currentLanguage === "es" ? "Confianza antes de pagar" : "Confidence Before You Pay"}</p>
-            <h2>${currentLanguage === "es" ? "Calidad clara, entrega fiable y pago seguro antes de confirmar el pedido." : "Clear quality, reliable delivery, and secure payment before the order is confirmed."}</h2>
+            <h2>${currentLanguage === "es" ? "Calidad clara, entrega fiable y pago seguro antes de confirmar el pedido." : "Quality cues, delivery clarity, and exact payment guidance before the order is confirmed."}</h2>
             <div class="metric-grid">
               <div class="metric-card"><strong>11</strong><small>${currentLanguage === "es" ? "productos activos" : "live products"}</small></div>
               <div class="metric-card"><strong>EN / ES</strong><small>${currentLanguage === "es" ? "flujo bilingue" : "bilingual flow"}</small></div>
@@ -1391,7 +1391,7 @@ function renderUpdatedHomePage() {
           </article>
           <article class="hero-visual hero-visual-photo reveal">
             <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
-            <div class="overlay-card">${currentLanguage === "es" ? "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda." : "Branded packshots, real laboratory-support imagery, and visible payment reassurance before the buyer leaves the store."}</div>
+            <div class="overlay-card">${currentLanguage === "es" ? "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda." : "A cleaner path from product review to secure payment, designed for serious repeat buyers."}</div>
           </article>
         </div>
       </div>
@@ -1403,8 +1403,8 @@ function renderUpdatedHomePage() {
       <div class="container">
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Seleccion centrada en calidad" : "Quality-Focused Product Selection"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Compara productos por dosis, precio y contexto de lote antes del checkout." : "Compare trusted products by dosage, price, and batch context."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Las tarjetas muestran calidad, entrega y checkout de forma facil de revisar." : "Product cards keep quality cues, delivery confidence, and checkout readiness easy to scan."}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Compara productos por dosis, precio y contexto de lote antes del checkout." : "Compare products quickly by dosage, price, quality cues, and availability."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Las tarjetas muestran calidad, entrega y checkout de forma facil de revisar." : "Product cards are tuned for confident browsing: premium visuals, clear pricing, and fast paths to secure checkout."}</p>
         </div>
         <div class="catalog-grid">${featured}</div>
       </div>
@@ -1413,8 +1413,8 @@ function renderUpdatedHomePage() {
       <div class="container section-stack">
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Por que los clientes vuelven a pedir" : "Why Customers Order Again"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Calidad constante, entrega fiable, checkout seguro y soporte cercano al pedido." : "Consistent product quality, reliable delivery, secure checkout, and support that stays close to the order."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "El recorrido responde las preguntas importantes antes de llegar al pago." : "The buying path answers the questions that matter before a customer reaches payment."}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Calidad constante, entrega fiable, checkout seguro y soporte cercano al pedido." : "Quality that is easy to verify, delivery that is clear, and checkout that feels controlled."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "El recorrido responde las preguntas importantes antes de llegar al pago." : "The buying path keeps the important answers close to the decision point."}</p>
         </div>
         <div class="service-grid">${renderServiceCards()}</div>
       </div>
@@ -1445,8 +1445,8 @@ function renderUpdatedHomePage() {
       <div class="container section-stack">
         <div class="section-header reveal">
           <p class="section-kicker">${currentLanguage === "es" ? "Listo para comprar con confianza" : "Ready to Order With Confidence?"}</p>
-          <h2 class="section-title">${currentLanguage === "es" ? "Elige productos de calidad, revisa la entrega y completa un checkout seguro." : "Choose quality products, review delivery clearly, and complete secure checkout."}</h2>
-          <p class="section-copy">${currentLanguage === "es" ? "Una ruta mas fluida ayuda a nuevos clientes a volver a pedir." : "A smoother route from product selection to confirmed order helps first-time customers become returning buyers."}</p>
+          <h2 class="section-title">${currentLanguage === "es" ? "Elige productos de calidad, revisa la entrega y completa un checkout seguro." : "Choose the right product, review delivery clearly, and complete secure checkout."}</h2>
+          <p class="section-copy">${currentLanguage === "es" ? "Una ruta mas fluida ayuda a nuevos clientes a volver a pedir." : "A calmer, clearer order journey helps first-time customers feel comfortable returning."}</p>
         </div>
         <div class="proof-grid">${renderProofCards()}</div>
       </div>
