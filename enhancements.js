@@ -2342,6 +2342,12 @@
     if (index === 0 || src.includes("/packshots/")) {
       return tx("Packshot", "Packshot");
     }
+    if (src.includes("/product-visuals/") && src.includes("-detail")) {
+      return tx("Label detail", "Detalle de etiqueta");
+    }
+    if (src.includes("/product-visuals/") && src.includes("-quality")) {
+      return tx("Quality card", "Ficha de calidad");
+    }
     if (src.includes("lab-vial-closeup")) {
       return tx("Vial close-up", "Primer plano del vial");
     }
@@ -2365,7 +2371,7 @@
 
   function imagePresentationKind(image) {
     const src = String(image || "").toLowerCase();
-    if (src.includes("/packshots/") || src.endsWith(".svg")) {
+    if (src.includes("/packshots/") || src.includes("/product-visuals/") || src.includes(".svg")) {
       return "packshot";
     }
     return "photo";

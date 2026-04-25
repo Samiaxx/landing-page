@@ -1,53 +1,90 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960" fill="none">
+
   <defs>
-    <linearGradient id="body-ipamorelin-10mg" x1="0" y1="140" x2="0" y2="780" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ffffff" stop-opacity="0.92"/>
-      <stop offset="0.55" stop-color="#f5f9ff" stop-opacity="0.98"/>
-      <stop offset="1" stop-color="#dbe9ff" stop-opacity="0.95"/>
+    <linearGradient id="panel-ipamorelin-10mg" x1="84" y1="72" x2="638" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="0.58" stop-color="#f3f8ff"/>
+      <stop offset="1" stop-color="#e4efff"/>
+    </linearGradient>
+    <linearGradient id="body-ipamorelin-10mg" x1="0" y1="120" x2="0" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.96"/>
+      <stop offset="0.6" stop-color="#f7fbff" stop-opacity="0.98"/>
+      <stop offset="1" stop-color="#dceaff" stop-opacity="0.95"/>
     </linearGradient>
     <linearGradient id="neck-ipamorelin-10mg" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#ffffff" stop-opacity="0.95"/>
-      <stop offset="1" stop-color="#e3eeff" stop-opacity="0.9"/>
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e5f0ff"/>
     </linearGradient>
     <linearGradient id="cap-ipamorelin-10mg" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#3f7fc7"/>
-      <stop offset="1" stop-color="#1e63c3"/>
+      <stop stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#99f6e4"/>
     </linearGradient>
-    <filter id="shadow-ipamorelin-10mg" x="120" y="70" width="500" height="820" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="28" stdDeviation="24" flood-color="#0f2549" flood-opacity="0.18"/>
-    </filter>
-    <filter id="soft-shadow-ipamorelin-10mg" x="170" y="710" width="380" height="120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="18"/>
-    </filter>
-    <pattern id="grid-ipamorelin-10mg" width="48" height="48" patternUnits="userSpaceOnUse">
-      <path d="M48 0H0V48" stroke="#3f7fc7" stroke-opacity="0.06"/>
-    </pattern>
+    <pattern id="pattern-ipamorelin-10mg" width="64" height="64" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="2" fill="#0f766e" fill-opacity="0.08"/><circle cx="44" cy="44" r="2" fill="#99f6e4" fill-opacity="0.1"/></pattern>
+    <filter id="shadow-ipamorelin-10mg" x="40" y="50" width="620" height="850" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="30" stdDeviation="25" flood-color="#0f2549" flood-opacity="0.18"/></filter>
+    <filter id="card-shadow-ipamorelin-10mg" x="40" y="180" width="320" height="600" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#0f2549" flood-opacity="0.14"/></filter>
+    <filter id="floor-ipamorelin-10mg" x="130" y="730" width="460" height="130" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="16"/></filter>
   </defs>
 
-  <rect width="720" height="960" fill="none"/>
-  <rect x="80" y="90" width="560" height="780" rx="44" fill="url(#grid-ipamorelin-10mg)"/>
-  <ellipse cx="360" cy="780" rx="150" ry="26" fill="#173865" fill-opacity="0.15" filter="url(#soft-shadow-ipamorelin-10mg)"/>
+    <rect width="720" height="960" rx="0" fill="#f6faff"/>
+    <rect x="64" y="72" width="592" height="816" rx="54" fill="url(#panel-ipamorelin-10mg)"/>
+    <rect x="64" y="72" width="592" height="816" rx="54" fill="url(#pattern-ipamorelin-10mg)" opacity="0.9"/>
+    <circle cx="373" cy="519" r="132" fill="#99f6e4" fill-opacity="0.13"/>
+    <circle cx="291" cy="547" r="178" fill="#0f766e" fill-opacity="0.08"/>
+    <ellipse cx="360" cy="796" rx="182" ry="30" fill="#0f2549" fill-opacity="0.14" filter="url(#floor-ipamorelin-10mg)"/>
 
-  <g filter="url(#shadow-ipamorelin-10mg)">
-    <rect x="290" y="120" width="140" height="96" rx="28" fill="url(#cap-ipamorelin-10mg)"/>
-    <rect x="304" y="140" width="112" height="16" rx="8" fill="#ffffff" fill-opacity="0.24"/>
-    <rect x="316" y="220" width="88" height="42" rx="18" fill="url(#neck-ipamorelin-10mg)" stroke="#c7daff" stroke-opacity="0.7"/>
-    <path d="M242 262C242 240.909 259.091 223.818 280.182 223.818H439.818C460.909 223.818 478 240.909 478 262V680C478 739.647 429.647 788 370 788H350C290.353 788 242 739.647 242 680V262Z" fill="url(#body-ipamorelin-10mg)" stroke="#cfe0ff" stroke-width="2"/>
-    <path d="M272 312C272 289.909 289.909 272 312 272H408C430.091 272 448 289.909 448 312V665C448 689.301 428.301 709 404 709H316C291.699 709 272 689.301 272 665V312Z" fill="#ffffff" fill-opacity="0.96" stroke="#d9e7ff" stroke-width="2"/>
-    <rect x="272" y="294" width="176" height="34" rx="16" fill="#3f7fc7" fill-opacity="0.12"/>
-    <rect x="288" y="294" width="144" height="34" rx="14" fill="#3f7fc7"/>
-    <text x="360" y="316" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2" fill="#ffffff">PRIMUS PEPTIDES</text>
-    <text x="360" y="404" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="50" font-weight="700" fill="#10213f">Ipamorelin</text>
-    <text x="360" y="454" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="3" fill="#3f7fc7">10mg</text>
-    <text x="360" y="515" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="2" fill="#64748b">RESEARCH USE ONLY</text>
-    <line x1="312" y1="548" x2="408" y2="548" stroke="#d5e4ff" stroke-width="2"/>
-    <text x="360" y="585" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="2" fill="#3e5a82">BATCH PP-IPA-PRE</text>
-    <text x="360" y="615" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="600" letter-spacing="1.6" fill="#7c8da8">IPAMOR ? HPLC VERIFIED</text>
-    <rect x="320" y="646" width="80" height="22" rx="11" fill="#eef5ff"/>
-    <text x="360" y="661" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#3f7fc7">EU DISPATCH</text>
-    <ellipse cx="310" cy="280" rx="18" ry="210" fill="#ffffff" fill-opacity="0.28" transform="rotate(8 310 280)"/>
-    <ellipse cx="400" cy="358" rx="10" ry="160" fill="#ffffff" fill-opacity="0.22" transform="rotate(-8 400 358)"/>
-    <path d="M288 690H432" stroke="#bfd4f8" stroke-width="3" stroke-linecap="round"/>
-    <path d="M296 716H424" stroke="#d7e6ff" stroke-width="3" stroke-linecap="round"/>
-  </g>
+    <g transform="rotate(-6 289 400) scale(1)" filter="url(#shadow-ipamorelin-10mg)">
+      <rect x="230" y="150" width="118" height="84" rx="24" fill="url(#cap-ipamorelin-10mg)"/>
+      <rect x="246" y="168" width="86" height="14" rx="7" fill="#ffffff" fill-opacity="0.28"/>
+      <rect x="259" y="244" width="60" height="45" rx="18" fill="url(#neck-ipamorelin-10mg)" stroke="#d8e7ff"/>
+      <path d="M184 289C184 264 204 244 229 244H349C374 244 394 264 394 289V650C394 720 336 770 299 770H279C242 770 184 720 184 650V289Z" fill="url(#body-ipamorelin-10mg)" stroke="#d7e7ff" stroke-width="2"/>
+      <rect x="212" y="320" width="154" height="310" rx="30" fill="#ffffff" fill-opacity="0.98" stroke="#dceaff" stroke-width="2"/>
+      <rect x="232" y="344" width="114" height="42" rx="18" fill="#0f766e"/>
+      <text x="289" y="372" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2" fill="#ffffff">PRIMUS PEPTIDES</text>
+      <text x="289" y="456" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" fill="#10213f">Ipamorelin</text>
+      <text x="289" y="506" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" letter-spacing="3" fill="#0f766e">10mg</text>
+      <text x="289" y="556" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2" fill="#64748b">RESEARCH USE ONLY</text>
+      <line x1="258" y1="580" x2="320" y2="580" stroke="#d5e4ff" stroke-width="2"/>
+      <text x="289" y="610" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" letter-spacing="1.5" fill="#3e5a82">PP-IPA-PRE</text>
+      <rect x="260" y="652" width="58" height="25" rx="12" fill="#99f6e4" fill-opacity="0.24"/>
+      <text x="289" y="670" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="800" letter-spacing="1.8" fill="#0f766e">IPAMOR VERIFIED</text>
+      <ellipse cx="248" cy="410" rx="16" ry="230" fill="#ffffff" fill-opacity="0.27" transform="rotate(7 248 410)"/>
+      <ellipse cx="324" cy="480" rx="10" ry="150" fill="#ffffff" fill-opacity="0.18" transform="rotate(-8 324 480)"/>
+    </g>
+    <g transform="rotate(-4 217 473)" filter="url(#card-shadow-ipamorelin-10mg)" opacity="0.98">
+      <rect x="112" y="258" width="210" height="430" rx="34" fill="#ffffff" stroke="#dceaff" stroke-width="2"/>
+      <rect x="112" y="258" width="210" height="92" rx="34" fill="#0f766e"/>
+      <rect x="112" y="316" width="210" height="54" fill="#0f766e"/>
+
+    <g transform="translate(138 283)" opacity="0.96">
+      <path d="M0 16L16 0H44L60 16L30 48L0 16Z" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M16 16L30 2L44 16L30 32L16 16Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+    </g>
+      <text x="142" y="420" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="800" fill="#10213f">Ipamorelin</text>
+      <text x="142" y="462" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="900" fill="#0f766e">10mg</text>
+      <text x="142" y="510" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="800" letter-spacing="2" fill="#64748b">SPECIALTY</text>
+      <line x1="142" y1="550" x2="292" y2="550" stroke="#dbeafe" stroke-width="2"/>
+      <text x="142" y="592" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="800" letter-spacing="1.4" fill="#475569">PP-IPA-PRE</text>
+      <rect x="142" y="616" width="150" height="34" rx="17" fill="#99f6e4" fill-opacity="0.22"/>
+      <text x="217" y="638" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="900" letter-spacing="1.8" fill="#0f766e">SEALED PACK</text>
+    </g>
+    <g transform="rotate(5 467 378) scale(1)" filter="url(#shadow-ipamorelin-10mg)">
+      <rect x="408" y="118" width="118" height="84" rx="24" fill="url(#cap-ipamorelin-10mg)"/>
+      <rect x="424" y="136" width="86" height="14" rx="7" fill="#ffffff" fill-opacity="0.28"/>
+      <rect x="437" y="212" width="60" height="45" rx="18" fill="url(#neck-ipamorelin-10mg)" stroke="#d8e7ff"/>
+      <path d="M362 257C362 232 382 212 407 212H527C552 212 572 232 572 257V638C572 708 514 758 477 758H457C420 758 362 708 362 638V257Z" fill="url(#body-ipamorelin-10mg)" stroke="#d7e7ff" stroke-width="2"/>
+      <rect x="390" y="288" width="154" height="310" rx="30" fill="#ffffff" fill-opacity="0.98" stroke="#dceaff" stroke-width="2"/>
+      <rect x="410" y="312" width="114" height="42" rx="18" fill="#0f766e"/>
+      <text x="467" y="340" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2" fill="#ffffff">PRIMUS PEPTIDES</text>
+      <text x="467" y="424" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" fill="#10213f">Ipamorelin</text>
+      <text x="467" y="474" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" letter-spacing="3" fill="#0f766e">10mg</text>
+      <text x="467" y="524" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2" fill="#64748b">RESEARCH USE ONLY</text>
+      <line x1="436" y1="548" x2="498" y2="548" stroke="#d5e4ff" stroke-width="2"/>
+      <text x="467" y="578" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" letter-spacing="1.5" fill="#3e5a82">PP-IPA-PRE</text>
+      <rect x="438" y="620" width="58" height="25" rx="12" fill="#99f6e4" fill-opacity="0.24"/>
+      <text x="467" y="638" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="800" letter-spacing="1.8" fill="#0f766e">IPAMOR VERIFIED</text>
+      <ellipse cx="426" cy="378" rx="16" ry="230" fill="#ffffff" fill-opacity="0.27" transform="rotate(7 426 378)"/>
+      <ellipse cx="502" cy="448" rx="10" ry="150" fill="#ffffff" fill-opacity="0.18" transform="rotate(-8 502 448)"/>
+    </g>
+  <text x="104" y="838" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="900" letter-spacing="2.4" fill="#0f766e" opacity="0.92">SPECIALTY SERIES</text>
+  <text x="104" y="864" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="800" letter-spacing="1.8" fill="#64748b">PP-IPA-PRE / RESEARCH USE ONLY</text>
 </svg>

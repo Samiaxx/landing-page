@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960" fill="none">
+
+  <defs>
+    <linearGradient id="panel-ipamorelin-10mg" x1="84" y1="72" x2="638" y2="880" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="0.58" stop-color="#f3f8ff"/>
+      <stop offset="1" stop-color="#e4efff"/>
+    </linearGradient>
+    <linearGradient id="body-ipamorelin-10mg" x1="0" y1="120" x2="0" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff" stop-opacity="0.96"/>
+      <stop offset="0.6" stop-color="#f7fbff" stop-opacity="0.98"/>
+      <stop offset="1" stop-color="#dceaff" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="neck-ipamorelin-10mg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e5f0ff"/>
+    </linearGradient>
+    <linearGradient id="cap-ipamorelin-10mg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#99f6e4"/>
+    </linearGradient>
+    <pattern id="pattern-ipamorelin-10mg" width="64" height="64" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="2" fill="#0f766e" fill-opacity="0.08"/><circle cx="44" cy="44" r="2" fill="#99f6e4" fill-opacity="0.1"/></pattern>
+    <filter id="shadow-ipamorelin-10mg" x="40" y="50" width="620" height="850" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="30" stdDeviation="25" flood-color="#0f2549" flood-opacity="0.18"/></filter>
+    <filter id="card-shadow-ipamorelin-10mg" x="40" y="180" width="320" height="600" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#0f2549" flood-opacity="0.14"/></filter>
+    <filter id="floor-ipamorelin-10mg" x="130" y="730" width="460" height="130" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="16"/></filter>
+  </defs>
+  <rect width="720" height="960" fill="#f7fbff"/>
+  <rect x="70" y="92" width="580" height="776" rx="56" fill="url(#panel-ipamorelin-10mg)"/>
+  <circle cx="590" cy="190" r="170" fill="#99f6e4" fill-opacity="0.16"/>
+  <g filter="url(#shadow-ipamorelin-10mg)">
+    <rect x="104" y="164" width="512" height="610" rx="48" fill="#ffffff" stroke="#dbeafe" stroke-width="2"/>
+    <rect x="104" y="164" width="512" height="124" rx="48" fill="#0f766e"/>
+    <rect x="104" y="230" width="512" height="74" fill="#0f766e"/>
+
+    <g transform="translate(136 198)" opacity="0.96">
+      <path d="M0 16L16 0H44L60 16L30 48L0 16Z" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M16 16L30 2L44 16L30 32L16 16Z" fill="none" stroke="#ffffff" stroke-width="4" stroke-linejoin="round"/>
+    </g>
+    <text x="432" y="226" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="900" letter-spacing="3" fill="#ffffff">PRIMUS PEPTIDES</text>
+    <text x="360" y="390" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="70" font-weight="900" fill="#10213f">Ipamorelin</text>
+    <text x="360" y="468" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="900" letter-spacing="4" fill="#0f766e">10mg</text>
+    <rect x="178" y="520" width="364" height="58" rx="29" fill="#99f6e4" fill-opacity="0.22"/>
+    <text x="360" y="557" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="900" letter-spacing="2.4" fill="#0f766e">SPECIALTY PRODUCT LABEL</text>
+    <line x1="184" y1="630" x2="536" y2="630" stroke="#dbeafe" stroke-width="2"/>
+    <text x="184" y="680" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="900" letter-spacing="2" fill="#475569">PP-IPA-PRE</text>
+    <text x="184" y="724" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2" fill="#64748b">RESEARCH USE ONLY / SEALED PACKSHOT</text>
+  </g>
+</svg>

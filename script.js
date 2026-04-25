@@ -9,6 +9,8 @@ const SITE_DOMAIN = "peptidos-primus.com";
 const BRAND_LOGO_SRC = "assets/store-logo.png";
 const HERO_VISUAL_SRC = "assets/lab-hand-vial.webp";
 const PACKSHOT_ROOT = "assets/packshots";
+const PRODUCT_VISUAL_ROOT = "assets/product-visuals";
+const PRODUCT_IMAGE_VERSION = "20260425img1";
 const PAYMENT_METHODS = ["USDT"];
 const WINDOW_NAME_STORE_PREFIX = "__primus-store__:";
 
@@ -29,72 +31,6 @@ const KPV_IMAGE_SET = [
   "assets/kpv-vial-2.jpg",
   "assets/brand-caps.webp"
 ];
-
-const SUPPORT_IMAGE_SET = [
-  "assets/lab-hand-vial.webp",
-  "assets/brand-caps.webp"
-];
-
-const SUPPORT_IMAGE_GROUPS = {
-  metabolic: [
-    "assets/lab-vial-closeup.webp",
-    "assets/lab-tube-tray.webp",
-    "assets/brand-caps.webp"
-  ],
-  recovery: [
-    "assets/lab-hand-vial.webp",
-    "assets/lab-vial-closeup.webp",
-    "assets/brand-caps.webp"
-  ],
-  neuro: [
-    "assets/lab-tube-tray.webp",
-    "assets/lab-hand-vial.webp",
-    "assets/brand-caps.webp"
-  ],
-  specialty: [
-    "assets/lab-vial-closeup.webp",
-    "assets/lab-hand-vial.webp",
-    "assets/brand-caps.webp"
-  ]
-};
-
-const PRODUCT_SUPPORT_GROUP = {
-  "tirzepatide-30mg": "metabolic",
-  "retatrutide-30mg": "metabolic",
-  "mots-c-40mg": "metabolic",
-  "nad-1000mg": "metabolic",
-  "tb-500-20mg": "recovery",
-  "bpc-157-10mg": "recovery",
-  "ghk-cu-50mg": "recovery",
-  "ss-31-50mg": "recovery",
-  "semax-30mg": "neuro",
-  "selank-10mg": "neuro",
-  "dsip-10mg": "neuro",
-  "epithalon-40mg": "neuro",
-  "ipamorelin-10mg": "specialty",
-  "melanotan-mt2-10mg": "specialty",
-  "pt141-10mg": "specialty",
-  "oxytocin-10mg": "specialty"
-};
-
-const PRODUCT_GALLERY_MAP = {
-  "tirzepatide-30mg": ["assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
-  "retatrutide-30mg": ["assets/lab-tube-tray.webp", "assets/lab-vial-closeup.webp", "assets/brand-caps.webp"],
-  "mots-c-40mg": ["assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
-  "nad-1000mg": ["assets/brand-caps.webp", "assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp"],
-  "tb-500-20mg": ["assets/lab-hand-vial.webp", "assets/brand-caps.webp", "assets/lab-vial-closeup.webp"],
-  "bpc-157-10mg": ["assets/lab-vial-closeup.webp", "assets/lab-hand-vial.webp", "assets/brand-caps.webp"],
-  "ghk-cu-50mg": ["assets/brand-caps.webp", "assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp"],
-  "ss-31-50mg": ["assets/lab-tube-tray.webp", "assets/brand-caps.webp", "assets/lab-hand-vial.webp"],
-  "semax-30mg": ["assets/lab-tube-tray.webp", "assets/lab-hand-vial.webp", "assets/lab-vial-closeup.webp"],
-  "selank-10mg": ["assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
-  "dsip-10mg": ["assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp", "assets/lab-hand-vial.webp"],
-  "epithalon-40mg": ["assets/brand-caps.webp", "assets/lab-tube-tray.webp", "assets/lab-vial-closeup.webp"],
-  "ipamorelin-10mg": ["assets/lab-hand-vial.webp", "assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp"],
-  "melanotan-mt2-10mg": ["assets/lab-vial-closeup.webp", "assets/brand-caps.webp", "assets/lab-hand-vial.webp"],
-  "pt141-10mg": ["assets/brand-caps.webp", "assets/lab-vial-closeup.webp", "assets/lab-hand-vial.webp"],
-  "oxytocin-10mg": ["assets/lab-hand-vial.webp", "assets/brand-caps.webp", "assets/lab-tube-tray.webp"]
-};
 
 const NAV_ITEMS = [
   { key: "home", href: "index.html" },
@@ -367,19 +303,23 @@ const PRODUCTS = [
 ];
 
 function productPackshot(slug) {
-  return `${PACKSHOT_ROOT}/${slug}.svg`;
+  return `${PACKSHOT_ROOT}/${slug}.svg?v=${PRODUCT_IMAGE_VERSION}`;
+}
+
+function productDetailVisual(slug) {
+  return `${PRODUCT_VISUAL_ROOT}/${slug}-detail.svg?v=${PRODUCT_IMAGE_VERSION}`;
+}
+
+function productQualityVisual(slug) {
+  return `${PRODUCT_VISUAL_ROOT}/${slug}-quality.svg?v=${PRODUCT_IMAGE_VERSION}`;
 }
 
 function standardProductGallery(product) {
-  if (PRODUCT_GALLERY_MAP[product.slug]) {
-    return [productPackshot(product.slug)].concat(PRODUCT_GALLERY_MAP[product.slug]);
-  }
-
-  const group = PRODUCT_SUPPORT_GROUP[product.slug];
-  const supportSet = group && SUPPORT_IMAGE_GROUPS[group]
-    ? SUPPORT_IMAGE_GROUPS[group]
-    : SUPPORT_IMAGE_SET;
-  return [productPackshot(product.slug)].concat(supportSet);
+  return [
+    productPackshot(product.slug),
+    productDetailVisual(product.slug),
+    productQualityVisual(product.slug)
+  ];
 }
 
 PRODUCTS.forEach((product) => {
@@ -387,7 +327,7 @@ PRODUCTS.forEach((product) => {
   product.image = packshot;
 
   if (product.slug === "kpv-10mg") {
-    product.gallery = [packshot].concat(KPV_IMAGE_SET);
+    product.gallery = standardProductGallery(product).concat(KPV_IMAGE_SET);
     return;
   }
 
