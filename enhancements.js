@@ -2299,14 +2299,14 @@
   }
 
   function productTone(product) {
-    const palette = [
-      { primary: "#1a6fd6", soft: "#dfeeff", shadow: "rgba(26, 111, 214, 0.24)" },
-      { primary: "#0d4f9e", soft: "#e4efff", shadow: "rgba(13, 79, 158, 0.22)" },
-      { primary: "#3f7fc7", soft: "#eef5ff", shadow: "rgba(63, 127, 199, 0.2)" },
-      { primary: "#245aa8", soft: "#e6f0ff", shadow: "rgba(36, 90, 168, 0.22)" }
-    ];
-    const seed = product.slug.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    return palette[seed % palette.length];
+    const palette = {
+      metabolic: { primary: "#1a6fd6", soft: "#e6f1ff", shadow: "rgba(26, 111, 214, 0.22)" },
+      recovery: { primary: "#0b7a63", soft: "#e6f7f2", shadow: "rgba(11, 122, 99, 0.2)" },
+      cognitive: { primary: "#4b5bb4", soft: "#eef1ff", shadow: "rgba(75, 91, 180, 0.18)" },
+      longevity: { primary: "#0c758b", soft: "#e5f6fa", shadow: "rgba(12, 117, 139, 0.2)" },
+      specialty: { primary: "#8d5818", soft: "#fff3e5", shadow: "rgba(141, 88, 24, 0.18)" }
+    };
+    return palette[primaryGoal(product)] || palette.specialty;
   }
 
   function goalConfig(goalId) {
@@ -3485,7 +3485,7 @@
       .join("");
 
     return `
-      <section class="hero-home">
+      <section class="hero-home hero-home-premium">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
             <p class="kicker">${tx("Secure Access to High-Quality Research Compounds", "Acceso seguro a compuestos de alta calidad")}</p>
@@ -4498,7 +4498,7 @@
       .join("");
 
     return `
-      <section class="hero-home">
+      <section class="hero-home hero-home-premium">
         <div class="container hero-grid">
           <div class="hero-copy reveal">
             <p class="kicker">${tx("Secure Access to High-Quality Research Compounds", "Acceso seguro a compuestos de alta calidad")}</p>
@@ -4507,8 +4507,8 @@
               "Productos premium de investigacion con checkout crypto seguro"
             )}</h1>
             <p class="lead">${tx(
-              "Built for serious buyers who value privacy, speed, and trusted quality.",
-              "Pensado para compradores serios que valoran privacidad, rapidez y calidad confiable."
+              "A cleaner path from product research to protected account, exact USDT payment, and confirmed order completion.",
+              "Una ruta mas clara desde la investigacion del producto hasta cuenta protegida, pago USDT exacto y pedido confirmado."
             )}</p>
             <div class="hero-actions">
               <a class="btn btn-primary" href="shop.html">${tx("Shop Now", "Comprar ahora")}</a>
@@ -4533,7 +4533,7 @@
               </div>
             </div>
           </div>
-          <div class="hero-stack reveal reveal-delay">
+          <div class="hero-stack hero-proof-stack reveal reveal-delay">
             <article class="panel panel-dark">
               <p class="panel-kicker">${tx("Built for Customer Confidence", "Pensado para generar confianza")}</p>
               <h2>${tx(
@@ -4546,11 +4546,11 @@
                 <div class="metric-card"><strong>USDT</strong><small>${tx("secure hosted checkout", "checkout seguro alojado")}</small></div>
               </div>
             </article>
-            <article class="hero-visual hero-visual-photo reveal">
+            <article class="hero-visual hero-visual-photo hero-visual-premium reveal">
               <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
               <div class="overlay-card">${tx(
-                "Real laboratory-support visuals, branded packshots, and stronger trust placement help the storefront feel more accountable before checkout begins.",
-                "Los visuales reales de apoyo de laboratorio, los packshots de marca y una mejor colocacion de confianza hacen que la tienda se sienta mas responsable antes del checkout."
+                "Branded packshots, real laboratory-support imagery, and visible payment reassurance before the buyer leaves the store.",
+                "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda."
               )}</div>
             </article>
           </div>
@@ -4994,9 +4994,11 @@
   };
 
   renderProductCard = function (product, options = {}) {
+    const tone = productTone(product);
+    const lane = primaryGoal(product);
     const cardClass = options.reveal === false
-      ? "product-card product-card-enhanced"
-      : `product-card product-card-enhanced reveal${options.delay ? " reveal-delay" : ""}`;
+      ? `product-card product-card-enhanced product-card-${lane}`
+      : `product-card product-card-enhanced product-card-${lane} reveal${options.delay ? " reveal-delay" : ""}`;
     const actionButton = product.status === "available"
       ? `<button class="btn btn-secondary" type="button" data-add-to-cart="${product.slug}">${localize(COPY.labels.addToCart)}</button>`
       : `<span class="badge badge-ready">${localize(COPY.labels.comingMay)}</span>`;
@@ -5022,7 +5024,7 @@
       ];
 
     return `
-      <article class="${cardClass}">
+      <article class="${cardClass}" style="--card-accent:${tone.primary}; --card-soft:${tone.soft}; --card-shadow:${tone.shadow};">
         ${renderProductVisual(product, "card")}
         <div class="card-body">
           <div class="card-storyline">

@@ -33,6 +33,96 @@
   background: radial-gradient(circle, rgba(143, 223, 255, 0.2), rgba(143, 223, 255, 0));
 }
 
+.hero-home-premium {
+  min-height: min(760px, 82vh);
+  padding-top: clamp(4.4rem, 7vw, 7rem);
+  padding-bottom: clamp(4.8rem, 7vw, 6.8rem);
+  color: #ffffff;
+  background:
+    linear-gradient(90deg, rgba(6, 16, 35, 0.9) 0%, rgba(10, 31, 62, 0.7) 47%, rgba(10, 31, 62, 0.28) 100%),
+    linear-gradient(180deg, rgba(4, 10, 22, 0.18), rgba(4, 10, 22, 0.4)),
+    url("assets/lab-hand-vial.webp") center / cover no-repeat;
+}
+
+.hero-home-premium::before,
+.hero-home-premium::after {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+}
+
+.hero-home-premium::before {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 118px);
+  opacity: 0.34;
+}
+
+.hero-home-premium::after {
+  top: auto;
+  height: 140px;
+  background: linear-gradient(180deg, rgba(219, 236, 255, 0), rgba(219, 236, 255, 0.98));
+}
+
+.hero-home-premium .hero-grid {
+  position: relative;
+  z-index: 1;
+  align-items: end;
+}
+
+.hero-home-premium .hero-copy h1 {
+  max-width: 12ch;
+  color: #ffffff;
+  font-size: clamp(3.4rem, 6.4vw, 6.6rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+.hero-home-premium .hero-copy .lead {
+  max-width: 52ch;
+  color: rgba(237, 246, 255, 0.9);
+  font-size: 1.18rem;
+}
+
+.hero-home-premium .hero-copy .kicker,
+.hero-home-premium .hero-copy .trust-chip,
+.hero-home-premium .panel,
+.hero-home-premium .overlay-card {
+  background: rgba(8, 19, 40, 0.58);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+.hero-home-premium .hero-copy .kicker,
+.hero-home-premium .hero-copy .trust-chip strong,
+.hero-home-premium .hero-copy .trust-chip span,
+.hero-home-premium .panel h2,
+.hero-home-premium .panel-kicker {
+  color: #ffffff;
+}
+
+.hero-home-premium .hero-copy .trust-chip span,
+.hero-home-premium .metric-card small {
+  color: rgba(237, 246, 255, 0.76);
+}
+
+.hero-home-premium .hero-proof-stack {
+  max-width: 520px;
+  justify-self: end;
+}
+
+.hero-home-premium .hero-visual-premium {
+  max-height: 260px;
+  overflow: hidden;
+}
+
+.hero-home-premium .hero-visual-premium img {
+  height: 100%;
+  object-fit: cover;
+}
+
 .hero-grid {
   grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
   gap: 32px;
@@ -64,19 +154,19 @@
 
 .hero-copy h1 {
   max-width: 11ch;
-  letter-spacing: -0.065em;
+  letter-spacing: 0;
 }
 
 .page-hero h1 {
   max-width: 12ch;
   font-size: clamp(2.9rem, 4.4vw, 4.8rem);
-  letter-spacing: -0.055em;
+  letter-spacing: 0;
 }
 
 .product-panel h1 {
   font-size: clamp(2.6rem, 4vw, 4rem);
   line-height: 0.96;
-  letter-spacing: -0.055em;
+  letter-spacing: 0;
 }
 
 .hero-copy .lead {
@@ -132,9 +222,17 @@
   gap: 10px;
   min-height: 100%;
   align-content: start;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(244, 248, 255, 0.94));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 248, 255, 0.96));
   border: 1px solid rgba(10, 23, 48, 0.08);
-  box-shadow: 0 18px 40px rgba(7, 16, 29, 0.08);
+  box-shadow: 0 20px 48px rgba(7, 16, 29, 0.09);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.trust-strip-card:hover,
+.trust-strip-card:focus-within {
+  transform: translateY(-3px);
+  border-color: rgba(26, 111, 214, 0.18);
+  box-shadow: 0 30px 68px rgba(7, 16, 29, 0.13);
 }
 
 .trust-strip-card .icon-chip {
@@ -584,9 +682,10 @@
   position: relative;
   isolation: isolate;
   height: 100%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 249, 255, 0.96));
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), var(--card-soft, rgba(245, 249, 255, 0.96)));
   border: 1px solid rgba(10, 23, 48, 0.08);
-  box-shadow: 0 22px 48px rgba(7, 16, 29, 0.08);
+  box-shadow: 0 24px 58px rgba(7, 16, 29, 0.09);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
 }
 
@@ -594,21 +693,21 @@
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 4px;
-  background: linear-gradient(90deg, rgba(26, 111, 214, 0.95), rgba(143, 223, 255, 0.85));
+  height: 5px;
+  background: linear-gradient(90deg, var(--card-accent, rgba(26, 111, 214, 0.95)), rgba(143, 223, 255, 0.85));
   opacity: 0.92;
 }
 
 .product-card-enhanced:hover,
 .product-card-enhanced:focus-within {
-  transform: translateY(-6px);
-  border-color: rgba(26, 111, 214, 0.16);
-  box-shadow: 0 28px 60px rgba(7, 16, 29, 0.12);
+  transform: translateY(-7px);
+  border-color: color-mix(in srgb, var(--card-accent, #1a6fd6) 26%, transparent);
+  box-shadow: 0 34px 78px rgba(7, 16, 29, 0.14);
 }
 
 .product-card-enhanced:hover .product-visual-stage {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 28px 42px rgba(13, 59, 122, 0.12);
+  box-shadow: 0 30px 48px var(--card-shadow, rgba(13, 59, 122, 0.14));
 }
 
 .product-visual {
@@ -619,14 +718,14 @@
 
 .product-visual-stage {
   position: relative;
-  min-height: 280px;
+  min-height: 300px;
   display: grid;
   place-items: center;
-  padding: 1.4rem;
+  padding: 1.55rem;
   overflow: hidden;
-  border-radius: 26px;
+  border-radius: 28px;
   background:
-    radial-gradient(circle at top, var(--visual-soft, #e6f0ff), rgba(126, 183, 255, 0) 48%),
+    radial-gradient(circle at 50% 18%, var(--visual-soft, #e6f0ff), rgba(126, 183, 255, 0) 54%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 248, 255, 0.94));
   border: 1px solid rgba(10, 23, 48, 0.06);
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -872,10 +971,38 @@
   color: var(--blue-600);
 }
 
+.product-card-metabolic .card-badge-soft {
+  background: rgba(26, 111, 214, 0.09);
+}
+
+.product-card-recovery .card-badge-soft {
+  background: rgba(8, 108, 76, 0.1);
+  border-color: rgba(8, 108, 76, 0.16);
+  color: #086c4c;
+}
+
+.product-card-cognitive .card-badge-soft {
+  background: rgba(75, 91, 180, 0.1);
+  border-color: rgba(75, 91, 180, 0.14);
+  color: #33408f;
+}
+
+.product-card-longevity .card-badge-soft {
+  background: rgba(12, 117, 139, 0.1);
+  border-color: rgba(12, 117, 139, 0.14);
+  color: #0c758b;
+}
+
+.product-card-specialty .card-badge-soft {
+  background: rgba(141, 88, 24, 0.1);
+  border-color: rgba(141, 88, 24, 0.14);
+  color: #8d5818;
+}
+
 .product-card-enhanced h3 {
   font-size: clamp(1.35rem, 1.4vw, 1.6rem);
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: 0;
 }
 
 .card-confidence-row {

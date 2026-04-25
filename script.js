@@ -77,6 +77,25 @@ const PRODUCT_SUPPORT_GROUP = {
   "oxytocin-10mg": "specialty"
 };
 
+const PRODUCT_GALLERY_MAP = {
+  "tirzepatide-30mg": ["assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
+  "retatrutide-30mg": ["assets/lab-tube-tray.webp", "assets/lab-vial-closeup.webp", "assets/brand-caps.webp"],
+  "mots-c-40mg": ["assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
+  "nad-1000mg": ["assets/brand-caps.webp", "assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp"],
+  "tb-500-20mg": ["assets/lab-hand-vial.webp", "assets/brand-caps.webp", "assets/lab-vial-closeup.webp"],
+  "bpc-157-10mg": ["assets/lab-vial-closeup.webp", "assets/lab-hand-vial.webp", "assets/brand-caps.webp"],
+  "ghk-cu-50mg": ["assets/brand-caps.webp", "assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp"],
+  "ss-31-50mg": ["assets/lab-tube-tray.webp", "assets/brand-caps.webp", "assets/lab-hand-vial.webp"],
+  "semax-30mg": ["assets/lab-tube-tray.webp", "assets/lab-hand-vial.webp", "assets/lab-vial-closeup.webp"],
+  "selank-10mg": ["assets/lab-hand-vial.webp", "assets/lab-tube-tray.webp", "assets/brand-caps.webp"],
+  "dsip-10mg": ["assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp", "assets/lab-hand-vial.webp"],
+  "epithalon-40mg": ["assets/brand-caps.webp", "assets/lab-tube-tray.webp", "assets/lab-vial-closeup.webp"],
+  "ipamorelin-10mg": ["assets/lab-hand-vial.webp", "assets/lab-vial-closeup.webp", "assets/lab-tube-tray.webp"],
+  "melanotan-mt2-10mg": ["assets/lab-vial-closeup.webp", "assets/brand-caps.webp", "assets/lab-hand-vial.webp"],
+  "pt141-10mg": ["assets/brand-caps.webp", "assets/lab-vial-closeup.webp", "assets/lab-hand-vial.webp"],
+  "oxytocin-10mg": ["assets/lab-hand-vial.webp", "assets/brand-caps.webp", "assets/lab-tube-tray.webp"]
+};
+
 const NAV_ITEMS = [
   { key: "home", href: "index.html" },
   { key: "shop", href: "shop.html" },
@@ -352,6 +371,10 @@ function productPackshot(slug) {
 }
 
 function standardProductGallery(product) {
+  if (PRODUCT_GALLERY_MAP[product.slug]) {
+    return [productPackshot(product.slug)].concat(PRODUCT_GALLERY_MAP[product.slug]);
+  }
+
   const group = PRODUCT_SUPPORT_GROUP[product.slug];
   const supportSet = group && SUPPORT_IMAGE_GROUPS[group]
     ? SUPPORT_IMAGE_GROUPS[group]
@@ -453,12 +476,12 @@ const COPY = {
       es: "Productos premium de investigacion con checkout crypto seguro"
     },
     heroBody: {
-      en: "Built for serious buyers who value privacy, speed, and trusted quality.",
-      es: "Pensado para compradores serios que valoran privacidad, rapidez y calidad confiable."
+      en: "A cleaner path from product research to protected account, exact USDT payment, and confirmed order completion.",
+      es: "Una ruta mas clara desde la investigacion del producto hasta cuenta protegida, pago USDT exacto y pedido confirmado."
     },
     heroNote: {
-      en: "Real lab-support visuals, batch-linked listings, and a calmer route into secure hosted payment.",
-      es: "Visuales reales de apoyo de laboratorio, fichas vinculadas a lote y una ruta mas clara hacia el pago seguro alojado."
+      en: "Branded packshots, real laboratory-support imagery, and visible payment reassurance before the buyer leaves the store.",
+      es: "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda."
     },
     trustTitle: { en: "Built for Customer Confidence", es: "Pensado para generar confianza" },
     trustBody: { en: "Secure access to high-quality research compounds, shaped around clear batch context and a calmer route to payment.", es: "Acceso seguro a compuestos de alta calidad, pensado alrededor de un contexto de lote claro y una ruta de pago mas tranquila." },
@@ -1125,7 +1148,7 @@ function renderHomePage() {
   const featured = PRODUCTS.filter((product) => product.featured).map((product, index) => renderProductCard(product, { delay: index % 2 === 1 })).join("");
 
   return `
-    <section class="hero-home">
+    <section class="hero-home hero-home-premium">
       <div class="container hero-grid">
         <div class="hero-copy reveal">
           <p class="kicker">${pick(COPY.home.heroKicker)}</p>
@@ -1319,7 +1342,7 @@ function renderUpdatedHomePage() {
     .join("");
 
   return `
-    <section class="hero-home">
+    <section class="hero-home hero-home-premium">
       <div class="container hero-grid">
         <div class="hero-copy reveal">
           <p class="kicker">${currentLanguage === "es" ? "Acceso seguro a compuestos de alta calidad" : "Secure Access to High-Quality Research Compounds"}</p>
@@ -1347,7 +1370,7 @@ function renderUpdatedHomePage() {
           </article>
           <article class="hero-visual hero-visual-photo reveal">
             <img src="${HERO_VISUAL_SRC}" alt="Primus Peptides laboratory handling visual">
-            <div class="overlay-card">${currentLanguage === "es" ? "Visuales reales de apoyo de laboratorio, packshots de marca y una colocacion mas fuerte de confianza antes del checkout." : "Real laboratory-support visuals, branded packshots, and stronger trust placement before checkout begins."}</div>
+            <div class="overlay-card">${currentLanguage === "es" ? "Packshots de marca, imagenes reales de apoyo de laboratorio y confianza de pago visible antes de salir de la tienda." : "Branded packshots, real laboratory-support imagery, and visible payment reassurance before the buyer leaves the store."}</div>
           </article>
         </div>
       </div>
