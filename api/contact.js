@@ -28,7 +28,8 @@ module.exports = async function handler(req, res) {
     name: typeof body.name === "string" ? body.name.trim() : "",
     email: typeof body.email === "string" ? body.email.trim().toLowerCase() : "",
     subject: typeof body.subject === "string" ? body.subject.trim() : "",
-    message: typeof body.message === "string" ? body.message.trim() : ""
+    message: typeof body.message === "string" ? body.message.trim() : "",
+    supportReference: `SUP-${Date.now().toString(36).toUpperCase()}`
   };
 
   const missing = [];

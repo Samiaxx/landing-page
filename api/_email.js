@@ -231,8 +231,9 @@ function orderItemsText(order) {
     .join("\n");
 }
 
-function orderSummaryMarkup(order) {
+function orderSummaryMarkup(order, options = {}) {
   const currency = order.storeCurrency || "EUR";
+  const totalLabel = trimValue(options.totalLabel) || "Total Amount";
   return `
     <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:18px;">
       <thead>
@@ -253,7 +254,7 @@ function orderSummaryMarkup(order) {
           <td style="padding-top:8px;text-align:right;color:#0d172f;font-weight:700;">${money(order.shippingCost, currency)}</td>
         </tr>
         <tr>
-          <td colspan="2" style="padding-top:12px;color:#0d172f;font-size:16px;font-weight:800;">Total paid</td>
+          <td colspan="2" style="padding-top:12px;color:#0d172f;font-size:16px;font-weight:800;">${escapeHtml(totalLabel)}</td>
           <td style="padding-top:12px;text-align:right;color:#0d172f;font-size:16px;font-weight:800;">${money(order.total, currency)}</td>
         </tr>
       </tfoot>
@@ -312,7 +313,7 @@ function emailLayout({ preview, eyebrow, title, intro, body, ctaLabel, ctaHref, 
     <div style="margin:0;padding:34px 16px;background:linear-gradient(135deg,#eef6ff 0%,#f8fbff 48%,#ffffff 100%);font-family:Arial,Helvetica,sans-serif;">
       <div style="max-width:660px;margin:0 auto;">
         <div style="padding:22px 26px;border-radius:28px 28px 0 0;background:#0d172f;color:#ffffff;">
-          <p style="margin:0;color:#7fc0ff;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;">Primus Peptides</p>
+          <p style="margin:0;color:#7fc0ff;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;">PRIMUS PEPTIDES</p>
           <p style="margin:8px 0 0;color:#d7e7ff;font-size:13px;">Secure research product ordering and order communication.</p>
         </div>
         <div style="background:#ffffff;border:1px solid rgba(13,23,47,0.08);border-top:0;border-radius:0 0 28px 28px;padding:30px 26px;box-shadow:0 18px 50px rgba(13,23,47,.08);">
@@ -326,6 +327,18 @@ function emailLayout({ preview, eyebrow, title, intro, body, ctaLabel, ctaHref, 
       </div>
     </div>
   `;
+}
+
+function orderViewUrl(order, config) {
+  if (!config.siteUrl || !order.reference) {
+    return "";
+  }
+
+  return `${config.siteUrl}/checkout.html?reference=${encodeURIComponent(order.reference)}&status=success`;
+}
+
+function checkoutUrl(config) {
+  return config.siteUrl ? `${config.siteUrl}/checkout.html` : "";
 }
 
 function orderContext(order) {
@@ -471,65 +484,83 @@ async function sendEmail({ to, subject, html, text, replyTo, tag, idempotencyKey
 }
 
 async function sendOrderCreatedEmails(order) {
-  const { firstName, payment, shipping, config } = orderContext(order);
-  const customerIntro = `Hi ${firstName}, your order ${order.reference} has been received and your secure payment page is ready.`;
+  const { payment, shipping, config } = orderContext(order);
+  const existing = (order.notifications && order.notifications.created) || {};
+  const nextCreated = {
+    ...existing,
+    lastAttemptAt: new Date().toISOString()
+  };
+
+  const customerIntro = "Thank you for your order. Your order has been created successfully and is currently awaiting payment confirmation. Once payment is received, we will immediately confirm your order and begin processing.";
   const customerBody = `
-    ${infoCard("Secure payment", `
-      <p style="margin:0;color:#42526b;line-height:1.7;">Payment method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
-      <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Order reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+    ${infoCard("Order Summary", `
+      <p style="margin:0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+      <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment Method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
       <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Delivery: <strong style="color:#0d172f;">${escapeHtml(shipping.label)}</strong> (${escapeHtml(shipping.eta)})</p>
     `)}
-    ${orderSummaryMarkup(order)}
+    ${orderSummaryMarkup(order, { totalLabel: "Total Amount" })}
   `;
 
-  const customerResult = await sendEmail({
-    to: order.customer && order.customer.email,
-    subject: `Primus Peptides order ${order.reference}: payment page ready`,
-    html: emailLayout({
-      preview: `Your secure payment page for order ${order.reference} is ready.`,
-      eyebrow: "Order received",
-      title: "Your secure payment page is ready",
-      intro: customerIntro,
-      body: customerBody,
-      ctaLabel: "Open secure payment page",
-      ctaHref: order.invoiceUrl,
-      footer: "You will receive a confirmation email after ArionPay confirms payment."
-    }),
-    text: `${customerIntro}\n\n${orderItemsText(order)}\n\nOrder total: ${money(order.total, order.storeCurrency || "EUR")}`,
-    tag: "order-created-customer",
-    idempotencyKey: `order-created-customer-${order.reference}`
-  });
+  if (existing.customer && existing.customer.ok) {
+    nextCreated.customer = { ...existing.customer, skipped: true, reason: "already_sent" };
+  } else {
+    nextCreated.customer = await sendEmail({
+      to: order.customer && order.customer.email,
+      subject: "Your Order Has Been Created — Awaiting Payment",
+      html: emailLayout({
+        preview: `Order ${order.reference} is awaiting payment confirmation.`,
+        eyebrow: "Order created",
+        title: "Your Order Is Ready for Payment",
+        intro: customerIntro,
+        body: customerBody,
+        ctaLabel: "Complete Payment",
+        ctaHref: order.invoiceUrl,
+        footer: "Need help? Reply to this email for support."
+      }),
+      text: `Thank you for your order.\n\nYour order has been created successfully and is currently awaiting payment confirmation.\n\nOnce payment is received, we will immediately confirm your order and begin processing.\n\nOrder Reference: ${order.reference}\n${orderItemsText(order)}\nTotal Amount: ${money(order.total, order.storeCurrency || "EUR")}`,
+      tag: "order-created-customer",
+      idempotencyKey: `order-created-customer-${order.reference}`
+    });
+  }
 
   const adminBody = `
     ${infoCard("Customer", customerDetailsMarkup(order))}
-    ${infoCard("Payment", `
-      <p style="margin:0;color:#42526b;line-height:1.7;">Method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
-      <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
-      <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Status: <strong style="color:#0d172f;">${escapeHtml(order.status || "invoice_created")}</strong></p>
+    ${infoCard("Order", `
+      <p style="margin:0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+      <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Status: <strong style="color:#0d172f;">Awaiting payment confirmation</strong></p>
     `)}
-    ${orderSummaryMarkup(order)}
+    ${orderSummaryMarkup(order, { totalLabel: "Total" })}
   `;
 
-  const adminResult = await sendEmail({
-    to: config.adminTo,
-    subject: `New Primus order ${order.reference}`,
-    html: emailLayout({
-      preview: `New order ${order.reference} has been created.`,
-      eyebrow: "Admin notification",
-      title: "New order received",
-      intro: "A new ArionPay order has been created and stored by the storefront backend.",
-      body: adminBody,
-      footer: "Use the stored order reference to coordinate payment review, fulfilment, and support follow-up."
-    }),
-    text: `New order ${order.reference}\n\n${customerDetailsText(order)}\n\n${orderItemsText(order)}\n\nTotal: ${money(order.total, order.storeCurrency || "EUR")}`,
-    tag: "order-created-admin",
-    idempotencyKey: `order-created-admin-${order.reference}`
-  });
+  if (existing.admin && existing.admin.ok) {
+    nextCreated.admin = { ...existing.admin, skipped: true, reason: "already_sent" };
+  } else {
+    nextCreated.admin = await sendEmail({
+      to: config.adminTo,
+      subject: "New Order Received",
+      html: emailLayout({
+        preview: `New order ${order.reference} is awaiting payment confirmation.`,
+        eyebrow: "Admin notification",
+        title: "A New Customer Order Has Been Created",
+        intro: "A new order has been placed and is currently awaiting payment confirmation.",
+        body: adminBody,
+        footer: "Review the order record and wait for payment confirmation before fulfilment."
+      }),
+      text: `A new order has been placed and is currently awaiting payment confirmation.\n\n${customerDetailsText(order)}\nOrder Reference: ${order.reference}\n${orderItemsText(order)}\nTotal: ${money(order.total, order.storeCurrency || "EUR")}`,
+      tag: "order-created-admin",
+      idempotencyKey: `order-created-admin-${order.reference}`
+    });
+  }
+
+  if ((nextCreated.customer && nextCreated.customer.ok) || (nextCreated.admin && nextCreated.admin.ok)) {
+    nextCreated.sentAt = existing.sentAt || nextCreated.lastAttemptAt;
+  }
 
   return {
-    customer: customerResult,
-    admin: adminResult,
-    sentAt: new Date().toISOString()
+    ...(order.notifications || {}),
+    created: nextCreated,
+    customer: nextCreated.customer,
+    admin: nextCreated.admin
   };
 }
 
@@ -537,149 +568,231 @@ function isPaidStatus(status) {
   return /paid|completed|confirmed|success/i.test(String(status || ""));
 }
 
-function existingPaidNotifications(order) {
-  return (order && order.notifications && order.notifications.paid) || {};
+function isFailedStatus(status) {
+  return /failed|expired|unpaid|cancel|canceled|cancelled|void|invalid/i.test(String(status || ""));
+}
+
+function statusNotificationKey(status) {
+  if (isPaidStatus(status)) {
+    return "paid";
+  }
+
+  if (isFailedStatus(status)) {
+    return "failed";
+  }
+
+  return "";
+}
+
+function existingStatusNotifications(order, key) {
+  return (order && order.notifications && order.notifications[key]) || {};
 }
 
 async function sendOrderStatusEmails(order, previousStatus) {
-  if (!isPaidStatus(order.status)) {
+  const statusKey = statusNotificationKey(order.status);
+  if (!statusKey) {
     return order.notifications || null;
   }
 
-  const { firstName, payment, shipping, accountUrl, supportEmail, config } = orderContext(order);
-  const existing = existingPaidNotifications(order);
+  const { payment, accountUrl, config } = orderContext(order);
+  const existing = existingStatusNotifications(order, statusKey);
   const attemptedAt = new Date().toISOString();
-  const nextPaid = {
+  const nextStatus = {
     ...existing,
     lastAttemptAt: attemptedAt
   };
-  delete nextPaid.processingAt;
+  delete nextStatus.processingAt;
 
-  if (existing.customer && existing.customer.ok) {
-    nextPaid.customer = {
-      ...existing.customer,
-      skipped: true,
-      reason: "already_sent"
-    };
-  } else {
-    const intro = `Hi ${firstName}, your payment for order ${order.reference} has been confirmed.`;
-    nextPaid.customer = await sendEmail({
-      to: order.customer && order.customer.email,
-      subject: `Payment confirmed for Primus order ${order.reference}`,
-      html: emailLayout({
-        preview: `Payment confirmed for order ${order.reference}.`,
-        eyebrow: "Payment confirmed",
-        title: "Your order is confirmed",
-        intro,
-        body: `
-          ${infoCard("Order status", `
-            <p style="margin:0;color:#42526b;line-height:1.7;">Order reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment status: <strong style="color:#0d172f;">${escapeHtml(order.status || "paid")}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Total paid: <strong style="color:#0d172f;">${escapeHtml(gatewayTotalLine(order))}</strong></p>
-          `)}
-          ${infoCard("Next steps", `
-            <p style="margin:0;color:#42526b;line-height:1.7;">Your order is moving to fulfilment review. Delivery updates will be shared if anything changes.</p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Delivery method: <strong style="color:#0d172f;">${escapeHtml(shipping.label)}</strong> (${escapeHtml(shipping.eta)})</p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Need help? Contact support at <strong style="color:#0d172f;">${escapeHtml(supportEmail)}</strong>.</p>
-          `)}
-          ${orderSummaryMarkup(order)}
-        `,
-        ctaLabel: accountUrl ? "View your customer dashboard" : "",
-        ctaHref: accountUrl,
-        footer: "Payments are confirmed automatically when the exact amount is received through ArionPay."
-      }),
-      text: `${intro}\n\nOrder reference: ${order.reference}\nPayment status: ${order.status || "paid"}\nTotal paid: ${gatewayTotalLine(order)}\n\n${orderItemsText(order)}\n\nNext steps: Your order is moving to fulfilment review. Contact support: ${supportEmail}`,
-      tag: "paid-order-customer",
-      idempotencyKey: `paid-order-customer-${order.reference}`
-    });
+  if (statusKey === "paid") {
+    if (existing.customer && existing.customer.ok) {
+      nextStatus.customer = {
+        ...existing.customer,
+        skipped: true,
+        reason: "already_sent"
+      };
+    } else {
+      const intro = "We have received your payment successfully. Your order is now confirmed and has moved into processing. Our team will keep you updated on the next steps.";
+      nextStatus.customer = await sendEmail({
+        to: order.customer && order.customer.email,
+        subject: "Payment Confirmed — Your Order Is Now Processing",
+        html: emailLayout({
+          preview: `Payment confirmed for order ${order.reference}.`,
+          eyebrow: "Payment confirmed",
+          title: "Payment Successfully Confirmed",
+          intro,
+          body: `
+            ${infoCard("Order Summary", `
+              <p style="margin:0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment Status: <strong style="color:#0d172f;">Confirmed</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Items Ordered: <strong style="color:#0d172f;">${escapeHtml((order.items || []).length || 0)}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Total Paid: <strong style="color:#0d172f;">${escapeHtml(gatewayTotalLine(order))}</strong></p>
+            `)}
+            ${orderSummaryMarkup(order, { totalLabel: "Total Paid" })}
+          `,
+          ctaLabel: "View Order",
+          ctaHref: orderViewUrl(order, config) || accountUrl,
+          footer: "Thank you for choosing Primus Peptides."
+        }),
+        text: `We have received your payment successfully.\n\nYour order is now confirmed and has moved into processing.\n\nOur team will keep you updated on the next steps.\n\nOrder Reference: ${order.reference}\nPayment Status: Confirmed\n${orderItemsText(order)}\nTotal Paid: ${gatewayTotalLine(order)}`,
+        tag: "paid-order-customer",
+        idempotencyKey: `paid-order-customer-${order.reference}`
+      });
+    }
+
+    if (existing.admin && existing.admin.ok) {
+      nextStatus.admin = {
+        ...existing.admin,
+        skipped: true,
+        reason: "already_sent"
+      };
+    } else {
+      nextStatus.admin = await sendEmail({
+        to: config.adminTo,
+        subject: "Payment Confirmed for New Order",
+        html: emailLayout({
+          preview: `Payment confirmed for order ${order.reference}.`,
+          eyebrow: "Paid order",
+          title: "A Customer Payment Has Been Received",
+          intro: "A recent order has now been successfully paid and is ready for fulfillment.",
+          body: `
+            ${infoCard("Customer", customerDetailsMarkup(order))}
+            ${infoCard("Payment", `
+              <p style="margin:0;color:#42526b;line-height:1.7;">Customer Name: <strong style="color:#0d172f;">${escapeHtml(customerName(order.customer || {}) || "Customer")}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Total Paid: <strong style="color:#0d172f;">${escapeHtml(gatewayTotalLine(order))}</strong></p>
+            `)}
+          `,
+          footer: "This notification is sent once per paid order. Webhook retries will not duplicate it after a successful send."
+        }),
+        text: `A recent order has now been successfully paid and is ready for fulfillment.\n\nCustomer Name: ${customerName(order.customer || {}) || "Customer"}\nOrder Reference: ${order.reference}\nTotal Paid: ${gatewayTotalLine(order)}`,
+        tag: "paid-order-admin",
+        idempotencyKey: `paid-order-admin-${order.reference}`
+      });
+    }
   }
 
-  if (existing.admin && existing.admin.ok) {
-    nextPaid.admin = {
-      ...existing.admin,
-      skipped: true,
-      reason: "already_sent"
-    };
-  } else {
-    nextPaid.admin = await sendEmail({
-      to: config.adminTo,
-      subject: `Paid order received: ${order.reference}`,
-      html: emailLayout({
-        preview: `Paid order ${order.reference} is ready for fulfilment review.`,
-        eyebrow: "Paid order",
-        title: "A paid order is ready for review",
-        intro: `ArionPay confirmed payment for order ${order.reference}.`,
-        body: `
-          ${infoCard("Customer details", customerDetailsMarkup(order))}
-          ${infoCard("Payment details", `
-            <p style="margin:0;color:#42526b;line-height:1.7;">Previous status: <strong style="color:#0d172f;">${escapeHtml(previousStatus || "unknown")}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Current status: <strong style="color:#0d172f;">${escapeHtml(order.status || "paid")}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment method: <strong style="color:#0d172f;">${escapeHtml(payment.label)}</strong></p>
-            <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Total paid: <strong style="color:#0d172f;">${escapeHtml(gatewayTotalLine(order))}</strong></p>
-          `)}
-          ${orderSummaryMarkup(order)}
-        `,
-        footer: "This notification is sent once per paid order. Webhook retries will not duplicate it after a successful send."
-      }),
-      text: `Paid order ${order.reference}\nPrevious status: ${previousStatus || "unknown"}\nCurrent status: ${order.status || "paid"}\nTotal paid: ${gatewayTotalLine(order)}\nCustomer: ${customerName(order.customer || {}) || "Customer"} <${(order.customer && order.customer.email) || ""}>\n\n${orderItemsText(order)}`,
-      tag: "paid-order-admin",
-      idempotencyKey: `paid-order-admin-${order.reference}`
-    });
+  if (statusKey === "failed") {
+    if (existing.customer && existing.customer.ok) {
+      nextStatus.customer = {
+        ...existing.customer,
+        skipped: true,
+        reason: "already_sent"
+      };
+    } else {
+      const intro = "We noticed that payment for your recent order was not completed successfully. If this was accidental, you can return and complete your order anytime. If you need assistance, our support team is ready to help.";
+      nextStatus.customer = await sendEmail({
+        to: order.customer && order.customer.email,
+        subject: "Payment Not Completed — Action Needed",
+        html: emailLayout({
+          preview: `Payment was not completed for order ${order.reference}.`,
+          eyebrow: "Payment not completed",
+          title: "Your Payment Was Not Completed",
+          intro,
+          body: `
+            ${infoCard("Order Summary", `
+              <p style="margin:0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Payment Status: <strong style="color:#0d172f;">${escapeHtml(order.status || "Not completed")}</strong></p>
+            `)}
+            ${orderSummaryMarkup(order, { totalLabel: "Total Amount" })}
+          `,
+          ctaLabel: "Complete Payment",
+          ctaHref: order.invoiceUrl || checkoutUrl(config),
+          footer: "Need help? Contact support anytime."
+        }),
+        text: `We noticed that payment for your recent order was not completed successfully.\n\nIf this was accidental, you can return and complete your order anytime.\n\nIf you need assistance, our support team is ready to help.\n\nOrder Reference: ${order.reference}\n${orderItemsText(order)}\nTotal Amount: ${money(order.total, order.storeCurrency || "EUR")}`,
+        tag: "payment-failed-customer",
+        idempotencyKey: `payment-failed-customer-${order.reference}`
+      });
+    }
+
+    if (existing.admin && existing.admin.ok) {
+      nextStatus.admin = {
+        ...existing.admin,
+        skipped: true,
+        reason: "already_sent"
+      };
+    } else {
+      nextStatus.admin = await sendEmail({
+        to: config.adminTo,
+        subject: `Payment Not Completed for Order ${order.reference}`,
+        html: emailLayout({
+          preview: `Payment was not completed for order ${order.reference}.`,
+          eyebrow: "Payment not completed",
+          title: "Payment Was Not Completed",
+          intro: `Order ${order.reference} moved to ${order.status || "failed"} and may need customer support follow-up.`,
+          body: `
+            ${infoCard("Customer", customerDetailsMarkup(order))}
+            ${infoCard("Order", `
+              <p style="margin:0;color:#42526b;line-height:1.7;">Order Reference: <strong style="color:#0d172f;">${escapeHtml(order.reference)}</strong></p>
+              <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Status: <strong style="color:#0d172f;">${escapeHtml(order.status || "failed")}</strong></p>
+            `)}
+            ${orderSummaryMarkup(order, { totalLabel: "Total Amount" })}
+          `,
+          footer: "Review the payment state before contacting the customer or reissuing a payment link."
+        }),
+        text: `Payment was not completed for order ${order.reference}.\n\n${customerDetailsText(order)}\nStatus: ${order.status || "failed"}\n${orderItemsText(order)}\nTotal: ${money(order.total, order.storeCurrency || "EUR")}`,
+        tag: "payment-failed-admin",
+        idempotencyKey: `payment-failed-admin-${order.reference}`
+      });
+    }
   }
 
-  if ((nextPaid.customer && nextPaid.customer.ok) || (nextPaid.admin && nextPaid.admin.ok)) {
-    nextPaid.sentAt = existing.sentAt || attemptedAt;
+  if ((nextStatus.customer && nextStatus.customer.ok) || (nextStatus.admin && nextStatus.admin.ok)) {
+    nextStatus.sentAt = existing.sentAt || attemptedAt;
   }
 
   return {
     ...(order.notifications || {}),
-    paid: nextPaid
+    [statusKey]: nextStatus
   };
 }
 
 async function sendContactEmails(message) {
   const config = getEmailConfig();
+  const supportReference = trimValue(message.supportReference) || `SUP-${Date.now().toString(36).toUpperCase()}`;
   const adminResult = await sendEmail({
     to: config.adminTo,
-    subject: `Primus support request: ${message.subject || "New enquiry"}`,
+    subject: "New Customer Support Message",
     html: emailLayout({
-      preview: `${message.name} submitted a support request.`,
+      preview: `${message.name} submitted a new support request.`,
       eyebrow: "Support request",
-      title: "New customer enquiry",
-      intro: `${message.name} submitted a support message through the storefront contact form.`,
-      body: infoCard("Message details", `
+      title: "New Support Request Received",
+      intro: "A customer has submitted a new support request.",
+      body: infoCard("Message Details", `
         <p style="margin:0;color:#42526b;line-height:1.7;">Name: <strong style="color:#0d172f;">${escapeHtml(message.name)}</strong></p>
         <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Email: <strong style="color:#0d172f;">${escapeHtml(message.email)}</strong></p>
         <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Subject: <strong style="color:#0d172f;">${escapeHtml(message.subject || "General enquiry")}</strong></p>
+        <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Support Reference: <strong style="color:#0d172f;">${escapeHtml(supportReference)}</strong></p>
         <p style="margin:12px 0 0;color:#42526b;line-height:1.7;white-space:pre-wrap;">${escapeHtml(message.message)}</p>
       `),
       footer: "Reply directly to continue the conversation with the customer."
     }),
-    text: `${message.name} (${message.email})\n${message.subject}\n\n${message.message}`,
+    text: `A customer has submitted a new support request.\n\nName: ${message.name}\nEmail: ${message.email}\nSubject: ${message.subject || "General enquiry"}\nSupport Reference: ${supportReference}\n\n${message.message}`,
     replyTo: message.email,
-    tag: "contact-admin"
+    tag: "contact-admin",
+    idempotencyKey: `support-admin-${supportReference}`
   });
 
   const customerResult = await sendEmail({
     to: message.email,
-    subject: "Primus Peptides: we received your message",
+    subject: "We Received Your Message",
     html: emailLayout({
-      preview: "Your Primus support request has been received.",
+      preview: `Support request ${supportReference} has been received.`,
       eyebrow: "Support confirmation",
-      title: "Your message is in the queue",
-      intro: `Hi ${message.name}, thanks for contacting Primus Peptides.`,
-      body: infoCard("Support request received", `
-        <p style="margin:0;color:#42526b;line-height:1.7;">We have recorded your enquiry and sent it to the support inbox.</p>
-        <p style="margin:8px 0 0;color:#42526b;line-height:1.7;">Subject: <strong style="color:#0d172f;">${escapeHtml(message.subject || "General enquiry")}</strong></p>
+      title: "Support Request Received",
+      intro: "Thank you for contacting us. We have received your message and a member of our support team will respond as soon as possible.",
+      body: infoCard("Support Reference", `
+        <p style="margin:0;color:#42526b;line-height:1.7;">Support Reference: <strong style="color:#0d172f;">${escapeHtml(supportReference)}</strong></p>
       `),
-      footer: "A team member will reply using the email address you submitted."
+      footer: "We appreciate your patience."
     }),
-    text: `Hi ${message.name}, we received your message and sent it to the Primus support inbox.`,
-    tag: "contact-customer"
+    text: `Thank you for contacting us.\n\nWe have received your message and a member of our support team will respond as soon as possible.\n\nSupport Reference: ${supportReference}\n\nWe appreciate your patience.`,
+    tag: "contact-customer",
+    idempotencyKey: `support-customer-${supportReference}`
   });
 
   return {
+    supportReference,
     customer: customerResult,
     admin: adminResult
   };
@@ -688,6 +801,7 @@ async function sendContactEmails(message) {
 module.exports = {
   getEmailConfig,
   isEmailConfigured,
+  isFailedStatus,
   isPaidStatus,
   sendContactEmails,
   sendOrderCreatedEmails,

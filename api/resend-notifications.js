@@ -1,6 +1,7 @@
 const { readOrder, findOrderByInvoiceId, saveOrder } = require("./_orders");
 const {
   isEmailConfigured,
+  isFailedStatus,
   isPaidStatus,
   sendOrderCreatedEmails,
   sendOrderStatusEmails
@@ -40,9 +41,10 @@ module.exports = async function handler(req, res) {
 
   try {
     const paid = isPaidStatus(order.status);
+    const failed = isFailedStatus(order.status);
     let notifications = null;
 
-    if (paid) {
+    if (paid || failed) {
       notifications = await sendOrderStatusEmails(order, order.status || null);
     } else {
       notifications = await sendOrderCreatedEmails(order);

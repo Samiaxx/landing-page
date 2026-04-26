@@ -1,4 +1,4 @@
-const { isEmailConfigured, sendOrderStatusEmails } = require("./_email");
+const { isEmailConfigured, isFailedStatus, sendOrderStatusEmails } = require("./_email");
 const { findOrderByInvoiceId, readOrder, saveOrder } = require("./_orders");
 const {
   extractGatewayStatus,
@@ -42,23 +42,35 @@ function hasGatewayEvidence(payload, invoiceId) {
   );
 }
 
-function paidEmailProcessingRecently(order) {
+function notificationKeyForStatus(status) {
+  if (isPaidStatus(status)) {
+    return "paid";
+  }
+
+  if (isFailedStatus(status)) {
+    return "failed";
+  }
+
+  return "";
+}
+
+function statusEmailProcessingRecently(order, key) {
   const processingAt = order
     && order.notifications
-    && order.notifications.paid
-    && order.notifications.paid.processingAt;
+    && order.notifications[key]
+    && order.notifications[key].processingAt;
   const timestamp = Date.parse(processingAt || "");
 
   return Number.isFinite(timestamp) && (Date.now() - timestamp) < 2 * 60 * 1000;
 }
 
-function markPaidEmailProcessing(order) {
+function markStatusEmailProcessing(order, key) {
   return {
     ...order,
     notifications: {
       ...(order.notifications || {}),
-      paid: {
-        ...((order.notifications && order.notifications.paid) || {}),
+      [key]: {
+        ...((order.notifications && order.notifications[key]) || {}),
         processingAt: new Date().toISOString()
       }
     }
@@ -129,13 +141,15 @@ module.exports = async function handler(req, res) {
     await saveOrder(nextOrder);
   }
 
-  if (nextOrder && shouldPersistGatewayUpdate && isPaidStatus(nextOrder.status)) {
+  const statusEmailKey = nextOrder ? notificationKeyForStatus(nextOrder.status) : "";
+
+  if (nextOrder && shouldPersistGatewayUpdate && statusEmailKey) {
     if (isEmailConfigured()) {
       try {
-        if (paidEmailProcessingRecently(nextOrder)) {
-          console.log("Paid order email already processing; skipping duplicate webhook attempt.");
+        if (statusEmailProcessingRecently(nextOrder, statusEmailKey)) {
+          console.log("Order status email already processing; skipping duplicate webhook attempt.");
         } else {
-          nextOrder = markPaidEmailProcessing(nextOrder);
+          nextOrder = markStatusEmailProcessing(nextOrder, statusEmailKey);
           await saveOrder(nextOrder);
 
           const notifications = await sendOrderStatusEmails(nextOrder, previousStatus);
@@ -148,10 +162,10 @@ module.exports = async function handler(req, res) {
           }
         }
       } catch (e) {
-        console.warn("Failed to send paid order emails:", e && e.message);
+        console.warn("Failed to send order status emails:", e && e.message);
       }
     } else {
-      console.log("Email sending disabled; skipping paid order notification.");
+      console.log("Email sending disabled; skipping order status notification.");
     }
   }
 
