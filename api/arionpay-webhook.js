@@ -1,4 +1,4 @@
-const { sendOrderStatusEmails } = require("./_email");
+const { isEmailConfigured, sendOrderStatusEmails } = require("./_email");
 const { findOrderByInvoiceId, readOrder, saveOrder } = require("./_orders");
 const {
   extractGatewayStatus,
@@ -42,6 +42,29 @@ function hasGatewayEvidence(payload, invoiceId) {
   );
 }
 
+function paidEmailProcessingRecently(order) {
+  const processingAt = order
+    && order.notifications
+    && order.notifications.paid
+    && order.notifications.paid.processingAt;
+  const timestamp = Date.parse(processingAt || "");
+
+  return Number.isFinite(timestamp) && (Date.now() - timestamp) < 2 * 60 * 1000;
+}
+
+function markPaidEmailProcessing(order) {
+  return {
+    ...order,
+    notifications: {
+      ...(order.notifications || {}),
+      paid: {
+        ...((order.notifications && order.notifications.paid) || {}),
+        processingAt: new Date().toISOString()
+      }
+    }
+  };
+}
+
 module.exports = async function handler(req, res) {
   applyNoStore(res);
 
@@ -79,7 +102,7 @@ module.exports = async function handler(req, res) {
       ? previousStatus
       : incomingStatus)
     : previousStatus;
-  const nextOrder = shouldPersistGatewayUpdate
+  let nextOrder = shouldPersistGatewayUpdate
     ? (order
       ? {
           ...order,
@@ -106,17 +129,29 @@ module.exports = async function handler(req, res) {
     await saveOrder(nextOrder);
   }
 
-  if (nextOrder && shouldPersistGatewayUpdate && previousStatus !== nextOrder.status) {
-    // Only attempt to send status emails if email sending is configured.
-    const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.EMAIL_FROM || process.env.RESEND_FROM));
-    if (emailConfigured) {
+  if (nextOrder && shouldPersistGatewayUpdate && isPaidStatus(nextOrder.status)) {
+    if (isEmailConfigured()) {
       try {
-        await sendOrderStatusEmails(nextOrder, previousStatus);
+        if (paidEmailProcessingRecently(nextOrder)) {
+          console.log("Paid order email already processing; skipping duplicate webhook attempt.");
+        } else {
+          nextOrder = markPaidEmailProcessing(nextOrder);
+          await saveOrder(nextOrder);
+
+          const notifications = await sendOrderStatusEmails(nextOrder, previousStatus);
+          if (notifications) {
+            nextOrder = {
+              ...nextOrder,
+              notifications
+            };
+            await saveOrder(nextOrder);
+          }
+        }
       } catch (e) {
-        console.warn("Failed to send order status emails:", e && e.message);
+        console.warn("Failed to send paid order emails:", e && e.message);
       }
     } else {
-      console.log("Email sending disabled; skipping status notification.");
+      console.log("Email sending disabled; skipping paid order notification.");
     }
   }
 

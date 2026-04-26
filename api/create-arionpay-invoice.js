@@ -10,7 +10,7 @@ const {
   serializeItems,
   validateCustomer
 } = require("./_catalog");
-const { sendOrderCreatedEmails } = require("./_email");
+const { isEmailConfigured, sendOrderCreatedEmails } = require("./_email");
 const { convertAmount } = require("./_fx");
 const { getOrderStoreStatus, readOrder, saveOrder } = require("./_orders");
 
@@ -342,9 +342,8 @@ module.exports = async function handler(req, res) {
   try {
     await saveOrder(order);
 
-    // Only attempt to send emails if the required env vars are present.
-    const emailConfigured = Boolean(process.env.RESEND_API_KEY && (process.env.EMAIL_FROM || process.env.RESEND_FROM));
-    if (emailConfigured) {
+    // Only attempt to send emails if a server-side provider is configured.
+    if (isEmailConfigured()) {
       notifications = await sendOrderCreatedEmails(order);
 
       try {

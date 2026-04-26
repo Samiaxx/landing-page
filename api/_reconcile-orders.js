@@ -1,4 +1,5 @@
 const { listPendingOrders, findOrderByInvoiceId, readOrder, saveOrder } = require("./_orders");
+const { isEmailConfigured, sendOrderStatusEmails } = require("./_email");
 const {
   fetchArionPayInvoice,
   isPaidStatus,
@@ -83,8 +84,25 @@ async function reconcileOrder(reference, invoiceId) {
   }
 
   if (hasOrderChanged(order, syncedOrder)) {
-    await saveOrder(syncedOrder);
-    return syncedOrder;
+    let savedOrder = syncedOrder;
+    await saveOrder(savedOrder);
+
+    if (!isPaidStatus(order && order.status) && isPaidStatus(savedOrder.status) && isEmailConfigured()) {
+      try {
+        const notifications = await sendOrderStatusEmails(savedOrder, normalizeStatus(order && order.status));
+        if (notifications) {
+          savedOrder = {
+            ...savedOrder,
+            notifications
+          };
+          await saveOrder(savedOrder);
+        }
+      } catch (error) {
+        console.warn("Failed to send reconciled paid order emails:", error && error.message);
+      }
+    }
+
+    return savedOrder;
   }
 
   return order;
